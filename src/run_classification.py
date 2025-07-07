@@ -1,4 +1,4 @@
-# ADAPTED FROM https://github.com/huggingface/transformers/blob/main/examples/pytorch/text-classification/run_classification.py
+# INSPIRED FROM https://github.com/huggingface/transformers/blob/main/examples/pytorch/text-classification/run_classification.py
 # !/usr/bin/env python
 # coding=utf-8
 # Copyright 2020 The HuggingFace Team All rights reserved.
@@ -246,7 +246,7 @@ def preprocess_function(examples, tokenizer, max_seq_length):
     """Preprocess input examples by tokenizing them."""
     result = tokenizer(
         examples["sentence"],
-        padding=False,
+        padding='max_length',  # Ensure padding to max length
         max_length=max_seq_length,
         truncation=True
     )
@@ -365,6 +365,7 @@ def main():
         token=model_args.token,
         trust_remote_code=model_args.trust_remote_code,
         add_prefix_space=True if tokenizer_name_or_path.startswith("deberta") else False,
+
     )
 
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -454,15 +455,6 @@ def main():
 
     trainer.log_metrics("test", test_results.metrics)
     trainer.save_metrics("test", test_results.metrics)
-
-    # Testing with different seeds
-    file_path = os.path.join(Path(training_args.output_dir).parent.absolute(), "random_seed_testing.csv")
-    write_header = not os.path.exists(file_path)
-
-    with open(file_path, 'a') as file:
-        if write_header:
-            file.write('model,seed,f1_score\n')
-        file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
 
     logger.info("*** Starting Testing on all ckpt***")
     metrics = []

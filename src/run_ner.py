@@ -1,4 +1,4 @@
-# ADAPTED FROM https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py
+# INSPIRED FROM https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py
 # !/usr/bin/env python
 # coding=utf-8
 # Copyright 2020 The HuggingFace Team All rights reserved.
@@ -410,18 +410,29 @@ def main():
             b_to_i_label.append(idx)
 
     def tokenize_and_align_labels(examples):
+        # Tokenize the input text with padding and truncation
         tokenized_inputs = tokenizer(
             examples[text_column_name],
-            padding=False,
-            truncation=True,
-            max_length=data_args.max_seq_length,
+            padding='max_length',  # Ensure padding to max length
+            truncation=True,  # Truncate if sequence exceeds max length
+            max_length=data_args.max_seq_length,  # Define max sequence length
             is_split_into_words=True,
         )
+
         labels = []
+
         for i, label in enumerate(examples[label_column_name]):
-            word_ids = tokenized_inputs.word_ids(batch_index=i)
+            word_ids = []
+            current_word_idx = 0
+            # Manually tokenize each word in the sentence
+            for word in examples[text_column_name][i]:
+                word_tokens = tokenizer.tokenize(word)  # Tokenize the word manually
+                word_ids.extend([current_word_idx] * len(word_tokens))
+                current_word_idx += 1
+
             previous_word_idx = None
             label_ids = []
+
             for word_idx in word_ids:
                 if word_idx is None:
                     label_ids.append(-100)
@@ -434,7 +445,10 @@ def main():
                         label_ids.append(-100)
                 previous_word_idx = word_idx
 
-            labels.append(label_ids)
+            # Ensure labels are padded to match max_length
+            label_ids += [-100] * (data_args.max_seq_length - len(label_ids))  # Padding for labels
+            labels.append(label_ids[:data_args.max_seq_length])  # Truncate if longer than max_length
+
         tokenized_inputs["labels"] = labels
         return tokenized_inputs
 
@@ -508,15 +522,6 @@ def main():
 
     trainer.log_metrics("test", test_results.metrics)
     trainer.save_metrics("test", test_results.metrics)
-
-    # Testing with different seeds
-    file_path = os.path.join(Path(training_args.output_dir).parent.absolute(), "random_seed_testing.csv")
-    write_header = not os.path.exists(file_path)
-
-    with open(file_path, 'a') as file:
-        if write_header:
-            file.write('model,seed,f1_score\n')
-        file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
 
     logger.info("*** Starting Testing on all ckpt***")
     metrics = []
