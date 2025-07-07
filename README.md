@@ -17,7 +17,7 @@
     - [🚀 Prepare the Dataset](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-prepare-the-dataset)
     - [🚀 Running Continuous Pretraining for Masked Language Modeling](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-running-continuous-pretraining-for-masked-language-modeling)
     - [🚀 Choose a Downstream Task](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-choose-a-downstream-task)
-- [5️⃣ Extract Results](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#5%EF%B8%8F⃣-extract-results)
+- [5️⃣ Extract Results](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-extract-results)
 ## 1️⃣ Description
 
 The goal of this project is to continue the pretraining of BERT on a curated dataset of political debates.
