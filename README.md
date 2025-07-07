@@ -6,6 +6,10 @@
 [![Conference](http://img.shields.io/badge/AnyConference-year-4b44ce.svg)](https://papers.nips.cc/paper/2020)
 </div>
 
+All pretrained models can be found in the repo od [ddore14](https://huggingface.co/ddore14/models) on the Hugging Face Hub!
+If you use these models, cite us:
+todo
+
 ## Table of Contents
 
 - [1️⃣ Description](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#1%EF%B8%8F⃣-description)
