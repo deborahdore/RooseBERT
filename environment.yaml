@@ -1,0 +1,24 @@
+name: rooseBERT
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - nltk
+  - scikit-learn
+  - pip:
+      - torch
+      - torchvision
+      - torchaudio
+      - git+https://github.com/huggingface/transformers
+      - rootutils
+      - evaluate
+      - datasets
+      - deepspeed
+      - bs4
+      - "accelerate>=0.26.0"
+      - hf_xet
+      - seqeval
+      - wandb
+      - openpyxl

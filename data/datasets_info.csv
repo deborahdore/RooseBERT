@@ -1,0 +1,11 @@
+dataset, link, years, GB,Cluster #
+US DEBATES,https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0,1960-2024,21M,0
+UNGDC,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y,1946-2024,196M,1
+UK Parliament,https://reshare.ukdataservice.ac.uk/854292/,1979-2019,2.5G,2
+Australian Parliament,https://zenodo.org/records/8121950,1998-2022,933M,3
+European Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XPCVEI,2007-2015,114M,3
+ParlEE plenary speeches,"https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0, https://dataverse.harvard.edu/file.xhtml?fileId=6435505&version=2.0",2009-2019,1.3G,3
+Scottish Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE,1999-2021,433M,3
+UN Security Council,https://dataverse.harvard.edu/file.xhtml?fileId=10809805&version=6.1,1992-2023,377M,1
+TOTAL,TRAINING,//,5G,
+TOTAL,VALIDATION,//,577M,

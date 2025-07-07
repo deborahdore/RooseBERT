@@ -1,0 +1,462 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+W&B disabled.
+Starting training run: polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4
+/linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/launch.py:208: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use-env is set by default in torchrun.
+If your script expects `--local-rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  main()
+W0619 19:33:05.249000 470113 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] 
+W0619 19:33:05.249000 470113 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] *****************************************
+W0619 19:33:05.249000 470113 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0619 19:33:05.249000 470113 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] *****************************************
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.98,
+adam_epsilon=1e-06,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=42,
+dataloader_drop_last=False,
+dataloader_num_workers=8,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+dispatch_batches=None,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=True,
+eval_steps=1000,
+eval_strategy=steps,
+eval_use_gather_object=False,
+evaluation_strategy=None,
+fp16=True,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=False,
+gradient_checkpointing_kwargs=None,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=0.0001,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=detail,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=logs/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_kwargs={},
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=150000,
+metric_for_best_model=None,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=3.0,
+optim=adamw_torch,
+optim_args=None,
+optim_target_modules=None,
+output_dir=logs/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=64,
+per_device_train_batch_size=64,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=True,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=20000,
+save_strategy=steps,
+save_total_limit=1,
+seed=42,
+skip_memory_metrics=True,
+split_batches=None,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=10000,
+weight_decay=0.01,
+)
+Using custom data configuration default-dfadf533d9911a46
+06/19/2025 19:33:21 - INFO - datasets.builder - Using custom data configuration default-dfadf533d9911a46
+Loading Dataset Infos from /linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/datasets/packaged_modules/csv
+06/19/2025 19:33:21 - INFO - datasets.info - Loading Dataset Infos from /linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/datasets/packaged_modules/csv
+Generating dataset csv (/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52)
+06/19/2025 19:33:21 - INFO - datasets.builder - Generating dataset csv (/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52)
+Downloading and preparing dataset csv/default to /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52...
+06/19/2025 19:33:21 - INFO - datasets.builder - Downloading and preparing dataset csv/default to /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52...
+Downloading took 0.0 min
+06/19/2025 19:33:21 - INFO - datasets.download.download_manager - Downloading took 0.0 min
+Checksum Computation took 0.0 min
+06/19/2025 19:33:21 - INFO - datasets.download.download_manager - Checksum Computation took 0.0 min
+Generating train split
+06/19/2025 19:33:21 - INFO - datasets.builder - Generating train split
+Generating train split: 0 examples [00:00, ? examples/s]06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 3, device: cuda:3, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 6, device: cuda:6, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 5, device: cuda:5, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 7, device: cuda:7, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 1, device: cuda:1, n_gpu: 1, distributed training: True, 16-bits training: True
+Done writing 2099 examples in 6033857 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52.incomplete/csv-train-00000-00000-of-NNNNN.arrow.
+06/19/2025 19:33:21 - DEBUG - datasets.arrow_writer - Done writing 2099 examples in 6033857 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52.incomplete/csv-train-00000-00000-of-NNNNN.arrow.
+Generating train split: 2099 examples [00:00, 32300.69 examples/s]
+Renaming 1 shards.
+06/19/2025 19:33:21 - DEBUG - datasets.builder - Renaming 1 shards.
+Generating validation split
+06/19/2025 19:33:21 - INFO - datasets.builder - Generating validation split
+Generating validation split: 0 examples [00:00, ? examples/s]06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 2, device: cuda:2, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 19:33:21 - WARNING - __main__ - Process rank: 4, device: cuda:4, n_gpu: 1, distributed training: True, 16-bits training: True
+Done writing 2099 examples in 6033857 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52.incomplete/csv-validation-00000-00000-of-NNNNN.arrow.
+06/19/2025 19:33:21 - DEBUG - datasets.arrow_writer - Done writing 2099 examples in 6033857 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52.incomplete/csv-validation-00000-00000-of-NNNNN.arrow.
+Generating validation split: 2099 examples [00:00, 34061.25 examples/s]
+Renaming 1 shards.
+06/19/2025 19:33:21 - DEBUG - datasets.builder - Renaming 1 shards.
+Unable to verify splits sizes.
+06/19/2025 19:33:21 - INFO - datasets.utils.info_utils - Unable to verify splits sizes.
+Dataset csv downloaded and prepared to /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52. Subsequent calls will reuse this data.
+06/19/2025 19:33:21 - INFO - datasets.builder - Dataset csv downloaded and prepared to /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52. Subsequent calls will reuse this data.
+Constructing Dataset for split train, validation, from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+06/19/2025 19:33:21 - DEBUG - datasets.builder - Constructing Dataset for split train, validation, from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+[INFO|configuration_utils.py:694] 2025-06-19 19:33:21,531 >> loading configuration file /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm/config.json
+[INFO|configuration_utils.py:768] 2025-06-19 19:33:21,532 >> Model config RobertaConfig {
+  "_name_or_path": "/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm",
+  "architectures": [
+    "RobertaForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "classifier_dropout": null,
+  "eos_token_id": 2,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 130,
+  "model_type": "roberta",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 1,
+  "position_embedding_type": "absolute",
+  "tokenizer_class": "BertweetTokenizer",
+  "transformers_version": "4.49.0.dev0",
+  "type_vocab_size": 1,
+  "use_cache": true,
+  "vocab_size": 64001
+}
+
+06/19/2025 19:33:21 - INFO - __main__ - Loading tokenizer using model_name_or_path from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm.
+[INFO|configuration_utils.py:694] 2025-06-19 19:33:21,553 >> loading configuration file /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm/config.json
+[INFO|configuration_utils.py:768] 2025-06-19 19:33:21,554 >> Model config RobertaConfig {
+  "_name_or_path": "/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm",
+  "architectures": [
+    "RobertaForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "classifier_dropout": null,
+  "eos_token_id": 2,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 130,
+  "model_type": "roberta",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 1,
+  "position_embedding_type": "absolute",
+  "tokenizer_class": "BertweetTokenizer",
+  "transformers_version": "4.49.0.dev0",
+  "type_vocab_size": 1,
+  "use_cache": true,
+  "vocab_size": 64001
+}
+
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file vocab.txt
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file bpe.codes
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 19:33:21,807 >> loading file chat_template.jinja
+[INFO|configuration_utils.py:694] 2025-06-19 19:33:21,808 >> loading configuration file /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm/config.json
+[INFO|configuration_utils.py:768] 2025-06-19 19:33:21,809 >> Model config RobertaConfig {
+  "_name_or_path": "/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm",
+  "architectures": [
+    "RobertaForMaskedLM"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "classifier_dropout": null,
+  "eos_token_id": 2,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 130,
+  "model_type": "roberta",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 1,
+  "position_embedding_type": "absolute",
+  "tokenizer_class": "BertweetTokenizer",
+  "transformers_version": "4.49.0.dev0",
+  "type_vocab_size": 1,
+  "use_cache": true,
+  "vocab_size": 64001
+}
+
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,850 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,850 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,850 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,850 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,851 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,851 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,851 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[WARNING|tokenization_bertweet.py:126] 2025-06-19 19:33:21,851 >> emoji is not installed, thus not converting emoticons or emojis into text. Install emoji: pip3 install emoji==0.6.0
+[INFO|modeling_utils.py:3914] 2025-06-19 19:33:22,042 >> loading weights file /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm/pytorch_model.bin
+[INFO|modeling_utils.py:4914] 2025-06-19 19:33:24,060 >> All model checkpoint weights were used when initializing RobertaForMaskedLM.
+
+[INFO|modeling_utils.py:4922] 2025-06-19 19:33:24,060 >> All the weights of RobertaForMaskedLM were initialized from the model checkpoint at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/models/polibertweet-political-twitter-roberta-mlm.
+If your task is similar to the task the model of the checkpoint was trained on, you can already use RobertaForMaskedLM for predictions without further training.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+[rank5]:[W619 19:33:24.011680477 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 5]  using GPU 5 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank2]:[W619 19:33:24.011717616 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 2]  using GPU 2 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+06/19/2025 19:33:24 - WARNING - __main__ - The max_seq_length passed (512) is larger than the maximum length for the model (128). Using max_seq_length=128.
+[rank3]:[W619 19:33:24.012394558 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 3]  using GPU 3 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank7]:[W619 19:33:24.012429633 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 7]  using GPU 7 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank6]:[W619 19:33:24.012476080 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 6]  using GPU 6 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank1]:[W619 19:33:24.012921921 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank4]:[W619 19:33:24.012960082 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 4]  using GPU 4 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00000_of_00004.arrow
+06/19/2025 19:33:24 - INFO - datasets.arrow_dataset - Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00000_of_00004.arrow
+Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00001_of_00004.arrow
+06/19/2025 19:33:24 - INFO - datasets.arrow_dataset - Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00001_of_00004.arrow
+Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00002_of_00004.arrow
+06/19/2025 19:33:24 - INFO - datasets.arrow_dataset - Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00002_of_00004.arrow
+Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00003_of_00004.arrow
+06/19/2025 19:33:24 - INFO - datasets.arrow_dataset - Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00003_of_00004.arrow
+Spawning 4 processes
+06/19/2025 19:33:24 - INFO - datasets.arrow_dataset - Spawning 4 processes
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:25 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:26 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:27 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:28 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00000_of_00004.arrow
+06/19/2025 19:33:28 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00000_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 159.65 examples/s]Done writing 525 examples in 478618 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp6aj8hsar.
+06/19/2025 19:33:28 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478618 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp6aj8hsar.
+Finished processing shard number 0 of 4.
+06/19/2025 19:33:28 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 4.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00001_of_00004.arrow
+06/19/2025 19:33:28 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00001_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 294.23 examples/s]Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp5maefys6.
+06/19/2025 19:33:29 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp5maefys6.
+Finished processing shard number 1 of 4.
+06/19/2025 19:33:29 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 4.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00002_of_00004.arrow
+06/19/2025 19:33:29 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00002_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 389.83 examples/s]Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpjg5ezegd.
+06/19/2025 19:33:29 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpjg5ezegd.
+Finished processing shard number 2 of 4.
+06/19/2025 19:33:29 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 4.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00003_of_00004.arrow
+06/19/2025 19:33:30 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-cd0d0332c1f187d1_00003_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 464.78 examples/s]Done writing 524 examples in 477888 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpo_6hrud7.
+06/19/2025 19:33:30 - DEBUG - datasets.arrow_writer - Done writing 524 examples in 477888 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpo_6hrud7.
+Finished processing shard number 3 of 4.
+06/19/2025 19:33:30 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 4.
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 366.83 examples/s]
+Concatenating 4 shards
+06/19/2025 19:33:30 - INFO - datasets.arrow_dataset - Concatenating 4 shards
+Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'special_tokens_mask', 'attention_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:30 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'special_tokens_mask', 'attention_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:30 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00000_of_00004.arrow
+06/19/2025 19:33:31 - INFO - datasets.arrow_dataset - Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00000_of_00004.arrow
+Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00001_of_00004.arrow
+06/19/2025 19:33:31 - INFO - datasets.arrow_dataset - Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00001_of_00004.arrow
+Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00002_of_00004.arrow
+06/19/2025 19:33:31 - INFO - datasets.arrow_dataset - Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00002_of_00004.arrow
+Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00003_of_00004.arrow
+06/19/2025 19:33:31 - INFO - datasets.arrow_dataset - Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00003_of_00004.arrow
+Spawning 4 processes
+06/19/2025 19:33:31 - INFO - datasets.arrow_dataset - Spawning 4 processes
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:32 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:33 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:34 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00000_of_00004.arrow
+06/19/2025 19:33:34 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00000_of_00004.arrow
+Done writing 525 examples in 478618 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpia7q5rxu.
+06/19/2025 19:33:35 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478618 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpia7q5rxu.
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 160.28 examples/s]Finished processing shard number 0 of 4.
+06/19/2025 19:33:35 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 4.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:35 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00001_of_00004.arrow
+06/19/2025 19:33:35 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00001_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 295.52 examples/s]Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpzer2dbtn.
+06/19/2025 19:33:35 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpzer2dbtn.
+Finished processing shard number 1 of 4.
+06/19/2025 19:33:35 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 4.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00002_of_00004.arrow
+06/19/2025 19:33:36 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00002_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 395.75 examples/s]Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpw6qmo_rh.
+06/19/2025 19:33:36 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 478800 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpw6qmo_rh.
+Finished processing shard number 2 of 4.
+06/19/2025 19:33:36 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 4.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00003_of_00004.arrow
+06/19/2025 19:33:37 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-4dfeead376c99d58_00003_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 478.04 examples/s]Done writing 524 examples in 477888 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpikr838o2.
+06/19/2025 19:33:37 - DEBUG - datasets.arrow_writer - Done writing 524 examples in 477888 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpikr838o2.
+Finished processing shard number 3 of 4.
+06/19/2025 19:33:37 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 4.
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 373.46 examples/s]
+Concatenating 4 shards
+06/19/2025 19:33:37 - INFO - datasets.arrow_dataset - Concatenating 4 shards
+Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'special_tokens_mask', 'attention_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:37 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'special_tokens_mask', 'attention_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:33:37 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+[DEBUG|training_args.py:2483] 2025-06-19 19:33:37,418 >> 0: main local process completed dataset map tokenization, releasing all replicas
+[rank0]:[W619 19:33:37.537224721 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s][2025-06-19 19:33:40,917] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 165.67 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 163.65 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 166.14 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 163.65 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 164.98 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 163.07 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 158.36 examples/s][INFO|trainer.py:695] 2025-06-19 19:33:44,484 >> max_steps is given, it will override any value given in num_train_epochs
+[INFO|trainer.py:745] 2025-06-19 19:33:44,484 >> Using auto half precision backend
+06/19/2025 19:33:44 - INFO - __main__ - *** Evaluate ***
+[INFO|trainer.py:921] 2025-06-19 19:33:44,485 >> The following columns in the evaluation set don't have a corresponding argument in `RobertaForMaskedLM.forward` and have been ignored: special_tokens_mask. If special_tokens_mask are not expected by `RobertaForMaskedLM.forward`,  you can safely ignore this message.
+[INFO|trainer.py:4244] 2025-06-19 19:33:44,492 >> 
+***** Running Evaluation *****
+[INFO|trainer.py:4246] 2025-06-19 19:33:44,492 >>   Num examples = 2099
+[INFO|trainer.py:4249] 2025-06-19 19:33:44,492 >>   Batch size = 64
+Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:03<00:03, 302.90 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:03<00:03, 297.72 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:03<00:03, 295.68 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:03<00:03, 296.07 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 294.89 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:03<00:03, 297.24 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 288.99 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 399.05 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 398.78 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 389.97 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 391.95 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 392.55 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 389.92 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 377.75 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 481.62 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 479.51 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 376.98 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 472.02 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 377.90 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 475.14 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 471.73 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 464.90 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 371.94 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 470.37 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 370.69 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 372.05 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 366.24 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 368.41 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 159.23 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 159.33 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 158.77 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 157.82 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:09, 158.47 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:10, 156.80 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:03<00:10, 155.30 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 291.61 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 287.80 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 288.53 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 283.94 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 288.55 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 289.33 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  50%|█████     | 1050/2099 [00:04<00:03, 285.47 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 390.76 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 394.01 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 384.47 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 385.50 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 386.12 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 387.11 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  75%|███████▌  | 1575/2099 [00:04<00:01, 382.83 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 471.49 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 477.88 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 368.57 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 370.89 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 469.03 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 467.19 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 460.58 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 364.93 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 461.22 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 463.42 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 364.85 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 361.26 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 362.38 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:05<00:00, 360.29 examples/s]
+[2025-06-19 19:33:53,748] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:53,807] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:54,393] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:54,484] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:54,490] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:54,492] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 19:33:54,511] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+  0%|          | 0/5 [00:00<?, ?it/s] 80%|████████  | 4/5 [00:00<00:00, 28.79it/s]Done writing 40286 examples in 322288 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/accuracy/default/default_experiment-1-0.arrow.
+06/19/2025 19:34:00 - DEBUG - datasets.arrow_writer - Done writing 40286 examples in 322288 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/polibertweet-political-twitter-roberta-mlm-batch2048-lr1e-4/accuracy/default/default_experiment-1-0.arrow.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 19:34:00 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+[INFO|integration_utils.py:817] 2025-06-19 19:34:00,155 >> Automatic Weights & Biases logging enabled, to disable set os.environ["WANDB_DISABLED"] = "true"
+100%|██████████| 5/5 [00:01<00:00,  4.79it/s]
+***** eval metrics *****
+  eval_accuracy               =     0.3043
+  eval_loss                   =     4.8786
+  eval_model_preparation_time =     0.0025
+  eval_runtime                = 0:00:15.66
+  eval_samples                =       2099
+  eval_samples_per_second     =    133.997
+  eval_steps_per_second       =      0.319
+  perplexity                  =   131.4514
+[INFO|modelcard.py:449] 2025-06-19 19:34:00,200 >> Dropping the following result as it does not have all the necessary fields:
+{'task': {'name': 'Masked Language Modeling', 'type': 'fill-mask'}}
+[rank0]:[W619 19:34:00.919328259 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())

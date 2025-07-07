@@ -1,0 +1,415 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+W&B disabled.
+Starting training run: bert-base-cased-batch2048-lr1e-4
+/linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/launch.py:208: FutureWarning: The module torch.distributed.launch is deprecated
+and will be removed in future. Use torchrun.
+Note that --use-env is set by default in torchrun.
+If your script expects `--local-rank` argument to be set, please
+change it to read from `os.environ['LOCAL_RANK']` instead. See 
+https://pytorch.org/docs/stable/distributed.html#launch-utility for 
+further instructions
+
+  main()
+W0619 16:29:46.723000 1281563 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] 
+W0619 16:29:46.723000 1281563 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] *****************************************
+W0619 16:29:46.723000 1281563 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0619 16:29:46.723000 1281563 /lustre/fswork/projects/rech/ezr/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/torch/distributed/run.py:793] *****************************************
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 16:30:02 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.98,
+adam_epsilon=1e-06,
+auto_find_batch_size=False,
+average_tokens_across_devices=False,
+batch_eval_metrics=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=42,
+dataloader_drop_last=False,
+dataloader_num_workers=8,
+dataloader_persistent_workers=False,
+dataloader_pin_memory=True,
+dataloader_prefetch_factor=None,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+dispatch_batches=None,
+do_eval=True,
+do_predict=False,
+do_train=False,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_do_concat_batches=True,
+eval_on_start=True,
+eval_steps=1000,
+eval_strategy=steps,
+eval_use_gather_object=False,
+evaluation_strategy=None,
+fp16=True,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=4,
+gradient_checkpointing=False,
+gradient_checkpointing_kwargs=None,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_always_push=False,
+hub_model_id=None,
+hub_private_repo=None,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_for_metrics=[],
+include_inputs_for_metrics=False,
+include_num_input_tokens_seen=False,
+include_tokens_per_second=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=0.0001,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=detail,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=logs/bert-base-cased-batch2048-lr1e-4/,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_kwargs={},
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=150000,
+metric_for_best_model=None,
+mp_parameters=,
+neftune_noise_alpha=None,
+no_cuda=False,
+num_train_epochs=3.0,
+optim=adamw_torch,
+optim_args=None,
+optim_target_modules=None,
+output_dir=logs/bert-base-cased-batch2048-lr1e-4/,
+overwrite_output_dir=False,
+past_index=-1,
+per_device_eval_batch_size=64,
+per_device_train_batch_size=64,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=True,
+report_to=['wandb'],
+restore_callback_states_from_checkpoint=False,
+resume_from_checkpoint=None,
+run_name=bert-base-cased-batch2048-lr1e-4,
+save_on_each_node=False,
+save_only_model=False,
+save_safetensors=True,
+save_steps=20000,
+save_strategy=steps,
+save_total_limit=1,
+seed=42,
+skip_memory_metrics=True,
+split_batches=None,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torch_empty_cache_steps=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_cpu=False,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_liger_kernel=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=10000,
+weight_decay=0.01,
+)
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 1, device: cuda:1, n_gpu: 1, distributed training: True, 16-bits training: True
+Using custom data configuration default-dfadf533d9911a46
+06/19/2025 16:30:02 - INFO - datasets.builder - Using custom data configuration default-dfadf533d9911a46
+Loading Dataset Infos from /linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/datasets/packaged_modules/csv
+06/19/2025 16:30:02 - INFO - datasets.info - Loading Dataset Infos from /linkhome/rech/genzqh01/ubq61ty/.conda/envs/pytorch-gpu-custom/lib/python3.10/site-packages/datasets/packaged_modules/csv
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 5, device: cuda:5, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 4, device: cuda:4, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 7, device: cuda:7, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 6, device: cuda:6, n_gpu: 1, distributed training: True, 16-bits training: True
+Generating train split: 0 examples [00:00, ? examples/s]06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 3, device: cuda:3, n_gpu: 1, distributed training: True, 16-bits training: True
+06/19/2025 16:30:02 - WARNING - __main__ - Process rank: 2, device: cuda:2, n_gpu: 1, distributed training: True, 16-bits training: True
+Generating train split: 2099 examples [00:00, 26078.59 examples/s]
+Generating validation split: 0 examples [00:00, ? examples/s]Generating validation split: 2099 examples [00:00, 27008.06 examples/s]
+Found cached dataset csv (/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52)
+06/19/2025 16:30:02 - INFO - datasets.builder - Found cached dataset csv (/lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52)
+Loading Dataset info from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+06/19/2025 16:30:02 - INFO - datasets.info - Loading Dataset info from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+Constructing Dataset for split train, validation, from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+06/19/2025 16:30:02 - DEBUG - datasets.builder - Constructing Dataset for split train, validation, from /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52
+[INFO|configuration_utils.py:694] 2025-06-19 16:30:03,001 >> loading configuration file /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased/config.json
+[INFO|configuration_utils.py:768] 2025-06-19 16:30:03,001 >> Model config BertConfig {
+  "_name_or_path": "/lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased",
+  "architectures": [
+    "BertModel"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "classifier_dropout": null,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "layer_norm_eps": 1e-12,
+  "max_position_embeddings": 512,
+  "model_type": "bert",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 0,
+  "position_embedding_type": "absolute",
+  "torch_dtype": "float32",
+  "transformers_version": "4.49.0.dev0",
+  "type_vocab_size": 2,
+  "use_cache": true,
+  "vocab_size": 28996
+}
+
+06/19/2025 16:30:03 - INFO - __main__ - Loading tokenizer using model_name_or_path from /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased.
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file vocab.txt
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file tokenizer.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file added_tokens.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file special_tokens_map.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file tokenizer_config.json
+[INFO|tokenization_utils_base.py:2032] 2025-06-19 16:30:03,010 >> loading file chat_template.jinja
+[INFO|modeling_utils.py:3914] 2025-06-19 16:30:03,048 >> loading weights file /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased/pytorch_model.bin
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|logging.py:328] 2025-06-19 16:30:03,421 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[INFO|configuration_utils.py:1138] 2025-06-19 16:30:03,421 >> Generate config GenerationConfig {
+  "pad_token_id": 0
+}
+
+[WARNING|logging.py:328] 2025-06-19 16:30:03,422 >> BertForMaskedLM has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,549 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,549 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,549 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[INFO|modeling_utils.py:4904] 2025-06-19 16:30:03,549 >> Some weights of the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased were not used when initializing BertForMaskedLM: ['pooler.dense.bias', 'pooler.dense.weight']
+- This IS expected if you are initializing BertForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,550 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,550 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,550 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,550 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[WARNING|modeling_utils.py:4916] 2025-06-19 16:30:03,551 >> Some weights of BertForMaskedLM were not initialized from the model checkpoint at /lustre/fsmisc/dataset/HuggingFace_Models/bert-base-cased and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
+[INFO|modeling_utils.py:4310] 2025-06-19 16:30:03,552 >> Generation config file not found, using a generation config created from the model config.
+[rank4]:[W619 16:30:03.342994209 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 4]  using GPU 4 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank6]:[W619 16:30:03.343220231 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 6]  using GPU 6 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank2]:[W619 16:30:03.343548382 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 2]  using GPU 2 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank1]:[W619 16:30:03.344686895 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 1]  using GPU 1 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank5]:[W619 16:30:03.344704728 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 5]  using GPU 5 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank3]:[W619 16:30:03.345190594 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 3]  using GPU 3 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+[rank7]:[W619 16:30:03.346201077 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 7]  using GPU 7 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00000_of_00004.arrow
+06/19/2025 16:30:03 - INFO - datasets.arrow_dataset - Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00000_of_00004.arrow
+Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00001_of_00004.arrow
+06/19/2025 16:30:03 - INFO - datasets.arrow_dataset - Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00001_of_00004.arrow
+Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00002_of_00004.arrow
+06/19/2025 16:30:03 - INFO - datasets.arrow_dataset - Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00002_of_00004.arrow
+Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00003_of_00004.arrow
+06/19/2025 16:30:03 - INFO - datasets.arrow_dataset - Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00003_of_00004.arrow
+Spawning 4 processes
+06/19/2025 16:30:03 - INFO - datasets.arrow_dataset - Spawning 4 processes
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:03 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:03 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:03 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:03 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00000_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00000_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00001_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00001_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00003_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00003_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00002_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-6586696cedef8e11_00002_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 639.75 examples/s]Done writing 525 examples in 1887585 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp0570tgq3.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1887585 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp0570tgq3.
+Done writing 525 examples in 1883007 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp9ss3qkah.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1883007 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp9ss3qkah.
+Done writing 525 examples in 1889846 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpmyug8zfq.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1889846 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpmyug8zfq.
+Finished processing shard number 1 of 4.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 4.
+Finished processing shard number 0 of 4.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 4.
+Finished processing shard number 2 of 4.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 4.
+Done writing 524 examples in 1882949 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp15edzoz2.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_writer - Done writing 524 examples in 1882949 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp15edzoz2.
+Finished processing shard number 3 of 4.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 4.
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2272.60 examples/s]
+Concatenating 4 shards
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Concatenating 4 shards
+Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00000_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Process #0 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00000_of_00004.arrow
+Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00001_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Process #1 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00001_of_00004.arrow
+Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00002_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Process #2 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00002_of_00004.arrow
+Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00003_of_00004.arrow
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Process #3 will write at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00003_of_00004.arrow
+Spawning 4 processes
+06/19/2025 16:30:04 - INFO - datasets.arrow_dataset - Spawning 4 processes
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:04 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00000_of_00004.arrow
+06/19/2025 16:30:05 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00000_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00003_of_00004.arrow
+06/19/2025 16:30:05 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00003_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00001_of_00004.arrow
+06/19/2025 16:30:05 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00001_of_00004.arrow
+Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00002_of_00004.arrow
+06/19/2025 16:30:05 - INFO - datasets.arrow_dataset - Caching processed dataset at /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/cache-51defe30bd68fe48_00002_of_00004.arrow
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▍       | 524/2099 [00:00<00:02, 652.66 examples/s]Done writing 524 examples in 1882949 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpkbqu18ez.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_writer - Done writing 524 examples in 1882949 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpkbqu18ez.
+Done writing 525 examples in 1887585 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpgvb9s63h.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1887585 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpgvb9s63h.
+Done writing 525 examples in 1883007 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpwf7ib6v2.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1883007 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmpwf7ib6v2.
+Done writing 525 examples in 1889846 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp26dib38z.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_writer - Done writing 525 examples in 1889846 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/csv/default-dfadf533d9911a46/0.0.0/9ea1179385ff7ad1e756d327ffccaa3b801175702a2d91528226ba2c66873f52/tmp26dib38z.
+Finished processing shard number 3 of 4.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 4.
+Finished processing shard number 1 of 4.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 4.
+Finished processing shard number 0 of 4.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 4.
+Finished processing shard number 2 of 4.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 4.
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2331.50 examples/s]
+Concatenating 4 shards
+06/19/2025 16:30:05 - INFO - datasets.arrow_dataset - Concatenating 4 shards
+Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:05 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+[DEBUG|training_args.py:2483] 2025-06-19 16:30:05,582 >> 0: main local process completed dataset map tokenization, releasing all replicas
+[rank0]:[W619 16:30:05.529185359 ProcessGroupNCCL.cpp:4115] [PG ID 0 PG GUID 0 Rank 0]  using GPU 0 to perform barrier as devices used by this process are currently unknown. This can potentially cause a hang if this rank to GPU mapping is incorrect.Specify device_ids in barrier() to force use of a particular device,or call init_process_group() with a device_id.
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s][2025-06-19 16:30:08,170] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 618.98 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 610.90 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 593.13 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 599.53 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 591.88 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 599.20 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 587.24 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2148.77 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2122.43 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2099.49 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:01<00:00, 2095.54 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:01<00:00, 2055.72 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:01<00:00, 2071.23 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:01<00:00, 2003.48 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):   0%|          | 0/2099 [00:00<?, ? examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 766.29 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 635.32 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 625.04 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 604.65 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2649.16 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 619.69 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 606.97 examples/s]Running tokenizer on dataset line_by_line (num_proc=4):  25%|██▌       | 525/2099 [00:00<00:02, 596.33 examples/s]Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2220.94 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2155.19 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2164.25 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2115.71 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:00<00:00, 2100.21 examples/s]
+Running tokenizer on dataset line_by_line (num_proc=4): 100%|██████████| 2099/2099 [00:01<00:00, 2030.14 examples/s]
+[2025-06-19 16:30:10,397] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,696] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,698] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,736] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,769] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,774] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[2025-06-19 16:30:10,775] [INFO] [real_accelerator.py:222:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+[INFO|trainer.py:695] 2025-06-19 16:30:11,880 >> max_steps is given, it will override any value given in num_train_epochs
+[INFO|trainer.py:745] 2025-06-19 16:30:11,880 >> Using auto half precision backend
+06/19/2025 16:30:11 - INFO - __main__ - *** Evaluate ***
+[INFO|trainer.py:921] 2025-06-19 16:30:11,881 >> The following columns in the evaluation set don't have a corresponding argument in `BertForMaskedLM.forward` and have been ignored: special_tokens_mask. If special_tokens_mask are not expected by `BertForMaskedLM.forward`,  you can safely ignore this message.
+[INFO|trainer.py:4244] 2025-06-19 16:30:11,888 >> 
+***** Running Evaluation *****
+[INFO|trainer.py:4246] 2025-06-19 16:30:11,888 >>   Num examples = 2099
+[INFO|trainer.py:4249] 2025-06-19 16:30:11,888 >>   Batch size = 64
+  0%|          | 0/5 [00:00<?, ?it/s] 60%|██████    | 3/5 [00:00<00:00, 16.81it/s]100%|██████████| 5/5 [00:00<00:00, 11.15it/s]Done writing 161133 examples in 1289064 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/accuracy/default/default_experiment-1-0.arrow.
+06/19/2025 16:30:17 - DEBUG - datasets.arrow_writer - Done writing 161133 examples in 1289064 bytes /lustre/fswork/projects/rech/ezr/ubq61ty/Perplexity/cache/bert-base-cased-batch2048-lr1e-4/accuracy/default/default_experiment-1-0.arrow.
+Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+06/19/2025 16:30:17 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
+[INFO|integration_utils.py:817] 2025-06-19 16:30:17,724 >> Automatic Weights & Biases logging enabled, to disable set os.environ["WANDB_DISABLED"] = "true"
+100%|██████████| 5/5 [00:01<00:00,  2.71it/s]
+***** eval metrics *****
+  eval_accuracy               =        0.0
+  eval_loss                   =    10.3834
+  eval_model_preparation_time =     0.0026
+  eval_runtime                = 0:00:05.83
+  eval_samples                =       2099
+  eval_samples_per_second     =    359.532
+  eval_steps_per_second       =      0.856
+  perplexity                  = 32317.7942
+[INFO|modelcard.py:449] 2025-06-19 16:30:17,756 >> Dropping the following result as it does not have all the necessary fields:
+{'task': {'name': 'Masked Language Modeling', 'type': 'fill-mask'}}
+[rank0]:[W619 16:30:18.127636969 ProcessGroupNCCL.cpp:1250] Warning: WARNING: process group has NOT been destroyed before we destruct ProcessGroupNCCL. On normal program exit, the application should call destroy_process_group to ensure that any pending NCCL operations have finished in this process. In rare cases this process can exit before this point and block the progress of another member of the process group. This constraint has always been present,  but this warning has only been added since PyTorch 2.4 (function operator())
