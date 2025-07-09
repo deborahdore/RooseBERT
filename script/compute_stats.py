@@ -36,6 +36,7 @@ if __name__ == '__main__':
             for model in models_list:
                 final_path = os.path.join(path, model)
                 results = pd.read_csv(os.path.join(final_path, "random_seed_testing.csv"))
+                assert (len(results) == 5)
 
                 models.append(model)
                 score = results['f1_score'].tolist()
