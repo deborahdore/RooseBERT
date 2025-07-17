@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import csv
+import gc
 import glob
 import logging
 import os
@@ -510,4 +511,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        if torch.distributed.is_initialized():
+            torch.distributed.barrier()
+            torch.distributed.destroy_process_group()
+
+        # Clean up resources
+        gc.collect()
+        with torch.no_grad():
+            torch.cuda.empty_cache()

@@ -21,7 +21,7 @@ Fine-tuning the library models for masked language modeling (BERT, ALBERT, RoBER
 Here is the full list of checkpoints on the hub that can be fine-tuned by this preprocessing:
 https://huggingface.co/models?filter=fill-mask
 """
-
+import gc
 import logging
 import math
 import os
@@ -644,4 +644,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        if torch.distributed.is_initialized():
+            torch.distributed.barrier()
+            torch.distributed.destroy_process_group()
+
+        # Clean up resources
+        gc.collect()
+        with torch.no_grad():
+            torch.cuda.empty_cache()

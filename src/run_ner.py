@@ -17,6 +17,7 @@
 
 
 import csv
+import gc
 import glob
 import logging
 import os
@@ -28,6 +29,7 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 import rootutils
+import torch
 from datasets import load_dataset, ClassLabel
 from scipy.special import softmax
 from seqeval.metrics import accuracy_score, recall_score, precision_score, f1_score
@@ -565,4 +567,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        if torch.distributed.is_initialized():
+            torch.distributed.barrier()
+            torch.distributed.destroy_process_group()
+
+        # Clean up resources
+        gc.collect()
+        with torch.no_grad():
+            torch.cuda.empty_cache()

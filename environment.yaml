@@ -17,8 +17,11 @@ dependencies:
       - datasets
       - deepspeed
       - bs4
-      - "accelerate>=0.26.0"
+      - accelerate
       - hf_xet
       - seqeval
       - wandb
       - openpyxl
+      - bitsandbites
+      - peft
+      - sentencepiece
