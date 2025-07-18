@@ -31,7 +31,7 @@ import torch
 from datasets import load_dataset, ClassLabel
 from peft import LoraConfig, TaskType, get_peft_model
 from scipy.special import softmax
-from seqeval.metrics import accuracy_score, recall_score, precision_score, f1_score
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from transformers import (
     AutoTokenizer,
     HfArgumentParser,
@@ -274,26 +274,30 @@ def load_and_prepare_datasets(data_args):
     return raw_datasets
 
 
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+
 def compute_metrics(p: EvalPrediction, label_list, output_dir: str = None, step: int = None, epoch: float = None):
     predictions, labels = p
     predictions = softmax(predictions, axis=-1)
     predictions = np.argmax(predictions, axis=-1)
-    preds = [
+    preds = flatten([
         [label_list[p] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
-    ]
-    labels = [
+    ])
+    labels = flatten([
         [label_list[l] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
-    ]
+    ])
 
     results = {
         'step': step,
         'epoch': epoch,
         'accuracy': accuracy_score(y_true=labels, y_pred=preds),
-        'precision': precision_score(y_true=labels, y_pred=preds, average="macro", zero_division=0),
-        'recall': recall_score(y_true=labels, y_pred=preds, average="macro", zero_division=0),
-        'f1': f1_score(y_true=labels, y_pred=preds, average="macro", zero_division=0),
+        'precision': precision_score(y_true=labels, y_pred=preds, average="macro"),
+        'recall': recall_score(y_true=labels, y_pred=preds, average="macro"),
+        'f1': f1_score(y_true=labels, y_pred=preds, average="macro")
     }
 
     if output_dir is not None:
