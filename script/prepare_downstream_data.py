@@ -6,10 +6,12 @@ This file will preprocess all the datasets needed for the downstream tasks.
 import json
 import logging
 import os
+import re
 
 import pandas as pd
 import rootutils
 from sklearn.model_selection import train_test_split
+from unidecode import unidecode
 
 # Set up the root directory so relative paths work across the project
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
@@ -51,6 +53,11 @@ def save_conll_data(df: pd.DataFrame, file_path: str):
     logging.info(f"Saved CONLL data to {file_path}")
 
 
+def matches_uppercase_name_colon(phrase: str) -> bool:
+    pattern = r'(?m)^(?:[A-Z]+(?:\s[A-Z]+)*)\s*:'
+    return re.match(pattern, phrase.strip()) is not None
+
+
 def preprocess_argument_detection(folder):
     """
     Preprocess argument detection data from CONLL-style text files.
@@ -70,15 +77,22 @@ def preprocess_argument_detection(folder):
 
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file:
+                # Group by speech turn
                 line = line.strip()
                 if line:
                     token, tag = line.split('\t')[1], line.split('\t')[-1]
-                    current_sentence["tokens"].append(token)
-                    current_sentence["ner_tags"].append(tag)
-                else:
-                    data.append(current_sentence)
-                    current_sentence = {"tokens": [], "ner_tags": []}
+                    token = unidecode(token)
+                    if matches_uppercase_name_colon(token):
+                        # new speech turn
+                        if len(current_sentence['tokens']) > 0:
+                            assert len(current_sentence['tokens']) == len(current_sentence['ner_tags'])
+                            data.append(current_sentence)
+                            current_sentence = {"tokens": [], "ner_tags": []}
+                    else:
+                        current_sentence["tokens"].append(token)
+                        current_sentence["ner_tags"].append(tag)
             if current_sentence["tokens"]:
+                assert len(current_sentence['tokens']) == len(current_sentence['ner_tags'])
                 data.append(current_sentence)
 
         # Remove the original file after reading
@@ -88,28 +102,6 @@ def preprocess_argument_detection(folder):
         # Shuffle and split data
         df = adjust_conll_data(pd.DataFrame(data).sample(frac=1, random_state=42).reset_index(drop=True))
         save_conll_data(df, os.path.join(folder, file_map.get(f)))
-
-    # Avoid duplicates
-    # df['tokens_tuple'] = df['tokens'].apply(tuple)
-    # df['ner_tags_tuple'] = df['ner_tags'].apply(tuple)
-    # df = df.drop_duplicates(subset=['tokens_tuple', 'ner_tags_tuple'])
-    # df = df.drop(columns=['tokens_tuple', 'ner_tags_tuple'])
-    # df = df.dropna().reset_index(drop=True)
-
-    # Split with stratification
-    # df['has_entity'] = df['ner_tags'].apply(lambda tags: any(tag != "O" for tag in tags))
-
-    # train, test = train_test_split(df, test_size=0.2, random_state=42, stratify=df['has_entity'])
-    # test, dev = train_test_split(test, test_size=0.5, random_state=42, stratify=test['has_entity'])
-
-    # train.drop(columns=['has_entity'], inplace=True)
-    # dev.drop(columns=['has_entity'], inplace=True)
-    # test.drop(columns=['has_entity'], inplace=True)
-
-    # Save splits
-    # save_conll_data(train, os.path.join(folder, f"train.json"))
-    # save_conll_data(dev, os.path.join(folder, f"dev.json"))
-    # save_conll_data(test, os.path.join(folder, f"test.json"))
 
 
 def preprocess_relation_classification(folder):
@@ -156,6 +148,7 @@ def preprocess_ner(folder):
                 line = line.strip()
                 if line:
                     token, tag = line.split('\t')
+                    token = unidecode(token)
                     current_sentence["tokens"].append(token)
                     current_sentence["ner_tags"].append(tag)
                 else:
@@ -197,7 +190,7 @@ def preprocess_sentiment_analysis(folder):
 
     # Save to CSV
     train.to_csv(os.path.join(folder, "train.csv"), index=False)
-    test.to_csv(os.path.join(folder, "perplexity_test.csv"), index=False)
+    test.to_csv(os.path.join(folder, "test.csv"), index=False)
     dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
 
     # Remove original file
