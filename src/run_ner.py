@@ -30,7 +30,7 @@ import pandas as pd
 import rootutils
 from datasets import load_dataset, ClassLabel
 from scipy.special import softmax
-from seqeval.metrics import accuracy_score, recall_score, precision_score, f1_score
+from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from transformers import (
     AutoConfig,
     AutoTokenizer,
@@ -266,18 +266,22 @@ def load_and_prepare_datasets(data_args):
     return raw_datasets
 
 
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+
 def compute_metrics(p: EvalPrediction, label_list, output_dir: str = None, step: int = None, epoch: float = None):
     predictions, labels = p
     predictions = softmax(predictions, axis=-1)
     predictions = np.argmax(predictions, axis=-1)
-    preds = [
+    preds = flatten([
         [label_list[p] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
-    ]
-    labels = [
+    ])
+    labels = flatten([
         [label_list[l] for (p, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(predictions, labels)
-    ]
+    ])
 
     results = {
         'step': step,
@@ -522,6 +526,15 @@ def main():
 
     trainer.log_metrics("test", test_results.metrics)
     trainer.save_metrics("test", test_results.metrics)
+
+    # Testing with different seeds
+    # file_path = os.path.join(Path(training_args.output_dir).parent.absolute(), "random_seed_testing.csv")
+    # write_header = not os.path.exists(file_path)
+    #
+    # with open(file_path, 'a') as file:
+    #     if write_header:
+    #         file.write('model,seed,f1_score\n')
+    #     file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
 
     logger.info("*** Starting Testing on all ckpt***")
     metrics = []
