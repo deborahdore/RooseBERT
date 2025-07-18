@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
         try:
             with torch.inference_mode():
-                output = generator(row.prompt, max_new_tokens=100)[0]["generated_text"].replace("\n", "")
+                output = generator(row.prompt)[0]["generated_text"].replace("\n", "")
                 output = re.sub(r'^.*?{', '{', output)
                 output = re.sub(r'}[^}]*$', '}', output)
                 output = output.replace("\\", "")

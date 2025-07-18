@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         try:
             with torch.inference_mode():
-                output = generator(row.prompt, max_new_tokens=100)[0]["generated_text"].replace("\n", "").lower()
+                output = generator(row.prompt)[0]["generated_text"].replace("\n", "").lower()
 
             assert "support" in output or "attack" in output or "equivalent" in output
 
