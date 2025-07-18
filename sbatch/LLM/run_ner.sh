@@ -1,23 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=mistral
-
-#SBATCH -C a100
-#SBATCH --ntasks=2
-#SBATCH --ntasks-per-node=2
-#SBATCH --gres=gpu:2
-#SBATCH --cpus-per-task=2
-
-#SBATCH --time=20:00:00
-#SBATCH --output=logs/mistral_ner_%j.out
-#SBATCH --error=logs/mistral_ner_%j.out
-
-#SBATCH --hint=nomultithread
-
-module purge
-module load arch/a100
-module load cuda/12.4.1
-module load miniforge/24.9.0
-
 conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
