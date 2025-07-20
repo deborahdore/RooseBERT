@@ -16,24 +16,22 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence):
-    return f"""[INST]
-    You are a helpful assistant. Your task is to classify the sentiment of the following sentence as either *Positive* or *Negative*.
-    
+    return f"""[INST] Classify the **sentiment** of the following sentence.
+
+    Allowed sentiment labels:
+    - Positive
+    - Negative
+
     Instructions:
-    - The only possibile choices are: **Positive** or **Negative**. Return only one word between **Positive** or **Negative**.
-    - Do not include any explanation, punctuation, or additional text.
-    
+    - Return **only** one of the two words: Positive or Negative.
+    - Do **not** include any explanation, punctuation, or extra text.
+    - Output must be exactly one word.
+
     Sentence:
-    "{sentence}"
-    [/INST]"""
+    "{sentence}" [/INST]"""
 
 
-if __name__ == "__main__":
-    model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
-    dataset = pd.read_csv("data/sentiment_analysis/test.csv")
-    dataset["prompt"] = dataset["text"].apply(build_prompt)
-
+def main(model_id: str, dataset: pd.DataFrame):
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -53,7 +51,6 @@ if __name__ == "__main__":
         repetition_penalty=1.1,
         torch_dtype=torch.bfloat16
     )
-
     preds = []
     labels_cleaned = []
     for row_idx, row in enumerate(tqdm(dataset.itertuples(index=False), total=len(dataset))):
@@ -75,13 +72,36 @@ if __name__ == "__main__":
             print(f"[{row_idx}] Format error: {e}\n Output: {output}")
         finally:
             continue
-
     assert len(preds) == len(labels_cleaned)
+    return {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
+            'precision': precision_score(y_true=labels_cleaned, y_pred=preds),
+            'recall': recall_score(y_true=labels_cleaned, y_pred=preds),
+            'f1': f1_score(y_true=labels_cleaned, y_pred=preds)
+            }
 
-    print(
-        {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-         'precision': precision_score(y_true=labels_cleaned, y_pred=preds),
-         'recall': recall_score(y_true=labels_cleaned, y_pred=preds),
-         'f1': f1_score(y_true=labels_cleaned, y_pred=preds)
-         }
-    )
+
+if __name__ == "__main__":
+    model_ids = ["mistralai/Mistral-7B-Instruct-v0.3",
+                 "meta-llama/Llama-3.1-8B-Instruct",
+                 "google/gemma-7b-it"]
+    output_file = os.path.join(rootutils.find_root(""), "results_llms.csv")
+
+    dataset = pd.read_csv("data/sentiment_analysis/test.csv")
+    dataset["prompt"] = dataset["text"].apply(build_prompt)
+
+    results = []
+    for model_id in model_ids:
+        models_results = main(model_id, dataset)
+        results.append({
+            'model': model_id,
+            'accuracy': models_results['accuracy'],
+            'precision': models_results['precision'],
+            'recall': models_results['recall'],
+            'f1': models_results['f1']
+        })
+        print("Model:", model_id)
+        print(results)
+
+    with pd.ExcelWriter(output_file) as writer:
+        df = pd.DataFrame(results)
+        df.to_excel(writer, sheet_name="sentiment_analysis", index=False)

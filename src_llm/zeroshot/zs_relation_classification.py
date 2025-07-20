@@ -16,29 +16,23 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence):
-    return f"""[INST]
-    You are a helpful assistant. Your task is to classify the **relation** between two arguments in the sentence below. The arguments are separated by a dot (".").
-    
+    return f"""[INST] Classify the **relation** between two arguments in the sentence below. The arguments are separated by a period (".").
+
+    Allowed relation types:
+    - support
+    - attack
+    - equivalent
+
     Instructions:
-    - Classify the relation between the two arguments as one of the following **exactly**:
-      - support
-      - attack
-      - equivalent
-    - Return **only** one of these words: support, attack, or equivalent.
-    - Do **not** include any explanation, punctuation, or additional text.
-    - Your output must be **only** the classification word.
-    
+    - Return **only** one of the allowed relation types: support, attack, or equivalent.
+    - Do **not** include any explanation, punctuation, or extra text.
+    - Output must be **only** the relation word, exactly as written.
+
     Sentence:
-    "{sentence}"
-    [/INST]"""
+    "{sentence}" [/INST]"""
 
 
-if __name__ == "__main__":
-    model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
-    dataset = pd.read_csv("data/relation_classification/test.csv")
-    dataset["prompt"] = dataset["text"].apply(build_prompt)
-
+def main(model_id, dataset):
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -85,10 +79,35 @@ if __name__ == "__main__":
 
     assert len(preds) == len(labels_cleaned)
 
-    print(
-        {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-         'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-         'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-         'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro")
-         }
-    )
+    return {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
+            'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+            'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+            'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro")
+            }
+
+
+if __name__ == '__main__':
+    model_ids = ["mistralai/Mistral-7B-Instruct-v0.3",
+                 "meta-llama/Llama-3.1-8B-Instruct",
+                 "google/gemma-7b-it"]
+    output_file = os.path.join(rootutils.find_root(""), "results_llms.csv")
+
+    dataset = pd.read_csv("data/relation_classification/test.csv")
+    dataset["prompt"] = dataset["text"].apply(build_prompt)
+
+    results = []
+    for model_id in model_ids:
+        models_results = main(model_id, dataset)
+        results.append({
+            'model': model_id,
+            'accuracy': models_results['accuracy'],
+            'precision': models_results['precision'],
+            'recall': models_results['recall'],
+            'f1': models_results['f1']
+        })
+        print("Model:", model_id)
+        print(results)
+
+    with pd.ExcelWriter(output_file) as writer:
+        df = pd.DataFrame(results)
+        df.to_excel(writer, sheet_name="relation_classification", index=False)

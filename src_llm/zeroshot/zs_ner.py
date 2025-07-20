@@ -6,7 +6,7 @@ import warnings
 import pandas as pd
 import rootutils
 import torch
-from seqeval.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer, pipeline
 
@@ -14,6 +14,24 @@ from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer
 warnings.filterwarnings("ignore")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
+
+def flatten(xss):
+    return [x for xs in xss for x in xs]
+
+
+def load_data(filepath):
+    with open(filepath, 'r') as f:
+        raw_data = json.load(f)
+    records = []
+    for entry in raw_data:
+        sentence = " ".join(entry['tokens']).strip()
+        ner_tag = " ".join(entry['ner_tags']).strip().lower()
+        records.append({
+            "sentence": sentence,
+            "ner_tag": ner_tag
+        })
+    return pd.DataFrame(records)
 
 
 def load_data(filepath):
@@ -31,10 +49,9 @@ def load_data(filepath):
 
 
 def build_prompt(sentence):
-    prompt = """[INST]
-    You are a helpful assistant. Your task is to perform Named Entity Recognition (NER) on the sentence below.
+    prompt = """[INST] You are an information extraction system. Your task is to perform Named Entity Recognition (NER) on the sentence below.
 
-    Return each identified named entity as a **separate, valid JSON object**.
+    Extract all named entities from the sentence and return each as a **separate, valid JSON object**.
 
     Allowed entity types:
     - politician
@@ -50,29 +67,24 @@ def build_prompt(sentence):
     Instructions:
     - For each entity, return a JSON object with exactly two fields:
       - "sentence": the exact text span from the input sentence representing the entity.
-      - "type": one of the allowed entity types above.
-    - If no entity is found, return a single JSON object with both fields as empty strings: `{{"sentence": "", "type": ""}}`
-    - Do **not** wrap the JSON objects in a list (i.e., no square brackets).
-    - Separate multiple JSON objects with **commas and a space only**, like this:
-      `{{"sentence": "...", "type": "..."}}, {{"sentence": "...", "type": "..."}}`
-    - The output must be **strictly valid JSON**:
-      - Use double quotes
-      - No trailing commas
-      - All braces must be correctly closed
-    - Do **not** include any explanation, commentary, or extra text. Output only the JSON objects.
+      - "type": one of the allowed entity types listed above.
+    - If no entity is found, return a single JSON object with both fields set to empty strings:
+      {"sentence": "", "type": ""}
+    - Do **not** wrap the JSON objects in a list (no square brackets).
+    - Separate multiple JSON objects using **commas and a single space only**, like this:
+      {"sentence": "...", "type": "..."}, {"sentence": "...", "type": "..."}
+    - The output must be strictly valid JSON:
+      - Use double quotes only
+      - Close all braces properly
+      - Do not include trailing commas
+    - Do not include any explanation, notes, or extra text. Output **only** the JSON objects.
 
     Sentence:
-    "%s"
-    [/INST]"""
+    "%s" [/INST]"""
     return prompt % sentence
 
 
-if __name__ == "__main__":
-    model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
-    dataset = load_data("data/ner/test.json")
-    dataset["prompt"] = dataset["sentence"].apply(build_prompt)
-
+def main(model_id: str, dataset: pd.DataFrame):
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -92,7 +104,6 @@ if __name__ == "__main__":
         repetition_penalty=1.1,
         torch_dtype=torch.bfloat16
     )
-
     preds = []
     labels_cleaned = []
     labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
@@ -135,11 +146,38 @@ if __name__ == "__main__":
         finally:
             continue
 
+    preds = flatten(preds)
+    labels_cleaned = flatten(labels_cleaned)
     assert len(preds) == len(labels_cleaned)
-    print(
-        {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-         'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-         'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-         'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro").item()
-         }
-    )
+    return {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
+            'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
+            'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
+            'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro").item()
+            }
+
+
+if __name__ == "__main__":
+    model_ids = ["mistralai/Mistral-7B-Instruct-v0.3",
+                 "meta-llama/Llama-3.1-8B-Instruct",
+                 "google/gemma-7b-it"]
+    output_file = os.path.join(rootutils.find_root(""), "results_llms.csv")
+
+    dataset = load_data("data/ner/test.json")
+    dataset["prompt"] = dataset["sentence"].apply(build_prompt)
+
+    results = []
+    for model_id in model_ids:
+        models_results = main(model_id, dataset)
+        results.append({
+            'model': model_id,
+            'accuracy': models_results['accuracy'],
+            'precision': models_results['precision'],
+            'recall': models_results['recall'],
+            'f1': models_results['f1']
+        })
+        print("Model:", model_id)
+        print(results)
+
+    with pd.ExcelWriter(output_file) as writer:
+        df = pd.DataFrame(results)
+        df.to_excel(writer, sheet_name="ner", index=False)

@@ -6,7 +6,7 @@ import warnings
 import pandas as pd
 import rootutils
 import torch
-from seqeval.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer, pipeline
 
@@ -14,6 +14,10 @@ from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer
 warnings.filterwarnings("ignore")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
+
+def flatten(xss):
+    return [x for xs in xss for x in xs]
 
 
 def load_data(filepath):
@@ -31,11 +35,10 @@ def load_data(filepath):
 
 
 def build_prompt(sentence):
-    prompt = """[INST]
-    You are a helpful assistant. Your task is to analyze the following sentence and determine whether it contains a *claim*, a *premise*, or neither.
-    
-    Return your output as one or more valid JSON objects.
-    
+    prompt = """[INST] Your task is to analyze the following sentence and determine whether it contains a *claim*, a *premise*, or neither.
+    Claims are statements that express a stance, opinion, or advocated policy in political debates.
+    Premises are the supporting reasons or justifications provided to back up these claims.
+
     Instructions:
     - For each claim or premise found, return a separate JSON object with exactly two fields:
       - "sentence": the exact span from the input sentence expressing the argument.
@@ -49,19 +52,13 @@ def build_prompt(sentence):
       - Close all braces correctly
       - Do not include trailing commas
     - Do not include any explanation, notes, or extra text. Output **only** the JSON objects.
-    
+
     Sentence:
-    "%s"
-    [/INST]"""
+    "%s" [/INST]"""
     return prompt % sentence
 
 
-if __name__ == "__main__":
-    model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
-    dataset = load_data("data/argument_detection/test.json")
-    dataset["prompt"] = dataset["sentence"].apply(build_prompt)
-
+def main(model_id: str, dataset: pd.DataFrame):
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -85,6 +82,7 @@ if __name__ == "__main__":
     preds = []
     labels_cleaned = []
     labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
+
     for row_idx, row in enumerate(tqdm(dataset.itertuples(index=False), total=len(dataset))):
 
         original_sentence = row.sentence.lower().strip().split()
@@ -121,12 +119,38 @@ if __name__ == "__main__":
         finally:
             continue
 
+    preds = flatten(preds)
+    labels_cleaned = flatten(labels_cleaned)
     assert len(preds) == len(labels_cleaned)
+    return {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
+            'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
+            'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
+            'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro").item()
+            }
 
-    print(
-        {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-         'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-         'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-         'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro").item()
-         }
-    )
+
+if __name__ == "__main__":
+    model_ids = ["mistralai/Mistral-7B-Instruct-v0.3",
+                 "meta-llama/Llama-3.1-8B-Instruct",
+                 "google/gemma-7b-it"]
+    output_file = os.path.join(rootutils.find_root(""), "results_llms.csv")
+
+    dataset = load_data("data/argument_detection/test.json")
+    dataset["prompt"] = dataset["sentence"].apply(build_prompt)
+
+    results = []
+    for model_id in model_ids:
+        models_results = main(model_id, dataset)
+        results.append({
+            'model': model_id,
+            'accuracy': models_results['accuracy'],
+            'precision': models_results['precision'],
+            'recall': models_results['recall'],
+            'f1': models_results['f1']
+        })
+        print("Model:", model_id)
+        print(results)
+
+    with pd.ExcelWriter(output_file) as writer:
+        df = pd.DataFrame(results)
+        df.to_excel(writer, sheet_name="argument_detection", index=False)
