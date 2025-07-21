@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 import re
@@ -8,7 +9,7 @@ import rootutils
 import torch
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
 # Setup
 warnings.filterwarnings("ignore")
@@ -34,22 +35,8 @@ def load_data(filepath):
     return pd.DataFrame(records)
 
 
-def load_data(filepath):
-    with open(filepath, 'r') as f:
-        raw_data = json.load(f)
-    records = []
-    for entry in raw_data:
-        sentence = " ".join(entry['tokens']).strip()
-        ner_tag = " ".join(entry['ner_tags']).strip().lower()
-        records.append({
-            "sentence": sentence,
-            "ner_tag": ner_tag
-        })
-    return pd.DataFrame(records)
-
-
-def build_prompt(sentence):
-    prompt = """[INST] You are an information extraction system. Your task is to perform Named Entity Recognition (NER) on the sentence below.
+def build_prompt(sentence, model_name):
+    prompt = """You are an information extraction system. Your task is to perform Named Entity Recognition (NER) on the sentence below.
 
     Extract all named entities from the sentence and return each as a **separate, valid JSON object**.
 
@@ -80,11 +67,18 @@ def build_prompt(sentence):
     - Do not include any explanation, notes, or extra text. Output **only** the JSON objects.
 
     Sentence:
-    "%s" [/INST]"""
-    return prompt % sentence
+    "%s" """
+    prompt_ = prompt % sentence
+    if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
+        return f"[INST] {prompt_} [/INST]"
+    elif model_name == "gemma-3-4b-it":
+        return (f"<start_of_turn>user "
+                f"{prompt_} <end_of_turn>"
+                f"<start_of_turn>model")
 
 
-def main(model_id: str, dataset: pd.DataFrame):
+def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
+    # Load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -94,90 +88,119 @@ def main(model_id: str, dataset: pd.DataFrame):
     )
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
+
     generator = pipeline(
         model=model,
         tokenizer=tokenizer,
         return_full_text=False,
         task="text-generation",
         do_sample=False,
-        max_new_tokens=500,
+        max_new_tokens=200,
         repetition_penalty=1.1,
         torch_dtype=torch.bfloat16
     )
+
+    prompts = dataset["prompt"].tolist()
+    sentences = dataset["sentence"].tolist()
+    gold_labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
+    assert len(sentences) == len(gold_labels)
     preds = []
     labels_cleaned = []
-    labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
-    for row_idx, row in enumerate(tqdm(dataset.itertuples(index=False), total=len(dataset))):
-
-        original_sentence = row.sentence.lower().strip().split()
-        ner_mask = ['o'] * len(original_sentence)
+    errors = 0
+    for i in tqdm(range(0, len(prompts), batch_size)):
+        batch_prompts = prompts[i:i + batch_size]
+        batch_sentences = sentences[i:i + batch_size]
+        batch_labels = gold_labels[i:i + batch_size]
 
         try:
             with torch.inference_mode():
-                output = generator(row.prompt)[0]["generated_text"].replace("\n", "")
+                outputs = generator(batch_prompts)
+            for j, output_dict in enumerate(outputs):
+                row_sentence = batch_sentences[j].lower().strip()
+                original_tokens = row_sentence.split()
+
+                ner_mask = ['o'] * len(original_tokens)
+
+                output = output_dict[0]["generated_text"].replace("\n", "")
+                if "[/INST]" in output:
+                    output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
                 output = re.sub(r'^.*?{', '{', output)
                 output = re.sub(r'}[^}]*$', '}', output)
                 output = output.replace("\\", "")
                 output = f"[{output}]"
+                parsed_data = json.loads(output)
 
-            parsed_data = json.loads(output)
+                for item in parsed_data:
+                    pred_sentence = item.get('sentence', '').lower().strip().split()
+                    pred_type = item.get('type', '').lower().strip()
+                    if not pred_sentence or not pred_type:
+                        continue
+                    if len(pred_sentence) > len(original_tokens):
+                        continue
+                    if " ".join(pred_sentence) not in row_sentence:
+                        continue
+                    first_token = pred_sentence[0]
+                    try:
+                        idx = original_tokens.index(first_token)
+                        ner_mask[idx] = f"b-{pred_type}"
+                        for k in range(1, len(pred_sentence)):
+                            ner_mask[idx + k] = f"i-{pred_type}"
+                    except ValueError:
+                        continue
 
-            for item in parsed_data:
-                pred_sentence = item.get('sentence').lower().strip().split()
-                pred_type = item.get('type').lower().strip()
+                preds.append(ner_mask)
+                labels_cleaned.append(batch_labels[j])
 
-                if len(pred_type.split()) == 0 or len(pred_sentence) == 0: continue
-                if len(pred_sentence) > len(original_sentence): continue
-                if item.get('sentence').lower().strip() not in row.sentence.lower().strip(): continue
-
-                first_token = pred_sentence[0]
-                len_pred_sentence = len(pred_sentence)
-
-                idx = original_sentence.index(first_token)
-                ner_mask[idx] = f"b-{pred_type}"
-                for i in range(1, len_pred_sentence):
-                    ner_mask[idx + i] = f"i-{pred_type}"
-
-            preds.append(ner_mask)
-            labels_cleaned.append(labels[row_idx])  # Only add label if parsing succeeded
-
-        except (json.JSONDecodeError, KeyError, TypeError) as e:
-            print(f"[{row_idx}] Format error: {e}\n Output: {output}")
-        finally:
+        except Exception as e:
+            print(f"[Batch {i}] Generator error: {e}")
+            errors += batch_size
             continue
 
     preds = flatten(preds)
     labels_cleaned = flatten(labels_cleaned)
-    assert len(preds) == len(labels_cleaned)
-    return {'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-            'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-            'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro").item(),
-            'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro").item()
-            }
+    assert len(preds) == len(labels_cleaned), "Mismatch between predictions and gold labels"
+
+    return {
+        'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
+        'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+        'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+        'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+        'errors': errors
+    }
 
 
 if __name__ == "__main__":
-    model_ids = ["mistralai/Mistral-7B-Instruct-v0.3",
-                 "meta-llama/Llama-3.1-8B-Instruct",
-                 "google/gemma-7b-it"]
-    output_file = os.path.join(rootutils.find_root(""), "results_llms.csv")
+    # model_id = "meta-llama/Llama-3.1-8B-Instruct"
+    # model_id = "google/gemma-3-4b-it"
+    # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_id", type=str, required=True, help="Model identifier from Hugging Face")
+    args = parser.parse_args()
+
+    model_id = args.model_id
+    model_name = model_id.split("/")[-1]
 
     dataset = load_data("data/ner/test.json")
-    dataset["prompt"] = dataset["sentence"].apply(build_prompt)
+    dataset["prompt"] = dataset["sentence"].apply(lambda x: build_prompt(x, model_name=model_name))
 
     results = []
-    for model_id in model_ids:
-        models_results = main(model_id, dataset)
-        results.append({
-            'model': model_id,
-            'accuracy': models_results['accuracy'],
-            'precision': models_results['precision'],
-            'recall': models_results['recall'],
-            'f1': models_results['f1']
-        })
-        print("Model:", model_id)
-        print(results)
+    models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)
 
-    with pd.ExcelWriter(output_file) as writer:
+    results.append({
+        'model': model_name,
+        'accuracy': models_results['accuracy'],
+        'precision': models_results['precision'],
+        'recall': models_results['recall'],
+        'f1': models_results['f1'],
+        'errors': models_results['errors']
+    })
+
+    print("################################### RESULTS ###################################")
+    print("Model:", model_name)
+    print(results)
+    print("###############################################################################")
+
+    with pd.ExcelWriter(os.path.join(rootutils.find_root(""), f"results_{model_name}.xlsx")) as writer:
         df = pd.DataFrame(results)
         df.to_excel(writer, sheet_name="ner", index=False)
