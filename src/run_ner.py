@@ -24,6 +24,7 @@ import os
 import shutil
 import sys
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -516,13 +517,13 @@ def main():
     trainer.save_metrics("test", test_results.metrics)
 
     # Testing with different seeds
-    # file_path = os.path.join(Path(training_args.output_dir).parent.absolute(), "random_seed_testing.csv")
-    # write_header = not os.path.exists(file_path)
-    #
-    # with open(file_path, 'a') as file:
-    #     if write_header:
-    #         file.write('model,seed,f1_score\n')
-    #     file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
+    file_path = os.path.join(Path(training_args.output_dir).parent.absolute(), "random_seed_testing.csv")
+    write_header = not os.path.exists(file_path)
+
+    with open(file_path, 'a') as file:
+        if write_header:
+            file.write('model,seed,f1_score\n')
+        file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
 
     logger.info("*** Starting Testing on all ckpt***")
     metrics = []
