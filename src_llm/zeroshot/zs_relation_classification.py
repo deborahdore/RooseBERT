@@ -85,7 +85,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                 output = output.replace("\n", "")
                 output = output.lower()
 
-                assert "support" in output or "attack" in output or "neither" in output or "none" in output or "No relation" in output
+                assert "support" in output or "attack" in output or "neither" in output or "none" in output or "no relation" in output
                 if "support" in output:
                     preds.append(0)
                 elif "attack" in output:
