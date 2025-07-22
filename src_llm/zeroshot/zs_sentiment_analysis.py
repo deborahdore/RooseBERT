@@ -63,9 +63,10 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
     )
 
     prompts = dataset["prompt"].tolist()
-    sentences = dataset["sentence"].tolist()
-    gold_labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
+    sentences = dataset["text"].tolist()
+    gold_labels = dataset["label"].tolist()
     assert len(sentences) == len(gold_labels)
+
     preds = []
     labels_cleaned = []
     errors = 0
@@ -73,15 +74,14 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         batch_prompts = prompts[i:i + batch_size]
         batch_labels = gold_labels[i:i + batch_size]
 
-        try:
-            with torch.inference_mode():
-                outputs = generator(batch_prompts)
-            for j, output_dict in enumerate(outputs):
-                output = output_dict[0]["generated_text"].replace("\n", "")
-
+        with torch.inference_mode():
+            outputs = generator(batch_prompts)
+        for j, output_dict in enumerate(outputs):
+            output = output_dict[0]["generated_text"]
+            try:
                 if "[/INST]" in output:
                     output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
-                output = output.replace("\\", "")
+                output = output.replace("\n", "")
                 output = output.lower()
 
                 assert "positive" in output or "negative" in output
@@ -91,10 +91,11 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                     preds.append(1)
                 labels_cleaned.append(batch_labels[j])
 
-        except Exception as e:
-            print(f"[Batch {i}] Generator error: {e}")
-            errors += batch_size
-            continue
+            except Exception as e:
+                print(f"[Batch {i}] Generator error: {e}")
+                print(f"Output: {output_dict[0]['generated_text']} \n \n")
+                errors += 1
+                continue
 
     assert len(preds) == len(labels_cleaned), "Mismatch between predictions and gold labels"
 
@@ -119,8 +120,8 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    dataset = pd.read_csv("data/sentiment_analysis/test.json")
-    dataset["prompt"] = dataset["sentence"].apply(lambda x: build_prompt(x, model_name=model_name))
+    dataset = pd.read_csv("data/sentiment_analysis/test.csv")
+    dataset["prompt"] = dataset["text"].apply(lambda x: build_prompt(x, model_name=model_name))
 
     results = []
     models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)

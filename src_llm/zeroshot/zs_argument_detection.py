@@ -1,7 +1,5 @@
 import argparse
-import json
 import os
-import re
 import warnings
 
 import pandas as pd
@@ -11,28 +9,12 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
+from utils import flatten, load_data, preprocess_and_parse_output
+
 # Setup
 warnings.filterwarnings("ignore")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
-
-
-def flatten(xss):
-    return [x for xs in xss for x in xs]
-
-
-def load_data(filepath):
-    with open(filepath, 'r') as f:
-        raw_data = json.load(f)
-    records = []
-    for entry in raw_data:
-        sentence = " ".join(entry['tokens']).strip()
-        ner_tag = " ".join(entry['ner_tags']).strip().lower()
-        records.append({
-            "sentence": sentence,
-            "ner_tag": ner_tag
-        })
-    return pd.DataFrame(records)
 
 
 def build_prompt(sentence, model_name):
@@ -92,6 +74,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
     sentences = dataset["sentence"].tolist()
     gold_labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
     assert len(sentences) == len(gold_labels)
+
     preds = []
     labels_cleaned = []
     errors = 0
@@ -100,23 +83,26 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         batch_sentences = sentences[i:i + batch_size]
         batch_labels = gold_labels[i:i + batch_size]
 
-        try:
-            with torch.inference_mode():
-                outputs = generator(batch_prompts)
-            for j, output_dict in enumerate(outputs):
-                row_sentence = batch_sentences[j].lower().strip()
-                original_tokens = row_sentence.split()
+        with torch.inference_mode():
+            outputs = generator(batch_prompts)
 
-                ner_mask = ['o'] * len(original_tokens)
+        for j, output_dict in enumerate(outputs):
+            row_sentence = batch_sentences[j].lower().strip()
+            original_tokens = row_sentence.split()
+            ner_mask = ['o'] * len(original_tokens)
+            output = output_dict[0]["generated_text"]
 
-                output = output_dict[0]["generated_text"].replace("\n", "")
-                if "[/INST]" in output:
-                    output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
-                output = re.sub(r'^.*?{', '{', output)
-                output = re.sub(r'}[^}]*$', '}', output)
-                output = output.replace("\\", "")
-                output = f"[{output}]"
-                parsed_data = json.loads(output)
+            try:
+                # output = output.replace("\\", "").replace("\n", "")
+                # if "[/INST]" in output:
+                #     output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
+                # output = re.sub(r'^.*?{', '{', output)
+                # output = re.sub(r'}[^}]*$', '}', output)
+                # output = re.sub(r'}\s*{', '}, {', output)
+                # output = remove_extra_closing_braces(output)
+                # output = f"[{output}]"
+                # parsed_data = json.loads(output)
+                parsed_data = preprocess_and_parse_output(output)
 
                 for item in parsed_data:
                     pred_sentence = item.get('sentence', '').lower().strip().split()
@@ -139,10 +125,11 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                 preds.append(ner_mask)
                 labels_cleaned.append(batch_labels[j])
 
-        except Exception as e:
-            print(f"[Batch {i}] Generator error: {e}")
-            errors += batch_size
-            continue
+            except Exception as e:
+                print(f"[Batch {i}] Generator error: {e}")
+                print(f"Output: {output_dict[0]['generated_text']} \n \n")
+                errors += 1
+                continue
 
     preds = flatten(preds)
     labels_cleaned = flatten(labels_cleaned)
