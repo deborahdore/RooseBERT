@@ -60,6 +60,15 @@ def preprocess_and_parse_output(output: str):
     output = re.sub(r'}[^{}]*{', '},{', output)
     output = re.sub(r'}\s*{', '}, {', output)
 
+    # Remove escaped quotes
+    output = re.sub(r'\\"', '"', output)
+    output = re.sub(r'"{2,}', '"', output)
+
+    # Replace double quote followed by single quote
+    output = re.sub(r'"\'', '"', output)
+    # Replace single quote followed by double quote
+    output = re.sub(r'\'"', '"', output)
+
     # Fix malformed stringified list of JSON: ["{...}", "{...}"]
     if re.match(r'^\[\s*"{.*}"\s*(,\s*"{.*}"\s*)*\]$', output):
         try:

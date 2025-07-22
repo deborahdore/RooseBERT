@@ -1,5 +1,6 @@
 import argparse
 import os
+import pickle
 import warnings
 
 import pandas as pd
@@ -89,7 +90,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         for j, output_dict in enumerate(outputs):
             row_sentence = batch_sentences[j].lower().strip()
             original_tokens = row_sentence.split()
-            ner_mask = ['o'] * len(original_tokens)
+            ner_mask = ['o'] * len(batch_labels[j])
             output = output_dict[0]["generated_text"]
 
             try:
@@ -122,7 +123,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                     except ValueError:
                         continue
 
-                preds.append(ner_mask)
+                preds.append(ner_mask[:len(batch_labels[j])])
                 labels_cleaned.append(batch_labels[j])
 
             except Exception as e:
@@ -133,6 +134,14 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
 
     preds = flatten(preds)
     labels_cleaned = flatten(labels_cleaned)
+
+    #  todo: testing
+    if len(preds) != len(labels_cleaned):
+        with open(f'preds_ner_{model_id.split("/")[-1]}.pkl', 'w') as f:
+            pickle.dump([preds], f)
+        with open(f'labels_cleaned_ner_{model_id.split("/")[-1]}.pkl', 'w') as f:
+            pickle.dump([labels_cleaned], f)
+
     assert len(preds) == len(labels_cleaned), "Mismatch between predictions and gold labels"
 
     return {
