@@ -53,7 +53,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         model_id,
         quantization_config=BitsAndBytesConfig(load_in_8bit=True),
         torch_dtype=torch.bfloat16,
-        device_map='cuda',
+        device_map='auto',
         trust_remote_code=True
     )
     tokenizer = AutoTokenizer.from_pretrained(model_id)

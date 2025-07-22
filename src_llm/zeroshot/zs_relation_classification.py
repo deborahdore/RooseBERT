@@ -22,10 +22,10 @@ def build_prompt(sentence, model_name):
     Allowed relation types:
     - support
     - attack
-    - equivalent
+    - neither
 
     Instructions:
-    - Return **only** one of the allowed relation types: support, attack, or equivalent.
+    - Return **only** one of the allowed relation types: support, attack, or neither if no relation is found.
     - Do **not** include any explanation, punctuation, or extra text.
     - Output must be **only** the relation word, exactly as written.
 
@@ -85,7 +85,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                 output = output.replace("\n", "")
                 output = output.lower()
 
-                assert "support" in output or "attack" in output or "equivalent" in output
+                assert "support" in output or "attack" in output or "neither" in output or "none" in output or "No relation" in output
                 if "support" in output:
                     preds.append(0)
                 elif "attack" in output:
