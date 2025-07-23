@@ -21,7 +21,6 @@ def extract_and_round(x):
 
 
 if __name__ == '__main__':
-    model_scores = defaultdict(list)
     # Each time a run_classification/run_ner is executed, it writes down the results in a csv file called random_seed_runs
     # After n runs, we can access it and extract mean and standard deviation
     with pd.ExcelWriter("logs/random_seed_runs.xlsx") as writer:
