@@ -19,26 +19,24 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence, model_name):
-    prompt = """Your task is to analyze the following sentence and determine whether it contains a *claim*, a *premise*, or neither.
-    Claims are statements that express a stance, opinion, or advocated policy in political debates.
-    Premises are the supporting reasons or justifications provided to back up these claims.
+    prompt = """You are an argument analysis assistant. Your task is to analyze the following sentence and identify whether it contains a *claim*, a *premise*, or neither.
 
-    Instructions:
-    - For each claim or premise found, return a separate JSON object with exactly two fields:
-      - "sentence": the exact span from the input sentence expressing the argument.
-      - "type": either "Claim" or "Premise".
-    - If no claim or premise is found, return one JSON object with both fields set to "".
-    - Do **not** wrap the JSON objects in a list (no square brackets).
-    - Separate multiple JSON objects with **commas and spaces only**, e.g.:
-      {"sentence": "...", "type": "Claim"}, {"sentence": "...", "type": "Premise"}
-    - The output must be strictly valid JSON:
-      - Use double quotes only
-      - Close all braces correctly
-      - Do not include trailing commas
-    - Do not include any explanation, notes, or extra text. Output **only** the JSON objects.
+        - A *claim* expresses a stance, opinion, or proposed policy.
+        - A *premise* provides justification or support for a claim.
 
-    Sentence:
-    "%s" """
+        ### Output Instructions
+
+        - Return one JSON object for **each** claim or premise found.
+        - Use this format: {"sentence": "...", "type": "Claim"} or {"sentence": "...", "type": "Premise"}
+        - If no claim or premise is present, return: {"sentence": "", "type": ""}
+        - Output must follow **all** of the following:
+          - Strictly valid JSON (double quotes, no trailing commas, no lists)
+          - No explanation, no notes — only the JSON objects
+          - If multiple objects: separate them with a comma **and a single space**
+
+        ### Sentence
+        "%s"
+        """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"

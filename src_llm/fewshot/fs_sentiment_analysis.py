@@ -19,18 +19,29 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 def build_prompt(sentence, model_name):
     prompt = f"""You are a sentiment classification assistant. Your task is to classify the **sentiment** of the sentence below.
 
-        ### Allowed Sentiment Labels:
-        - Positive
-        - Negative
+    ### Allowed Sentiment Labels:
+    - Positive
+    - Negative
 
-        ### Instructions:
-        - Return **only** one of the allowed sentiment labels: `Positive` or `Negative`.
-        - Do **not** include any explanation, punctuation, or extra text.
-        - The output must be exactly one word.
+    ### Examples
 
-        ### Sentence:
-        "%s"
-        """
+    1) Sentence: "Do not the Government’s proposals introduce some quite substantial financial risks for local authorities... councils in the very tough position of deciding who are the deserving poor and who are not?"
+       → Output: Negative
+
+    2) Sentence: "It is a pleasure to follow the right hon Member... the Minister's ID card proposals do not meet that threshold..."
+       → Output: Positive
+
+    3) Sentence: "Today’s debate is not just about reform of the health service; it is about democracy, accountability and transparency... That is a disgrace, and we should all support the motion today."
+       → Output: Negative
+
+    ### Instructions:
+    - Return **only** one of the allowed sentiment labels: `Positive` or `Negative`.
+    - Do **not** include any explanation, punctuation, or extra text.
+    - The output must be exactly one word.
+
+    ### Sentence:
+    "%s"
+    """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"

@@ -21,33 +21,44 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 def build_prompt(sentence, model_name):
     prompt = """You are an information extraction assistant. Your task is to perform Named Entity Recognition (NER) on the following sentence.
 
-        ### Identify all named entities and classify each using one of the following types:
+    ### Identify all named entities and classify each using one of the following types:
 
-        - "politician"
-        - "person"
-        - "organization"
-        - "politicalparty"
-        - "event"
-        - "election"
-        - "country"
-        - "location"
-        - "miscellaneous"
+    - "politician"
+    - "person"
+    - "organization"
+    - "politicalparty"
+    - "event"
+    - "election"
+    - "country"
+    - "location"
+    - "miscellaneous"
 
-        ### Output Instructions
+    ### Examples
 
-        - For each entity, output a separate JSON object like: {"sentence": "...", "type": "..."}
-        - If no entities are found, output: {"sentence": "", "type": ""}
-        - Do **not** use a list — no square brackets.
-        - If there are multiple entities, separate each object using a comma and a single space.
-        - Output must be strictly valid JSON:
-          - Use double quotes only
-          - Close all braces properly
-          - No trailing commas
-        - Do not include any notes, headers, or explanations. Output **only** the JSON objects.
+    1) Sentence: "Brazil's major cities began to resemble 1932-33 Berlin with its street battles between the Communist Party of Germany and the Nazi Party."
+       → {"sentence": "Brazil", "type": "country"}, {"sentence": "Berlin", "type": "location"}, {"sentence": "Communist Party of Germany", "type": "politicalparty"}, {"sentence": "Nazi Party", "type": "politicalparty"}
 
-        ### Sentence
-        "%s"
-        """
+    2) Sentence: "Amnesty International and Human Rights Watch as well as B'Tselem and Yesh Din criticized the military investigation."
+       → {"sentence": "Amnesty International", "type": "organization"}, {"sentence": "Human Rights Watch", "type": "organization"}, {"sentence": "B'Tselem", "type": "organization"}, {"sentence": "Yesh Din", "type": "organization"}
+
+    3) Sentence: "The People's Party, led by Aznar, won the most parliamentary seats at the 1996 Spanish general election, but he failed to obtain a majority in the Congress of Deputies, which forced the PP to seek the support of Basque (Basque Nationalist Party), Catalan (Convergence and Union) and Canarian (Canarian Coalition) regionalists."
+       → {"sentence": "The People's Party", "type": "politicalparty"}, {"sentence": "Aznar", "type": "politician"}, {"sentence": "1996 Spanish general election", "type": "election"}, {"sentence": "Congress of Deputies", "type": "organization"}, {"sentence": "Basque Nationalist Party", "type": "politicalparty"}, {"sentence": "Catalan", "type": "miscellaneous"}, {"sentence": "Convergence and Union", "type": "politicalparty"}, {"sentence": "Canarian", "type": "miscellaneous"}, {"sentence": "Canarian Coalition", "type": "politicalparty"}
+
+    ### Output Instructions
+
+    - For each entity, output a separate JSON object like: {"sentence": "...", "type": "..."}
+    - If no entities are found, output: {"sentence": "", "type": ""}
+    - Do **not** use a list — no square brackets.
+    - If there are multiple entities, separate each object using a comma and a single space.
+    - Output must be strictly valid JSON:
+      - Use double quotes only
+      - Close all braces properly
+      - No trailing commas
+    - Do not include any notes, headers, or explanations. Output **only** the JSON objects.
+
+    ### Sentence
+    "%s"
+    """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"

@@ -17,20 +17,22 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence, model_name):
-    prompt = f"""Classify the **relation** between two arguments in the sentence below. The arguments are separated by a period (".").
+    prompt = f"""You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below.
+        The two arguments are separated by a period (".").
 
-    Allowed relation types:
-    - support
-    - attack
-    - neither
+        ### Allowed relation types:
+        - support
+        - attack
+        - neither
 
-    Instructions:
-    - Return **only** one of the allowed relation types: support, attack, or neither if no relation is found.
-    - Do **not** include any explanation, punctuation, or extra text.
-    - Output must be **only** the relation word, exactly as written.
+        ### Instructions:
+        - Output **only** one of the allowed relation types: support, attack, or neither.
+        - Do **not** include punctuation, explanation, or formatting — just the relation word in lowercase.
+        - The output must be **exactly** one of: `support`, `attack`, or `neither`.
 
-    Sentence:
-    "%s" """
+        ### Sentence:
+        "%s"
+        """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"

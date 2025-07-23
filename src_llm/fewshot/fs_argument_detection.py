@@ -19,35 +19,35 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence, model_name):
-    prompt = """You are an information extraction assistant. Your task is to perform Named Entity Recognition (NER) on the following sentence.
+    prompt = """You are an argument analysis assistant. Your task is to analyze the following sentence and identify whether it contains a *claim*, a *premise*, or neither.
 
-        ### Identify all named entities and classify each using one of the following types:
+    - A *claim* expresses a stance, opinion, or proposed policy.
+    - A *premise* provides justification or support for a claim.
 
-        - "politician"
-        - "person"
-        - "organization"
-        - "politicalparty"
-        - "event"
-        - "election"
-        - "country"
-        - "location"
-        - "miscellaneous"
+    ### Examples
 
-        ### Output Instructions
+    1) Sentence: "Yes, I voted for it, supported it."
+       → {"sentence": "Yes, I voted for it", "type": "Premise"}, {"sentence": "supported it.", "type": "Claim"}
 
-        - For each entity, output a separate JSON object like: {"sentence": "...", "type": "..."}
-        - If no entities are found, output: {"sentence": "", "type": ""}
-        - Do **not** use a list — no square brackets.
-        - If there are multiple entities, separate each object using a comma and a single space.
-        - Output must be strictly valid JSON:
-          - Use double quotes only
-          - Close all braces properly
-          - No trailing commas
-        - Do not include any notes, headers, or explanations. Output **only** the JSON objects.
+    2) Sentence: "Next question here for President Clinton. Yes, ma'am, here on the front row."
+       → {"sentence": "", "type": ""}
 
-        ### Sentence
-        "%s"
-        """
+    3) Sentence: "Not some of the military. That was the decision of the Joint Chiefs of Staff, recommended to us and agreed to by the president. That is a fact."
+       → {"sentence": "Not some of the military.", "type": "Claim"}, {"sentence": "That was the decision of the Joint Chiefs of Staff, recommended to us and agreed to by the president. That is a fact.", "type": "Premise"}
+
+    ### Output Instructions
+
+    - Return one JSON object for **each** claim or premise found.
+    - Use this format: {"sentence": "...", "type": "Claim"} or {"sentence": "...", "type": "Premise"}
+    - If no claim or premise is present, return: {"sentence": "", "type": ""}
+    - Output must follow **all** of the following:
+      - Strictly valid JSON (double quotes, no trailing commas, no lists)
+      - No explanation, no notes — only the JSON objects
+      - If multiple objects: separate them with a comma **and a single space**
+
+    ### Sentence
+    "%s"
+    """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    dataset = load_data("data/ner/test.json")
+    dataset = load_data("data/argument_detection/test.json")
     dataset["prompt"] = dataset["sentence"].apply(lambda x: build_prompt(x, model_name=model_name))
 
     results = []
@@ -196,4 +196,4 @@ if __name__ == "__main__":
 
     with pd.ExcelWriter(os.path.join(rootutils.find_root(""), f"results_{model_name}.xlsx")) as writer:
         df = pd.DataFrame(results)
-        df.to_excel(writer, sheet_name="ner", index=False)
+        df.to_excel(writer, sheet_name="argument_detection", index=False)

@@ -17,20 +17,33 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 
 def build_prompt(sentence, model_name):
-    prompt = f"""You are a sentiment classification assistant. Your task is to classify the **sentiment** of the sentence below.
+    prompt = f"""You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below.
+    The two arguments are separated by a period (".").
 
-        ### Allowed Sentiment Labels:
-        - Positive
-        - Negative
+    ### Allowed relation types:
+    - support
+    - attack
+    - neither
 
-        ### Instructions:
-        - Return **only** one of the allowed sentiment labels: `Positive` or `Negative`.
-        - Do **not** include any explanation, punctuation, or extra text.
-        - The output must be exactly one word.
+    ### Examples:
 
-        ### Sentence:
-        "%s"
-        """
+    1) Sentence: "We're not going to support the $300 billion tax cut that they have for corporate America and the very wealthy. It didn't meet my test."
+       → Output: neither
+
+    2) Sentence: "They do have stakes in it. What we need now is a president who understands how to bring these other countries together to recognize their stakes in this."
+       → Output: support
+
+    3) Sentence: "I respect the belief about life and when it begins. I can't take what is an article of faith for me and legislate it for someone who doesn't share that article of faith, whether they be agnostic, atheist, Jew, Protestant, whatever."
+       → Output: attack
+
+    ### Instructions:
+    - Output **only** one of the allowed relation types: support, attack, or neither.
+    - Do **not** include punctuation, explanation, or formatting — just the relation word in lowercase.
+    - The output must be **exactly** one of: `support`, `attack`, or `neither`.
+
+    ### Sentence:
+    "%s"
+    """
     prompt_ = prompt % sentence
     if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
         return f"[INST] {prompt_} [/INST]"
@@ -65,7 +78,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
 
     prompts = dataset["prompt"].tolist()
     sentences = dataset["text"].tolist()
-    gold_labels = dataset["label"].tolist()
+    gold_labels = dataset["link_type"].tolist()
     assert len(sentences) == len(gold_labels)
 
     preds = []
@@ -85,11 +98,13 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
                 output = output.replace("\n", "")
                 output = output.lower()
 
-                assert "positive" in output or "negative" in output
-                if "positive" in output:
+                assert "support" in output or "attack" in output or "neither" in output or "none" in output or "no relation" in output
+                if "support" in output:
                     preds.append(0)
-                else:
+                elif "attack" in output:
                     preds.append(1)
+                else:
+                    preds.append(2)
                 labels_cleaned.append(batch_labels[j])
 
             except Exception as e:
@@ -121,7 +136,7 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    dataset = pd.read_csv("data/sentiment_analysis/test.csv")
+    dataset = pd.read_csv("data/relation_classification/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: build_prompt(x, model_name=model_name))
 
     results = []
@@ -143,4 +158,4 @@ if __name__ == "__main__":
 
     with pd.ExcelWriter(os.path.join(rootutils.find_root(""), f"results_{model_name}.xlsx")) as writer:
         df = pd.DataFrame(results)
-        df.to_excel(writer, sheet_name="sentiment_analysis", index=False)
+        df.to_excel(writer, sheet_name="relation_classification", index=False)
