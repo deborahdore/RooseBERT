@@ -14,82 +14,55 @@ def ttest(my_model, comparison_model):
 
 
 if __name__ == '__main__':
+    #  SENTIMENT ANALYSS  ----------------------------------------------------------------------------------------------
+    print(f"Sentiment Analysis".upper())
+    best_roosebert = [0.7323561346362649, 0.73021090112298, 0.7300167691447736, 0.7226615762203437, 0.725]
+    best_bert = [0.6911793467631527, 0.6911793467631527, 0.6911793467631527, 0.6911793467631527, 0.6836228287841191]
+    best_conflibert = [0.6839609483960949, 0.6939799331103679, 0.6964873765093305, 0.6909294512877939,
+                       0.6983346983346983]
+
+    print("RooseBERT vs BERT:")
+    ttest(best_roosebert, best_bert)
+
+    del best_bert
+
+    print("RooseBERT vs ConfliBERT:")
+    ttest(best_roosebert, best_conflibert)
+
+    del best_roosebert
+    del best_conflibert
     #  ARGUMENT DETECTION ----------------------------------------------------------------------------------------------
     print(f"Argument Detection".upper())
-    rooseBERT_scr_uncased_scores = [0.3301656620895921, 0.3302029609345039, 0.33175914531042, 0.3310522707078909,
-                                    0.3271505556958863]
-    bert_base_uncased_scores = [0.31239310267898, 0.3207886831776821, 0.3235274552855723, 0.3182794771697125,
-                                0.316768741394863]
-    conflibert_scr_uncased_scores = [0.3076573483215252, 0.3151745224629649, 0.3153311003616306, 0.3031947439117914,
-                                     0.318443764040236]
+    best_roosebert = [0.480125293612682, 0.4804703933080648, 0.4798378570599032, 0.4808326567886277, 0.4793058764283013]
+    best_bert = [0.4695875544555282, 0.4665518908439708, 0.4656770301817344, 0.4663864303982151, 0.4617379823398828]
+    best_conflibert = [0.4672975275177311, 0.4649378841182792, 0.4591647718944465, 0.4633626894671906,
+                       0.4656779816369374]
 
     print("RooseBERT vs BERT:")
-    ttest(rooseBERT_scr_uncased_scores, bert_base_uncased_scores)
+    ttest(best_roosebert, best_bert)
 
-    del bert_base_uncased_scores
+    del best_bert
 
     print("RooseBERT vs ConfliBERT:")
-    ttest(rooseBERT_scr_uncased_scores, conflibert_scr_uncased_scores)
+    ttest(best_roosebert, best_conflibert)
 
-    del rooseBERT_scr_uncased_scores
-    del conflibert_scr_uncased_scores
+    del best_roosebert
+    del best_conflibert
 
-    #  RELATION CLASSIFICATION -----------------------------------------------------------------------------------------
-    print(f"Relation Classification".upper())
-    rooseBERT_scr_cased_scores = [0.6849165662575398, 0.6766931332179259, 0.6656173665791226, 0.667523855458688,
-                                  0.6669544455984863]
-    bert_base_cased_scores = [0.6529206288369557, 0.6275234486727362, 0.6537824522685857, 0.6538981869188931,
-                              0.6501840760525223]
-    conflibert_scr_cased_scores = [0.6610098961699417, 0.4959431899658134, 0.6526340260006039, 0.6460737835161665,
-                                   0.6463791286128167]
+    #  RELATION CLASSIFICATION  ----------------------------------------------------------------------------------------------
+    print(f"Relation Classification ".upper())
+    best_roosebert = [0.6776738338495907, 0.6758947481456635, 0.6690721704710937, 0.6723456739634033,
+                      0.6751992255159696]
+    best_bert = [0.6653531347701714, 0.6702338433630088, 0.6597793320456513, 0.6526710525974705, 0.6621778828234155]
+    best_polibert = [0.6735475620614918, 0.6621611286226843, 0.6665943150331736, 0.6630980991650038, 0.6671327096726647]
 
     print("RooseBERT vs BERT:")
-    ttest(rooseBERT_scr_cased_scores, bert_base_cased_scores)
+    ttest(best_roosebert, best_bert)
 
-    del bert_base_cased_scores
+    del best_bert
 
-    print("RooseBERT vs ConfliBERT:")
-    ttest(rooseBERT_scr_cased_scores, conflibert_scr_cased_scores)
+    print("RooseBERT vs PoliBERT:")
+    ttest(best_roosebert, best_polibert)
 
-    del rooseBERT_scr_cased_scores
-    del conflibert_scr_cased_scores
-
-    #  NER -------------------------------------------------------------------------------------------------------------
-    print(f"NER".upper())
-    rooseBERT_scr_cased_scores = [0.4405480822968133, 0.3976779115069365, 0.4153811425314289, 0.4312212661038109,
-                                  0.3716378097888492]
-    bert_base_cased_scores = [0.4437390042527007, 0.4534863226523645, 0.442892302068622, 0.4553801903386688,
-                              0.4430179825416295]
-    conflibert_scr_cased_scores = [0.453595279082309, 0.4507577882278386, 0.4715140078646833, 0.447907490576221,
-                                   0.4466882054681466]
-
-    print("ConfliBERT vs BERT:")
-    ttest(conflibert_scr_cased_scores, bert_base_cased_scores)
-
-    del bert_base_cased_scores
-
-    print("ConfliBERT vs RooseBERT:")
-    ttest(conflibert_scr_cased_scores, rooseBERT_scr_cased_scores)
-
-    del conflibert_scr_cased_scores
-    del rooseBERT_scr_cased_scores
-
-    #  SENTIMENT ANALYSIS ----------------------------------------------------------------------------------------------
-    print(f"SENTIMENT ANALYSIS".upper())
-    rooseBERT_scr_uncased_scores = [0.7323561346362649, 0.72661670829864, 0.7225735496288149, 0.7344173441734417,
-                                    0.7305455552478538]
-    bert_base_uncased_scores = [0.6911793467631527, 0.6911793467631527, 0.6911793467631527, 0.6911793467631527,
-                                0.6911793467631527]
-    conflibert_scr_uncased_scores = [0.6839609483960949, 0.692706910680142, 0.6938775510204082, 0.697560975609756,
-                                     0.6841659610499576]
-
-    print("RooseBERT vs BERT:")
-    ttest(rooseBERT_scr_uncased_scores, bert_base_uncased_scores)
-
-    del bert_base_uncased_scores
-
-    print("RooseBERT vs ConfliBERT:")
-    ttest(rooseBERT_scr_uncased_scores, conflibert_scr_uncased_scores)
-
-    del rooseBERT_scr_uncased_scores
-    del conflibert_scr_uncased_scores
+    del best_roosebert
+    del best_polibert

@@ -52,6 +52,8 @@ def preprocess_and_parse_output(output: str):
     if "[/INST]" in output:
         output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
 
+    output = output.replace("[/INST]", "")
+
     # Extract everything between the first { and the last }
     output = re.sub(r'^.*?{', '{', output)
     output = re.sub(r'}[^}]*$', '}', output)
@@ -60,14 +62,10 @@ def preprocess_and_parse_output(output: str):
     output = re.sub(r'}[^{}]*{', '},{', output)
     output = re.sub(r'}\s*{', '}, {', output)
 
-    # Remove escaped quotes
-    output = re.sub(r'\\"', '"', output)
-    output = re.sub(r'"{2,}', '"', output)
-
     # Replace double quote followed by single quote
-    output = re.sub(r'"\'', '"', output)
+    # output = re.sub(r'"\'', '"', output)
     # Replace single quote followed by double quote
-    output = re.sub(r'\'"', '"', output)
+    # output = re.sub(r'\'"', '"', output)
 
     # Fix malformed stringified list of JSON: ["{...}", "{...}"]
     if re.match(r'^\[\s*"{.*}"\s*(,\s*"{.*}"\s*)*\]$', output):
@@ -102,3 +100,16 @@ def preprocess_and_parse_output(output: str):
         parsed_data = [parsed_data]
 
     return parsed_data
+
+
+def generate_prompt(model: str, role: str, instructions: str, examples: str):
+    prompt = None
+    if model == "Llama-3.1-8B-Instruct":
+        prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|> {role}\n{instructions}\n{examples}<|eot_id|>\n<|start_header_id|>user<|end_header_id|>Sentence: %s <|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>"
+    elif model == "Mistral-7B-Instruct-v0.3":
+        # <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
+        prompt = f"""<s>[INST]{role}\n{instructions}[/INST]\n{examples}</s>[INST]\nSentence: %s [/INST]"""
+    elif model == "gemma-3-4b-it":
+        prompt = f"""<start_of_turn>user\n{role}\n{instructions}\n{examples}\n Sentence: %s <end_of_turn><start_of_turn>model"""
+    assert prompt is not None, "No valid model passed"
+    return prompt

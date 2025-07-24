@@ -10,36 +10,24 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
+from utils import generate_prompt
+
 # Setup
 warnings.filterwarnings("ignore")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
+#  NO RELATION -> 2, SUPPORT -> 0, ATTACK -> 1
+label_map = {'support': 0, 'attack': 1, 'no_relation': 2}
 
-def build_prompt(sentence, model_name):
-    prompt = f"""You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below.
-        The two arguments are separated by a period (".").
 
-        ### Allowed relation types:
-        - support
-        - attack
-        - neither
-
-        ### Instructions:
-        - Output **only** one of the allowed relation types: support, attack, or neither.
-        - Do **not** include punctuation, explanation, or formatting — just the relation word in lowercase.
-        - The output must be **exactly** one of: `support`, `attack`, or `neither`.
-
-        ### Sentence:
-        "%s"
-        """
-    prompt_ = prompt % sentence
-    if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
-        return f"[INST] {prompt_} [/INST]"
-    elif model_name == "gemma-3-4b-it":
-        return (f"<start_of_turn>user "
-                f"{prompt_} <end_of_turn>"
-                f"<start_of_turn>model")
+def build_prompt(model):
+    role = "You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below. The two arguments are separated by a period."
+    instructions = """Output instructions:
+    - Output only one of the allowed relation types: support, attack, or neither.
+    - Do not include punctuation, explanation, or formatting.
+    """
+    return generate_prompt(model, role, instructions)
 
 
 def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
@@ -60,7 +48,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         return_full_text=False,
         task="text-generation",
         do_sample=False,
-        max_new_tokens=25,
+        max_new_tokens=100,
         repetition_penalty=1.1,
         torch_dtype=torch.bfloat16
     )
@@ -89,11 +77,11 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
 
                 assert "support" in output or "attack" in output or "neither" in output or "none" in output or "no relation" in output
                 if "support" in output:
-                    preds.append(0)
+                    preds.append(label_map["support"])
                 elif "attack" in output:
-                    preds.append(1)
+                    preds.append(label_map['attack'])
                 else:
-                    preds.append(2)
+                    preds.append(label_map['no_relation'])
                 labels_cleaned.append(batch_labels[j])
 
             except Exception as e:
@@ -125,14 +113,17 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    dataset = pd.read_csv("data/relation_classification/test.csv")
-    dataset["prompt"] = dataset["text"].apply(lambda x: build_prompt(x, model_name=model_name))
+    task = "relation_classification"
+    dataset = pd.read_csv(f"data/{task}/test.csv")
+    prompt = build_prompt(model_name)
+    dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
 
     results = []
     models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)
 
     results.append({
         'model': model_name,
+        'task': task,
         'accuracy': models_results['accuracy'],
         'precision': models_results['precision'],
         'recall': models_results['recall'],
@@ -145,6 +136,19 @@ if __name__ == "__main__":
     print(results)
     print("###############################################################################")
 
-    with pd.ExcelWriter(os.path.join(rootutils.find_root(""), f"results_{model_name}.xlsx")) as writer:
-        df = pd.DataFrame(results)
-        df.to_excel(writer, sheet_name="relation_classification", index=False)
+    file_path = os.path.join(rootutils.find_root(""), "results_zeroshot.xlsx")
+    results_df = pd.DataFrame(results)
+
+    if os.path.exists(file_path):
+        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
+            try:
+                existing_df = pd.read_excel(file_path, sheet_name=task)
+                combined_df = pd.concat([existing_df, results_df], ignore_index=True).reset_index(drop=True)
+            except ValueError:
+                combined_df = results_df
+
+            combined_df.to_excel(writer, sheet_name=task, index=False)
+
+    else:
+        with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
+            results_df.to_excel(writer, sheet_name=task, index=False)

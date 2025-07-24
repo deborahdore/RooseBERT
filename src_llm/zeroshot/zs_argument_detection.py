@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
-from utils import flatten, load_data, preprocess_and_parse_output
+from utils import flatten, load_data, preprocess_and_parse_output, generate_prompt
 
 # Setup
 warnings.filterwarnings("ignore")
@@ -18,32 +18,13 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 
-def build_prompt(sentence, model_name):
-    prompt = """You are an argument analysis assistant. Your task is to analyze the following sentence and identify whether it contains a *claim*, a *premise*, or neither.
-
-        - A *claim* expresses a stance, opinion, or proposed policy.
-        - A *premise* provides justification or support for a claim.
-
-        ### Output Instructions
-
-        - Return one JSON object for **each** claim or premise found.
-        - Use this format: {"sentence": "...", "type": "Claim"} or {"sentence": "...", "type": "Premise"}
-        - If no claim or premise is present, return: {"sentence": "", "type": ""}
-        - Output must follow **all** of the following:
-          - Strictly valid JSON (double quotes, no trailing commas, no lists)
-          - No explanation, no notes — only the JSON objects
-          - If multiple objects: separate them with a comma **and a single space**
-
-        ### Sentence
-        "%s"
-        """
-    prompt_ = prompt % sentence
-    if model_name == "Mistral-7B-Instruct-v0.3" or model_name == "Llama-3.1-8B-Instruct":
-        return f"[INST] {prompt_} [/INST]"
-    elif model_name == "gemma-3-4b-it":
-        return (f"<start_of_turn>user "
-                f"{prompt_} <end_of_turn>"
-                f"<start_of_turn>model")
+def build_prompt(model):
+    role = """You are an argument analysis assistant. Determine whether the sentence is a claim, a premise, or neither. A claim expresses a stance, opinion, or proposed policy, while a premise provides justification or support for a claim."""
+    instructions = """ Output instructions:
+    - Return one JSON object per claim or premise found, using the format: {"sentence": "...", "type": "Claim"} or {"sentence": "...", "type": "Premise"}. If none are present, return {"sentence": "", "type": ""}.
+    - If multiple objects, separate them with a comma and a single space.
+    - Output must be strictly valid JSON (double quotes, no trailing commas, no lists), with no explanations or notes. """
+    return generate_prompt(model, role, instructions)
 
 
 def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
@@ -163,8 +144,10 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    dataset = load_data("data/argument_detection/test.json")
-    dataset["prompt"] = dataset["sentence"].apply(lambda x: build_prompt(x, model_name=model_name))
+    task = "argument_detection"
+    dataset = load_data(f"data/{task}/test.json")
+    prompt = build_prompt(model_name)
+    dataset["prompt"] = dataset["sentence"].apply(lambda x: prompt % x)
 
     results = []
     models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)
@@ -183,6 +166,19 @@ if __name__ == "__main__":
     print(results)
     print("###############################################################################")
 
-    with pd.ExcelWriter(os.path.join(rootutils.find_root(""), f"results_{model_name}.xlsx")) as writer:
-        df = pd.DataFrame(results)
-        df.to_excel(writer, sheet_name="argument_detection", index=False)
+    file_path = os.path.join(rootutils.find_root(""), "results_zeroshot.xlsx")
+    results_df = pd.DataFrame(results)
+
+    if os.path.exists(file_path):
+        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
+            try:
+                existing_df = pd.read_excel(file_path, sheet_name=task)
+                combined_df = pd.concat([existing_df, results_df], ignore_index=True).reset_index(drop=True)
+            except ValueError:
+                combined_df = results_df
+
+            combined_df.to_excel(writer, sheet_name=task, index=False)
+
+    else:
+        with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
+            results_df.to_excel(writer, sheet_name=task, index=False)

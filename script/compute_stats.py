@@ -6,7 +6,6 @@ to an Excel file (`random_seed_runs.xlsx`), with one sheet per task.
 
 import os
 import statistics
-from collections import defaultdict
 
 import pandas as pd
 import rootutils
