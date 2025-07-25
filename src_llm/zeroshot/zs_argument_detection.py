@@ -29,13 +29,21 @@ def build_prompt(model):
 
 def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
     # Load model and tokenizer
-    model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        quantization_config=BitsAndBytesConfig(load_in_8bit=True),
-        torch_dtype=torch.bfloat16,
-        device_map='auto',
-        trust_remote_code=True
-    )
+    if "google/gemma-3-4b-it" in model_id:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            quantization_config=BitsAndBytesConfig(load_in_8bit=True),
+            torch_dtype=torch.bfloat16,
+            trust_remote_code=True
+        )
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            quantization_config=BitsAndBytesConfig(load_in_8bit=True),
+            torch_dtype=torch.bfloat16,
+            device_map='auto',
+            trust_remote_code=True
+        )
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
 
@@ -134,14 +142,14 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
 
 if __name__ == "__main__":
     # model_id = "meta-llama/Llama-3.1-8B-Instruct"
-    # model_id = "google/gemma-3-4b-it"
+    model_id = "google/gemma-3-4b-it"
     # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model_id", type=str, required=True, help="Model identifier from Hugging Face")
-    args = parser.parse_args()
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--model_id", type=str, required=True, help="Model identifier from Hugging Face")
+    # args = parser.parse_args()
 
-    model_id = args.model_id
+    # model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
     task = "argument_detection"
