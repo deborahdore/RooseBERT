@@ -22,10 +22,4 @@ conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 
-
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "relation_classification"
-  python src/zs_relation_classification.py --model_id "meta-llama/Llama-3.1-8B-Instruct"
-done
+python src/zs_relation_classification.py --model_id "meta-llama/Llama-3.1-8B-Instruct"

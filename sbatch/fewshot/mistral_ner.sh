@@ -22,10 +22,4 @@ conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 
-
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "ner"
-  python src/fs_ner.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"
-done
+python src/fs_ner.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"

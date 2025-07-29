@@ -22,10 +22,4 @@ conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 
-
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "sentiment_analysis"
-  python src/fs_sentiment_analysis.py --model_id "meta-llama/Llama-3.1-8B-Instruct"
-done
+python src/fs_sentiment_analysis.py --model_id "meta-llama/Llama-3.1-8B-Instruct"

@@ -22,10 +22,4 @@ conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 
-
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "argument_detection"
-  python src/fs_argument_detection.py --model_id "google/gemma-3-4b-it"
-done
+python src/fs_argument_detection.py --model_id "google/gemma-3-4b-it"

@@ -23,9 +23,4 @@ conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
 
 
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "argument_detection"
-  python src/zs_argument_detection.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"
-done
+python src/zs_argument_detection.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"

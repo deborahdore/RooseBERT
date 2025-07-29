@@ -23,9 +23,4 @@ conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
 
 
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "sentiment_analysis"
-  python src/zs_sentiment_analysis.py --model_id "google/gemma-3-4b-it"
-done
+python src/zs_sentiment_analysis.py --model_id "google/gemma-3-4b-it"

@@ -22,10 +22,4 @@ conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 
-
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "relation_classification"
-  python src/zs_relation_classification.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"
-done
+python src/zs_relation_classification.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"

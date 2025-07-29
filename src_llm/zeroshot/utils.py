@@ -14,7 +14,7 @@ def load_data(filepath):
     records = []
     for entry in raw_data:
         sentence = " ".join(entry['tokens']).strip()
-        ner_tag = " ".join(entry['ner_tags']).strip().lower()
+        ner_tag = " ".join(entry['ner_tags']).strip()
         records.append({
             "sentence": sentence,
             "ner_tag": ner_tag
@@ -101,15 +101,15 @@ def preprocess_and_parse_output(output: str):
 
     return parsed_data
 
-
-def generate_prompt(model: str, role: str, instructions: str):
-    prompt = None
-    if model == "Llama-3.1-8B-Instruct":
-        prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|> {role}\n{instructions}<|eot_id|>\n<|start_header_id|>user<|end_header_id|>Sentence: %s <|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>"
-    elif model == "Mistral-7B-Instruct-v0.3":
-        # <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
-        prompt = f"""<s>[INST]{role}\n{instructions}[/INST]\nSentence: %s [/INST]"""
-    elif model == "gemma-3-4b-it":
-        prompt = f"""<start_of_turn>user\n{role}\n{instructions}\n Sentence: %s <end_of_turn><start_of_turn>model"""
-    assert prompt is not None, "No valid model passed"
-    return prompt
+#
+# def generate_prompt(model: str, role: str, instructions: str):
+#     prompt = None
+#     if model == "Llama-3.1-8B-Instruct":
+#         prompt = f"<|begin_of_text|><|start_header_id|>system<|end_header_id|> {role}\n{instructions}<|eot_id|>\n<|start_header_id|>user<|end_header_id|>Sentence: %s <|eot_id|>\n<|start_header_id|>assistant<|end_header_id|>"
+#     elif model == "Mistral-7B-Instruct-v0.3":
+#         # <s>[INST] Instruction [/INST] Model answer</s>[INST] Follow-up instruction [/INST]
+#         prompt = f"""<s>[INST]{role}\n{instructions}[/INST]\nSentence: %s [/INST]"""
+#     elif model == "gemma-3-4b-it":
+#         prompt = f"""<start_of_turn>user\n{role}\n{instructions}\n Sentence: %s <end_of_turn><start_of_turn>model"""
+#     assert prompt is not None, "No valid model passed"
+#     return prompt

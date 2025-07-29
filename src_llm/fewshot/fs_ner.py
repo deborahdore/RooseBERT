@@ -1,6 +1,7 @@
 import argparse
+import logging
 import os
-import pickle
+import re
 import warnings
 
 import pandas as pd
@@ -10,36 +11,73 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
-from utils import flatten, load_data, preprocess_and_parse_output, generate_prompt
+from utils import flatten, load_data
 
 # Setup
 warnings.filterwarnings("ignore")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
+prompt = (
+    "You are an information extraction assistant. Your task is to identify and label named entities in the input sentence using the following entity types:\n"
+    "- <politician>\n- <person>\n- <organization>\n- <politicalparty>\n- <event>\n- <election>\n- <country>\n- <location>\n- <misc>\n\n"
+    "Instructions:\n"
+    "1. Rewrite the entire sentence *without* changing or omitting any words.\n"
+    "2. Surround each identified entity with the appropriate tag using the format <type>...</type>. For example: <politician>Barack Obama</politician>.\n"
+    "3. Tag only complete spans of meaning — do not tag partial words or sentence fragments.\n"
+    "4. Do not tag anything that does not clearly belong to one of the listed types.\n"
+    "5. Output *only* the fully tagged sentence. Do not include any explanations or extra text.\n\n"
+    "Examples:\n"
+    "Sentence: Brazil's major cities began to resemble 1932-33 Berlin with its street battles between the Communist Party of Germany and the Nazi Party.\n"
+    "Output: <country>Brazil</country>'s major cities began to resemble 1932-33 <location>Berlin</location> with its street battles between the <politicalparty>Communist Party of Germany</politicalparty> and the <politicalparty>Nazi Party</politicalparty>.\n\n"
+    "Sentence: Amnesty International and Human Rights Watch as well as B'Tselem and Yesh Din criticized the military investigation.\n"
+    "Output: <organization>Amnesty International</organization> and <organization>Human Rights Watch</organization> as well as <organization>B'Tselem</organization> and <organization>Yesh Din</organization> criticized the military investigation.\n\n"
+    "Sentence: The People's Party, led by Aznar, won the most parliamentary seats at the 1996 Spanish general election, but he failed to obtain a majority in the Congress of Deputies, which forced the PP to seek the support of Basque (Basque Nationalist Party), Catalan (Convergence and Union) and Canarian (Canarian Coalition) regionalists.\n"
+    "Output: <politicalparty>The People's Party</politicalparty>, led by <politician>Aznar</politician>, won the most parliamentary seats at the <election>1996 Spanish general election</election>, but he failed to obtain a majority in the <organization>Congress of Deputies</organization>, which forced the PP to seek the support of <misc>Basque</misc> (<politicalparty>Basque Nationalist Party</politicalparty>), <misc>Catalan</misc> (<politicalparty>Convergence and Union</politicalparty>) and <misc>Canarian</misc> (<politicalparty>Canarian Coalition</politicalparty>) regionalists.\n\n"
+    "Sentence: %s"
+)
 
-def build_prompt(model):
-    role = """You are an information extraction assistant. Your task is to perform Named Entity Recognition on the following sentence. The possible entity types are: politician, person, organization, politicalparty, event, election, country, location and miscellaneous."""
-    instructions = """ Output instructions:
-        - Return one JSON object per claim or premise found, using the format: {"sentence": "...", "type": "Claim"} or {"sentence": "...", "type": "Premise"}. If none are present, return {"sentence": "", "type": ""}.
-        - If multiple objects, separate them with a comma and a single space.
-        - Output must be strictly valid JSON (double quotes, no trailing commas, no lists), with no explanations or notes. """
-    examples = """
-        Examples:
-        1) Sentence: "Brazil's major cities began to resemble 1932-33 Berlin with its street battles between the Communist Party of Germany and the Nazi Party."
-        Output: {"sentence": "Brazil", "type": "country"}, {"sentence": "Berlin", "type": "location"}, {"sentence": "Communist Party of Germany", "type": "politicalparty"}, {"sentence": "Nazi Party", "type": "politicalparty"}
-        
-        2) Sentence: "Amnesty International and Human Rights Watch as well as B'Tselem and Yesh Din criticized the military investigation."
-        Output: {"sentence": "Amnesty International", "type": "organization"}, {"sentence": "Human Rights Watch", "type": "organization"}, {"sentence": "B'Tselem", "type": "organization"}, {"sentence": "Yesh Din", "type": "organization"}
-        
-        3) Sentence: "The People's Party, led by Aznar, won the most parliamentary seats at the 1996 Spanish general election, but he failed to obtain a majority in the Congress of Deputies, which forced the PP to seek the support of Basque (Basque Nationalist Party), Catalan (Convergence and Union) and Canarian (Canarian Coalition) regionalists."
-        Output: {"sentence": "The People's Party", "type": "politicalparty"}, {"sentence": "Aznar", "type": "politician"}, {"sentence": "1996 Spanish general election", "type": "election"}, {"sentence": "Congress of Deputies", "type": "organization"}, {"sentence": "Basque Nationalist Party", "type": "politicalparty"}, {"sentence": "Catalan", "type": "miscellaneous"}, {"sentence": "Convergence and Union", "type": "politicalparty"}, {"sentence": "Canarian", "type": "miscellaneous"}, {"sentence": "Canarian Coalition", "type": "politicalparty"}"""
-    return generate_prompt(model, role, instructions, examples)
+
+def transform_into_tags(original_sentence: str, predicted_tokens: str, length: int):
+    """
+    Produces BIO tags aligned with the original sentence, even if only partial matches
+    of tagged spans are found in the original tokens.
+    """
+    original_tokens = original_sentence.strip().split()
+    bio_labels = ['O'] * len(original_tokens)
+
+    # Match tagged entities in predicted output
+    pattern = re.compile(
+        r"<(politician|person|organization|politicalparty|event|election|country|location|misc)>(.*?)</\1>",
+        re.DOTALL | re.IGNORECASE
+    )
+    spans = pattern.findall(predicted_tokens)
+
+    for tag, span_text in spans:
+        tag = tag.lower()
+        span_tokens = span_text.strip().split()
+        used_indices = set()
+
+        for span_tok in span_tokens:
+            # Try to find first unmatched occurrence of span_tok in original_tokens
+            for i, orig_tok in enumerate(original_tokens):
+                if i in used_indices:
+                    continue
+                if orig_tok == span_tok:
+                    used_indices.add(i)
+                    break  # Stop after first match
+
+        # Apply BIO labels in order of appearance
+        sorted_indices = sorted(used_indices)
+        for idx, token_idx in enumerate(sorted_indices):
+            bio_labels[token_idx] = f"{'B' if idx == 0 else 'I'}-{tag}"
+
+    return bio_labels[:length]
 
 
-def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
-    # Load model and tokenizer
-    if "google/gemma-3-4b-it" in model_id:
+def main(model_id: str, dataset: pd.DataFrame, results_file: str, batch_size: int = 8):
+    if "gemma" in model_id:
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -51,8 +89,8 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
             model_id,
             quantization_config=BitsAndBytesConfig(load_in_8bit=True),
             torch_dtype=torch.bfloat16,
-            device_map='auto',
-            trust_remote_code=True
+            trust_remote_code=True,
+            device_map="auto"
         )
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
@@ -63,9 +101,9 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         return_full_text=False,
         task="text-generation",
         do_sample=False,
-        max_new_tokens=200,
+        max_new_tokens=512,
         repetition_penalty=1.1,
-        torch_dtype=torch.bfloat16
+        torch_dtype=torch.bfloat16,
     )
 
     prompts = dataset["prompt"].tolist()
@@ -73,9 +111,7 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
     gold_labels = dataset["ner_tag"].apply(lambda x: x.split() if isinstance(x, str) else []).tolist()
     assert len(sentences) == len(gold_labels)
 
-    preds = []
-    labels_cleaned = []
-    errors = 0
+    results = []
     for i in tqdm(range(0, len(prompts), batch_size)):
         batch_prompts = prompts[i:i + batch_size]
         batch_sentences = sentences[i:i + batch_size]
@@ -85,68 +121,31 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
             outputs = generator(batch_prompts)
 
         for j, output_dict in enumerate(outputs):
-            row_sentence = batch_sentences[j].lower().strip()
-            original_tokens = row_sentence.split()
-            ner_mask = ['o'] * len(batch_labels[j])
-            output = output_dict[0]["generated_text"]
+            results.append({
+                "sentence": batch_sentences[j],
+                "ner_tags": batch_labels[j],
+                "response": output_dict[0]["generated_text"]
+            })
 
-            try:
-                # output = output.replace("\\", "").replace("\n", "")
-                # if "[/INST]" in output:
-                #     output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
-                # output = re.sub(r'^.*?{', '{', output)
-                # output = re.sub(r'}[^}]*$', '}', output)
-                # output = re.sub(r'}\s*{', '}, {', output)
-                # output = remove_extra_closing_braces(output)
-                # output = f"[{output}]"
-                # parsed_data = json.loads(output)
-                parsed_data = preprocess_and_parse_output(output)
+    results = pd.DataFrame(results).reset_index(drop=True)
+    results.to_csv(results_file, index=False)
 
-                for item in parsed_data:
-                    pred_sentence = item.get('sentence', '').lower().strip().split()
-                    pred_type = item.get('type', '').lower().strip()
-                    if not pred_sentence or not pred_type:
-                        continue
-                    if len(pred_sentence) > len(original_tokens):
-                        continue
-                    if " ".join(pred_sentence) not in row_sentence:
-                        continue
-                    first_token = pred_sentence[0]
-                    try:
-                        idx = original_tokens.index(first_token)
-                        ner_mask[idx] = f"b-{pred_type}"
-                        for k in range(1, len(pred_sentence)):
-                            ner_mask[idx + k] = f"i-{pred_type}"
-                    except ValueError:
-                        continue
+    response_ner_tags = []
+    for sentence, response, ner_tag in zip(results['sentence'].tolist(), results['response'].tolist(),
+                                           results['ner_tags']):
+        response_ner_tags.append(
+            transform_into_tags(original_sentence=sentence, predicted_tokens=response, length=len(ner_tag)))
 
-                preds.append(ner_mask[:len(batch_labels[j])])
-                labels_cleaned.append(batch_labels[j])
+    flat_preds = flatten(response_ner_tags)
+    flat_labels = flatten(results['ner_tags'])
 
-            except Exception as e:
-                print(f"[Batch {i}] Generator error: {e}")
-                print(f"Output: {output_dict[0]['generated_text']} \n \n")
-                errors += 1
-                continue
-
-    preds = flatten(preds)
-    labels_cleaned = flatten(labels_cleaned)
-
-    #  todo: testing
-    if len(preds) != len(labels_cleaned):
-        with open(f'preds_ner_{model_id.split("/")[-1]}.pkl', 'w') as f:
-            pickle.dump([preds], f)
-        with open(f'labels_cleaned_ner_{model_id.split("/")[-1]}.pkl', 'w') as f:
-            pickle.dump([labels_cleaned], f)
-
-    assert len(preds) == len(labels_cleaned), "Mismatch between predictions and gold labels"
+    assert len(flat_preds) == len(flat_labels), "Prediction and label length mismatch."
 
     return {
-        'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-        'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-        'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-        'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-        'errors': errors
+        'accuracy': accuracy_score(flat_labels, flat_preds),
+        'precision': precision_score(flat_labels, flat_preds, average="macro"),
+        'recall': recall_score(flat_labels, flat_preds, average="macro"),
+        'f1': f1_score(flat_labels, flat_preds, average="macro"),
     }
 
 
@@ -154,9 +153,8 @@ if __name__ == "__main__":
     # model_id = "meta-llama/Llama-3.1-8B-Instruct"
     # model_id = "google/gemma-3-4b-it"
     # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_id", type=str, required=True, help="Model identifier from Hugging Face")
+    parser.add_argument("--model_id", type=str, required=True, help="Model identifier or path")
     args = parser.parse_args()
 
     model_id = args.model_id
@@ -164,39 +162,17 @@ if __name__ == "__main__":
 
     task = "ner"
     dataset = load_data(f"data/{task}/test.json")
-    prompt = build_prompt(model_name)
     dataset["prompt"] = dataset["sentence"].apply(lambda x: prompt % x)
 
-    results = []
-    models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)
+    output_dir = os.path.join("logs", model_name)
+    os.makedirs(output_dir, exist_ok=True)
+    results_file = os.path.join(output_dir, "ner_predictions.csv")
 
-    results.append({
-        'model': model_name,
-        'accuracy': models_results['accuracy'],
-        'precision': models_results['precision'],
-        'recall': models_results['recall'],
-        'f1': models_results['f1'],
-        'errors': models_results['errors']
-    })
+    metrics = main(model_id="/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset=dataset,
+                   results_file=results_file)
 
-    print("################################### RESULTS ###################################")
-    print("Model:", model_name)
-    print(results)
-    print("###############################################################################")
-
-    file_path = os.path.join(rootutils.find_root(""), "results_fewshot.xlsx")
-    results_df = pd.DataFrame(results)
-
-    if os.path.exists(file_path):
-        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
-            try:
-                existing_df = pd.read_excel(file_path, sheet_name=task)
-                combined_df = pd.concat([existing_df, results_df], ignore_index=True).reset_index(drop=True)
-            except ValueError:
-                combined_df = results_df
-
-            combined_df.to_excel(writer, sheet_name=task, index=False)
-
-    else:
-        with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
-            results_df.to_excel(writer, sheet_name=task, index=False)
+    logging.info("###################### RESULTS ######################")
+    logging.info(f"Model: {model_name}")
+    for k, v in metrics.items():
+        logging.info(f"{k.capitalize()}: {v}")
+    logging.info("######################################################")

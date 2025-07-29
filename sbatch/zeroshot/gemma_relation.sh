@@ -23,9 +23,4 @@ conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
 
 
-for i in {1..5}
-do
-  echo "------------------------> Run #$i"
-  echo "relation_classification"
-  python src/zs_relation_classification.py --model_id "google/gemma-3-4b-it"
-done
+python src/zs_relation_classification.py --model_id "google/gemma-3-4b-it"

@@ -10,38 +10,62 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
-from utils import generate_prompt
-
 # Setup
 warnings.filterwarnings("ignore")
 os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 # POSITIVE -> 1, NEGATIVE -> 0 in this dataset
-label_map = {'positive': 1, 'negative': 0}
+LABEL2ID_MAP = {'positive': 1, 'negative': 0}
+ID2LABEL_MAP = {0: 'negative', 1: 'positive'}
+ALLOWED_LABELS = {"positive", "negative"}
+
+prompt = (
+    "You are a sentiment classification assistant. Your task is to classify the sentiment of the given sentence. "
+    "The possible sentiment labels are: positive or negative.\n\n"
+    "Output instructions:\n"
+    "- Output only one of the allowed sentiment types: positive or negative\n"
+    "- Do not include punctuation, explanation, or formatting\n\n"
+    "Examples:\n"
+    "Sentence: Do not the Government’s proposals introduce some quite substantial financial risks for local authorities... councils in the very tough position of deciding who are the deserving poor and who are not?\n"
+    "Output: negative\n\n"
+    "Sentence: It is a pleasure to follow the right hon Member... the Minister's ID card proposals do not meet that threshold...\n"
+    "Output: positive\n\n"
+    "Sentence: Today’s debate is not just about reform of the health service; it is about democracy, accountability and transparency... That is a disgrace, and we should all support the motion today.\n"
+    "Output: negative\n\n"
+    "Sentence: %s"
+)
 
 
-def build_prompt(model):
-    role = "You are a sentiment classification assistant. Your task is to classify the sentiment of the sentence. The possibile sentiments are: positive or negative."
-    instructions = """Output instructions:
-        - Output only one of the allowed relation types: positive or negative.
-        - Do not include punctuation, explanation, or formatting.
-        """
-    examples = """Examples:
-    1) Sentence: "Do not the Government’s proposals introduce some quite substantial financial risks for local authorities... councils in the very tough position of deciding who are the deserving poor and who are not?"
-    Output: Negative
-    
-    2) Sentence: "It is a pleasure to follow the right hon Member... the Minister's ID card proposals do not meet that threshold..."
-    Output: Positive
-    
-    3) Sentence: "Today’s debate is not just about reform of the health service; it is about democracy, accountability and transparency... That is a disgrace, and we should all support the motion today."
-    Output: Negative"""
-    return generate_prompt(model, role, instructions, examples)
+def generate_predictions(generator, prompts, gold_labels, batch_size: int = 8):
+    results = []
+    for i in tqdm(range(0, len(prompts), batch_size)):
+        batch_prompts = prompts[i:i + batch_size]
+        batch_labels = gold_labels[i:i + batch_size]
+
+        with torch.inference_mode():
+            outputs = generator(batch_prompts)
+
+        for j, output_dict in enumerate(outputs):
+            output = output_dict[0]["generated_text"]
+            results.append({
+                'prompt': batch_prompts[j],
+                'y_true': ID2LABEL_MAP[batch_labels[j]],
+                'y_pred': output
+            })
+
+    return pd.DataFrame(results).reset_index(drop=True)
 
 
-def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
-    # Load model and tokenizer
-    if "google/gemma-3-4b-it" in model_id:
+def normalize_prediction(output: str) -> str:
+    output = output.replace("\n", "").lower()
+    if "[/inst]" in output:
+        output = re.sub(r'\s*\[/inst\].*', '', output, flags=re.DOTALL)
+    return output
+
+
+def main(model_id: str, dataset: pd.DataFrame, results_file: str, batch_size: int = 8):
+    if "gemma" in model_id:
         model = AutoModelForCausalLM.from_pretrained(
             model_id,
             quantization_config=BitsAndBytesConfig(load_in_8bit=True),
@@ -65,53 +89,41 @@ def main(model_id: str, dataset: pd.DataFrame, batch_size: int = 8):
         return_full_text=False,
         task="text-generation",
         do_sample=False,
-        max_new_tokens=100,
+        max_new_tokens=50,
         repetition_penalty=1.1,
         torch_dtype=torch.bfloat16
     )
 
-    prompts = dataset["prompt"].tolist()
-    sentences = dataset["text"].tolist()
-    gold_labels = dataset["label"].tolist()
-    assert len(sentences) == len(gold_labels)
+    results_df = generate_predictions(generator, dataset["prompt"].tolist(), dataset["label"].tolist(), batch_size)
+    results_df.to_csv(results_file, index=False)
 
-    preds = []
-    labels_cleaned = []
+    preds, labels_cleaned = [], []
     errors = 0
-    for i in tqdm(range(0, len(prompts), batch_size)):
-        batch_prompts = prompts[i:i + batch_size]
-        batch_labels = gold_labels[i:i + batch_size]
 
-        with torch.inference_mode():
-            outputs = generator(batch_prompts)
-        for j, output_dict in enumerate(outputs):
-            output = output_dict[0]["generated_text"]
-            try:
-                if "[/INST]" in output:
-                    output = re.sub(r'\s*\[/INST\].*', '', output, flags=re.DOTALL)
-                output = output.replace("\n", "")
-                output = output.lower()
+    for _, row in results_df.iterrows():
+        y_true, raw_output = row['y_true'], row['y_pred']
+        try:
+            output = normalize_prediction(raw_output)
+            if not any(label in output for label in ALLOWED_LABELS):
+                raise ValueError("No valid label found in output.")
 
-                assert "positive" in output or "negative" in output
-                if "positive" in output:
-                    preds.append(label_map["positive"])
-                else:
-                    preds.append(label_map["negative"])
-                labels_cleaned.append(batch_labels[j])
+            if "positive" in output:
+                preds.append(LABEL2ID_MAP["positive"])
+            else:
+                preds.append(LABEL2ID_MAP["negative"])
+            labels_cleaned.append(LABEL2ID_MAP[y_true])
 
-            except Exception as e:
-                print(f"[Batch {i}] Generator error: {e}")
-                print(f"Output: {output_dict[0]['generated_text']} \n \n")
-                errors += 1
-                continue
+        except Exception:
+            errors += 1
 
-    assert len(preds) == len(labels_cleaned), "Mismatch between predictions and gold labels"
+    if len(preds) != len(labels_cleaned):
+        raise ValueError("Mismatch between predictions and ground truth.")
 
     return {
-        'accuracy': accuracy_score(y_true=labels_cleaned, y_pred=preds),
-        'precision': precision_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-        'recall': recall_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
-        'f1': f1_score(y_true=labels_cleaned, y_pred=preds, average="macro"),
+        'accuracy': accuracy_score(labels_cleaned, preds),
+        'precision': precision_score(labels_cleaned, preds, zero_division=0),
+        'recall': recall_score(labels_cleaned, preds, zero_division=0),
+        'f1': f1_score(labels_cleaned, preds, zero_division=0),
         'errors': errors
     }
 
@@ -120,49 +132,25 @@ if __name__ == "__main__":
     # model_id = "meta-llama/Llama-3.1-8B-Instruct"
     # model_id = "google/gemma-3-4b-it"
     # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_id", type=str, required=True, help="Model identifier from Hugging Face")
+    parser.add_argument("--model_id", type=str, required=True, help="Model identifier or path")
     args = parser.parse_args()
 
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    task = "sentiment_analysis"
-    dataset = pd.read_csv("data/%s/test.csv" % task)
-    prompt = build_prompt(model_name)
+    dataset = pd.read_csv("data/sentiment_analysis/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
 
-    results = []
-    models_results = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset)
+    results_file = "logs/" + model_name + "/sentiment_analysis_predictions.csv"
+    os.makedirs("logs/" + model_name, exist_ok=True)
+    metrics = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset, results_file)
 
-    results.append({
-        'model': model_name,
-        'accuracy': models_results['accuracy'],
-        'precision': models_results['precision'],
-        'recall': models_results['recall'],
-        'f1': models_results['f1'],
-        'errors': models_results['errors']
-    })
-
-    print("################################### RESULTS ###################################")
-    print("Model:", model_name)
-    print(results)
-    print("###############################################################################")
-
-    file_path = os.path.join(rootutils.find_root(""), "results_fewshot.xlsx")
-    results_df = pd.DataFrame(results)
-
-    if os.path.exists(file_path):
-        with pd.ExcelWriter(file_path, engine="openpyxl", mode="a", if_sheet_exists="overlay") as writer:
-            try:
-                existing_df = pd.read_excel(file_path, sheet_name=task)
-                combined_df = pd.concat([existing_df, results_df], ignore_index=True).reset_index(drop=True)
-            except ValueError:
-                combined_df = results_df
-
-            combined_df.to_excel(writer, sheet_name=task, index=False)
-
-    else:
-        with pd.ExcelWriter(file_path, engine="openpyxl") as writer:
-            results_df.to_excel(writer, sheet_name=task, index=False)
+    print("\n############## RESULTS ##############")
+    print(f"Model: {model_id}")
+    print(f"Accuracy:  {metrics['accuracy']:.4f}")
+    print(f"Precision: {metrics['precision']:.4f}")
+    print(f"Recall:    {metrics['recall']:.4f}")
+    print(f"F1:        {metrics['f1']:.4f}")
+    print(f"Errors:    {metrics['errors']}")
+    print("#####################################\n")
