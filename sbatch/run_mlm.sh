@@ -1,25 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=bert_base_uncased
-
-#SBATCH -C a100
-#SBATCH --ntasks=8
-#SBATCH --ntasks-per-node=8
-#SBATCH --gres=gpu:8
-#SBATCH --cpus-per-task=8
-
-#SBATCH --time=20:00:00
-#SBATCH --output=logs/bert_base_uncased_%j.out
-#SBATCH --error=logs/bert_base_uncased_%j.out
-
-#SBATCH --hint=nomultithread
-
-module purge
-module load arch/a100
-module load cuda/12.4.1
-module load miniforge/24.9.0
-
-conda activate rooseBERT
-
+conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
 
 wandb offline

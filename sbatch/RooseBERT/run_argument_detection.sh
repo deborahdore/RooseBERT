@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 set -u
-
-module purge
-module load miniconda
 conda activate rooseBERT
 
 export TOKENIZERS_PARALLELISM=false
