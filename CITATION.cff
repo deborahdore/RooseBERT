@@ -1,10 +1,15 @@
-@article{
-    dore2025roosebertnewdealpolitical,
-    title={RooseBERT: A New Deal For Political Language Modelling},
-    author={Deborah Dore and Elena Cabrio and Serena Villata},
-    year={2025},
-    eprint={2508.03250},
-    archivePrefix={arXiv},
-    primaryClass={cs.CL},
-    url={https://arxiv.org/abs/2508.03250},
-}
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "RooseBERT: A New Deal For Political Language Modelling"
+authors:
+  - family-names: Dore
+    given-names: Deborah
+  - family-names: Cabrio
+    given-names: Elena
+  - family-names: Villata
+    given-names: Serena
+date-released: 2025-08-05
+url: https://arxiv.org/abs/2508.03250
+version: 1.0.0
+doi: 10.48550/arXiv.2508.03250
+repository-code: https://github.com/YOUR_USERNAME/YOUR_REPO
