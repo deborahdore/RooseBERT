@@ -2,8 +2,7 @@
 
 # RooseBERT: A New Deal For Political Language Modelling
 
-[![Paper](http://img.shields.io/badge/paper-arxiv.1001.2234-B31B1B.svg)](https://www.nature.com/articles/nature14539)
-
+[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250v1-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
 </div>
 
 All pretrained models can be found in the HuggingFace repo: [ddore14](https://huggingface.co/ddore14/models)!
