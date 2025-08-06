@@ -6,6 +6,18 @@
 </div>
 
 All pretrained models can be found in the HuggingFace repo: [ddore14](https://huggingface.co/ddore14/models)!
+If you use this model, cite us:
+
+```bibtex 
+@misc{dore2025roosebertnewdealpolitical, 
+title={RooseBERT: A New Deal For Political Language Modelling}, 
+author={Deborah Dore and Elena Cabrio and Serena Villata}, 
+year={2025}, 
+eprint={2508.03250}, 
+archivePrefix={arXiv}, 
+primaryClass={cs.CL}, 
+url={https://arxiv.org/abs/2508.03250}, } 
+```
 
 ## Table of Contents
 
