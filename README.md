@@ -22,6 +22,40 @@ If you use this model, cite us:
 } 
 ```
 
+Load and use the models with HuggingFace:
+
+```python
+!pip install transformers torch
+
+from transformers import AutoModelForMaskedLM, AutoTokenizer
+import torch
+
+# Load the model and tokenizer
+model_name = "ddore14/RooseBERT-scr-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForMaskedLM.from_pretrained(model_name)
+
+# Example text from a political debate with a mask token
+text = "The government should focus on [MASK] healthcare."
+
+# Tokenize the input text
+inputs = tokenizer(text, return_tensors="pt")
+mask_token_index = torch.where(inputs.input_ids == tokenizer.mask_token_id)[1]
+
+# Perform inference
+with torch.no_grad():
+    outputs = model(**inputs)
+    predictions = outputs.logits
+
+# Get the top predicted tokens for the mask
+predicted_token_id = predictions[0, mask_token_index].argmax(axis=-1)
+predicted_token = tokenizer.decode(predicted_token_id)
+
+print(f"Original text: {text}")
+print(f"Predicted token: {predicted_token}")
+```
+
+
 ## Table of Contents
 
 - [1️⃣ Description](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#1%EF%B8%8F⃣-description)
