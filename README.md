@@ -2,10 +2,10 @@
 
 # RooseBERT: A New Deal For Political Language Modelling
 
-[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250v1-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
+[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
 </div>
 
-All pretrained models can be found in the HuggingFace repo: [ddore14](https://huggingface.co/ddore14/models)!
+All pretrained models can be found in the HuggingFace [RooseBERT](https://huggingface.co/collections/ddore14/roosebert-68931c9b0db3d24e42051c74)'s collection!
 
 If you use this model, cite us:
 
