@@ -5,6 +5,12 @@
 [![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
 </div>
 
+<center>
+<img src="roosebert.jpeg" alt="drawing" width="200"/>
+</center>
+
+---
+
 All pretrained models can be found in the HuggingFace [RooseBERT](https://huggingface.co/collections/ddore14/roosebert-68931c9b0db3d24e42051c74)'s collection!
 
 If you use this model, cite us:
@@ -21,6 +27,7 @@ If you use this model, cite us:
     url={https://arxiv.org/abs/2508.03250}, 
 } 
 ```
+
 
 Load and use the models with HuggingFace:
 
