@@ -2,9 +2,9 @@
 
 # RooseBERT: A New Deal For Political Language Modelling
 
-[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
-
 <img src="roosebert.jpeg" alt="drawing" width="200"/>
+
+[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
 
 </div>
 
