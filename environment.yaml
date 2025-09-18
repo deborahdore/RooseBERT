@@ -1,4 +1,4 @@
-name: rooseBERT
+name: roosebert
 channels:
   - conda-forge
   - defaults
@@ -7,6 +7,7 @@ dependencies:
   - pip
   - nltk
   - scikit-learn
+  - spacy
   - pip:
       - torch
       - torchvision
@@ -25,3 +26,4 @@ dependencies:
       - bitsandbites
       - peft
       - sentencepiece
+      - unicode

@@ -8,15 +8,15 @@ import logging
 import os
 import re
 
+import nltk
 import pandas as pd
 import rootutils
+from nltk.tokenize import sent_tokenize
 from sklearn.model_selection import train_test_split
 from unidecode import unidecode
 
-# Set up the root directory so relative paths work across the project
+nltk.download("punkt")
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
-
-# Configure logging for tracking progress
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -56,6 +56,11 @@ def save_conll_data(df: pd.DataFrame, file_path: str):
 def matches_uppercase_name_colon(phrase: str) -> bool:
     pattern = r'(?m)^(?:[A-Z]+(?:\s[A-Z]+)*)\s*:'
     return re.match(pattern, phrase.strip()) is not None
+
+
+def insert_sep(text):
+    sentences = sent_tokenize(text)  # split into sentences
+    return " [SEP] ".join(s.strip() for s in sentences)  # join with [SEP]
 
 
 def preprocess_argument_detection(folder):
@@ -120,6 +125,7 @@ def preprocess_relation_classification(folder):
         # Load TSV into DataFrame
         df = pd.read_csv(os.path.join(folder, f), sep='\t')
         df.rename({'merged_sent': 'text'}, inplace=True, axis=1)
+        df["text"] = df["text"].apply(insert_sep)
         df = df.dropna().drop_duplicates().reset_index(drop=True)
 
         # Save cleaned DataFrame as CSV
@@ -197,9 +203,41 @@ def preprocess_sentiment_analysis(folder):
     os.remove(file_path)
 
 
+def process_argument_quality(folder):
+    """
+    Preprocess argument quality dataset.
+    """
+    files = ["train.csv", "test.csv"]
+    for f in files:
+        path = os.path.join(folder, f)
+        df = pd.read_csv(path)[['topic', 'evidence_1', 'evidence_2', 'label']]
+
+        df['text'] = df.apply(lambda row: f"TOPIC: {row['topic']} [SEP] {row['evidence_1']} [SEP] {row['evidence_2']}",
+                              axis=1)
+        df["text"] = (
+            df["text"].str.replace(" [REF].", ".", regex=False)
+            .str.replace("[REF]", "", regex=False)
+            .str.replace(r"\s+", " ", regex=True)
+            .str.replace('"', '', regex=False))
+
+        df.drop(columns=['topic', 'evidence_1', 'evidence_2'], inplace=True)
+
+        df['label'] = df['label'] - 1
+
+        df = df.dropna().drop_duplicates().reset_index(drop=True)
+
+        if f == "test.csv":
+            df.to_csv(os.path.join(folder, f), index=False)
+        else:
+            train, dev = train_test_split(df, test_size=0.1, random_state=42)
+            train.to_csv(os.path.join(folder, "train.csv"), index=False)
+            dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
+
+
 if __name__ == "__main__":
     root = rootutils.find_root("")
     preprocess_argument_detection(os.path.join(root, "data/argument_detection"))
     preprocess_relation_classification(os.path.join(root, "data/relation_classification"))
     preprocess_ner(os.path.join(root, "data/ner"))
     preprocess_sentiment_analysis(os.path.join(root, "data/sentiment_analysis"))
+    process_argument_quality(os.path.join(root, "data/argument_quality"))

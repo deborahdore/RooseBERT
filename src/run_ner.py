@@ -114,15 +114,15 @@ class DataTrainingArguments:
             "help": 'The name of the test split in the input dataset. If not specified, will use the "test" split when do_predict is enabled'
         },
     )
-    max_seq_length: int = field(
-        default=512,
-        metadata={
-            "help": (
-                "The maximum total input sequence length after tokenization. Sequences longer "
-                "than this will be truncated, sequences shorter will be padded."
-            )
-        },
-    )
+    # max_seq_length: int = field(
+    #     default=512,
+    #     metadata={
+    #         "help": (
+    #             "The maximum total input sequence length after tokenization. Sequences longer "
+    #             "than this will be truncated, sequences shorter will be padded."
+    #         )
+    #     },
+    # )
     preprocessing_num_workers: Optional[int] = field(
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
@@ -387,13 +387,17 @@ def main():
             add_prefix_space=True
         )
     else:
+        add_prefix_space = False
+        if any(x in tokenizer_name_or_path.lower() for x in ["longformer", "polibert", "deberta"]):
+            add_prefix_space = True
+
         tokenizer = AutoTokenizer.from_pretrained(
             tokenizer_name_or_path,
             cache_dir=model_args.cache_dir,
             use_fast=True,
             token=model_args.token,
             trust_remote_code=model_args.trust_remote_code,
-            add_prefix_space=True if tokenizer_name_or_path.startswith("deberta") else False,
+            add_prefix_space=add_prefix_space
         )
 
     model = AutoModelForTokenClassification.from_pretrained(
@@ -416,12 +420,15 @@ def main():
         else:
             b_to_i_label.append(idx)
 
+    max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings)
+    logger.info(f"MAX SEQUENCE LENGTH: {max_seq_length}")
+
     def tokenize_and_align_labels(examples):
         tokenized_inputs = tokenizer(
             examples[text_column_name],
             padding=False,
             truncation=True,
-            max_length=data_args.max_seq_length,
+            max_length=max_seq_length,
             is_split_into_words=True,
         )
         labels = []

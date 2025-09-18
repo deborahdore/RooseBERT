@@ -384,12 +384,17 @@ def main():
             config.update_from_string(model_args.config_overrides)
             logger.info(f"New config: {config}")
 
+    add_prefix_space = False
+    if any(x in model_args.config_name.lower() for x in ["longformer", "deberta"]):
+        add_prefix_space = True
+
     tokenizer_kwargs = {
         "cache_dir": model_args.cache_dir,
         "use_fast": model_args.use_fast_tokenizer,
         "revision": model_args.model_revision,
         "token": model_args.token,
         "trust_remote_code": model_args.trust_remote_code,
+        "add_prefix_space": add_prefix_space
     }
 
     tokenizer = None

@@ -1,12 +1,11 @@
 """
 Preprocessing Script for ParlEE Dataset
 
-This script consolidates debates from the Irish and UK Parliaments into a single cleaned CSV file.
+This script consolidates debates from the Irish Parliament into a single cleaned CSV file.
 
 Instructions:
 1. Download the following files from Harvard Dataverse:
    - https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0 (IE debates)
-   - https://dataverse.harvard.edu/file.xhtml?fileId=6435505&version=2.0 (UK debates)
 
 2. Provide the folder path containing these files using the --path_to_downloaded_folder argument.
 
@@ -40,7 +39,7 @@ def preprocess_files(input_folder: str, output_file: str):
     """
     file_paths = [
         os.path.join(input_folder, "ParlEE_IE_plenary_speeches.csv"),
-        os.path.join(input_folder, "ParlEE_UK_plenary_speeches.csv")
+        # os.path.join(input_folder, "ParlEE_UK_plenary_speeches.csv")
     ]
 
     records = []

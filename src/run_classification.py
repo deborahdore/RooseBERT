@@ -116,15 +116,15 @@ class DataTrainingArguments:
             )
         },
     )
-    max_seq_length: int = field(
-        default=512,
-        metadata={
-            "help": (
-                "The maximum total input sequence length after tokenization. Sequences longer "
-                "than this will be truncated, sequences shorter will be padded."
-            )
-        },
-    )
+    # max_seq_length: int = field(
+    #     default=512,
+    #     metadata={
+    #         "help": (
+    #             "The maximum total input sequence length after tokenization. Sequences longer "
+    #             "than this will be truncated, sequences shorter will be padded."
+    #         )
+    #     },
+    # )
     preprocessing_num_workers: Optional[int] = field(
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
@@ -359,15 +359,28 @@ def main():
     config.problem_type = "single_label_classification"
 
     tokenizer_name_or_path = model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path
+    if config.model_type in {"bloom", "gpt2", "roberta", "deberta"}:
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_name_or_path,
+            cache_dir=model_args.cache_dir,
+            use_fast=True,
+            token=model_args.token,
+            trust_remote_code=model_args.trust_remote_code,
+            add_prefix_space=True
+        )
+    else:
+        add_prefix_space = False
+        if any(x in tokenizer_name_or_path.lower() for x in ["longformer", "polibert", "deberta"]):
+            add_prefix_space = True
 
-    tokenizer = AutoTokenizer.from_pretrained(
-        tokenizer_name_or_path,
-        cache_dir=model_args.cache_dir,
-        use_fast=model_args.use_fast_tokenizer,
-        token=model_args.token,
-        trust_remote_code=model_args.trust_remote_code,
-        add_prefix_space=True if tokenizer_name_or_path.startswith("deberta") else False,
-    )
+        tokenizer = AutoTokenizer.from_pretrained(
+            tokenizer_name_or_path,
+            cache_dir=model_args.cache_dir,
+            use_fast=True,
+            token=model_args.token,
+            trust_remote_code=model_args.trust_remote_code,
+            add_prefix_space=add_prefix_space
+        )
 
     model = AutoModelForSequenceClassification.from_pretrained(
         model_args.model_name_or_path,
@@ -382,7 +395,8 @@ def main():
 
     # Preprocess datasets
     with training_args.main_process_first(desc="dataset map pre-processing"):
-        max_seq_length = min(data_args.max_seq_length, tokenizer.model_max_length)
+        max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings)
+        logger.info(f"MAX SEQUENCE LENGTH: {max_seq_length}")
         raw_datasets = raw_datasets.map(
             lambda examples: preprocess_function(examples, tokenizer, max_seq_length),
             batched=True,
