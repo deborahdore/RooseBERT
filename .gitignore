@@ -155,3 +155,7 @@ dmypy.json
 data/training
 /logs/ConfliBERT/
 /data/training.zip
+
+sbatch/dr1.sh
+sbatch/azzurra.sh
+sbatch/jeanzay.sh
