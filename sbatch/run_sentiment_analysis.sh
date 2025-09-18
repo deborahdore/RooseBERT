@@ -1,23 +1,25 @@
 #!/bin/bash
-conda activate roosebert
+set -e
+set -u
+
+module purge
+module load miniconda
+conda activate rooseBERT
 
 export TOKENIZERS_PARALLELISM=false
-export WANDB_PROJECT="Large-Language-Models_argument_detection"
+export WANDB_PROJECT="sentiment_analysis"
+
+wandb offline
 wandb disabled
 
-# meta-llama/Meta-Llama-3-8B
-# mistralai/Mistral-7B-v0.3
-# google/gemma-2-9b
-
-MODEL_PATH="mistralai"
-MODEL="Mistral-7B-v0.3"
-N_GPUS=2
-
 # HYPERPARAMETERS -----------------------------
+MODEL=""
+MODEL_DIR=""
+
 LEARNING_RATES=(2e-5 3e-5 5e-5)
 WEIGHT_DECAYS=(0.01)
 BATCH_SIZES=(8 16 32)
-MAX_LENGTHS=(256)
+MAX_LENGTHS=(512)
 EPOCHS=(2 3 4)
 # ---------------------------------------------
 
@@ -32,21 +34,21 @@ for lr in "${LEARNING_RATES[@]}"; do
 
           mkdir -p "$OUTPUT_DIR"
 
-          accelerate launch src/run_ner.py \
+          python src/run_classification.py \
             --run_name "$RUN_NAME" \
-            --model_name_or_path "$MODEL_PATH/$MODEL" \
-            --config_name "$MODEL_PATH/$MODEL" \
-            --tokenizer_name "$MODEL_PATH/$MODEL" \
+            --model_name_or_path "$MODEL_DIR/$MODEL" \
+            --config_name "$MODEL_DIR/$MODEL" \
+            --tokenizer_name "$MODEL_DIR/$MODEL" \
             --cache_dir "./cache/" \
             --logging_dir "./logs" \
             --output_dir "$OUTPUT_DIR" \
-            --train_file "./data/argument_detection/train.json" \
-            --validation_file "./data/argument_detection/dev.json" \
-            --test_file "./data/argument_detection/test.json" \
+            --train_file "./data/sentiment_analysis/train.csv" \
+            --validation_file "./data/sentiment_analysis/dev.csv" \
+            --test_file "./data/sentiment_analysis/test.csv" \
             --eval_strategy "steps" \
             --eval_steps 1000 \
-            --per_device_train_batch_size $((batch/N_GPUS)) \
-            --per_device_eval_batch_size $((batch/N_GPUS)) \
+            --per_device_train_batch_size "$batch" \
+            --per_device_eval_batch_size "$batch" \
             --learning_rate "$lr" \
             --max_seq_length "$max_length" \
             --weight_decay "$wd" \
@@ -56,7 +58,11 @@ for lr in "${LEARNING_RATES[@]}"; do
             --save_strategy "epoch" \
             --save_total_limit 1 \
             --seed 42 \
-            --report_to "wandb"
+            --report_to "wandb" \
+            --text_column_name "text" \
+            --label_column_name "label" \
+            --eval_on_start \
+            --remove_unused_columns
         done
       done
     done
