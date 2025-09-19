@@ -79,6 +79,6 @@ if __name__ == "__main__":
     # preprocess_europarl(args.path_to_downloaded_folder, PATH_TO_FINAL_FILE)
 
     # Quick local testing without CLI
-    preprocess_europarl("/Downloads/Users/hjms/Desktop/Cleaned_Speeches", PATH_TO_FINAL_FILE)
+    preprocess_europarl(os.path.expanduser("~/Downloads/Users/hjms/Desktop/Cleaned_Speeches"), PATH_TO_FINAL_FILE)
 
     os.system(f"du -sh {PATH_TO_FINAL_FILE}")

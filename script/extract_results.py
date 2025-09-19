@@ -16,7 +16,7 @@ import rootutils
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 # Define the regular expression pattern
-pattern = r"(.*?)-?EPOCH(\d+)-LR([\d\.e\-]+)-WD([\d\.]+)-B(\d+)-ML(\d+)"
+pattern = r"(.*?)-?EPOCH(\d+)-LR([\d\.e\-]+)-WD([\d\.]+)-B(\d+)"
 
 RESULTS_FOLDER = "logs/"
 
@@ -44,7 +44,6 @@ if __name__ == '__main__':
                     learning_rate = float(match.group(3))
                     weight_decay = float(match.group(4))
                     batch_size = int(match.group(5))
-                    max_length = int(match.group(6))
                     type = None
 
                     with open(os.path.join(run_path, "all_results.json"), "r") as file:
@@ -57,7 +56,6 @@ if __name__ == '__main__':
                         "epoch": epoch,
                         "batch_size": batch_size,
                         "learning_rate": learning_rate,
-                        "max_length": max_length,
                         "weight_decay": weight_decay,
                         "test_f1": all_results.get("test_f1", None),
                         "test_precision": all_results.get("test_precision", None),

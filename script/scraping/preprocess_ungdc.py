@@ -96,6 +96,6 @@ if __name__ == "__main__":
     # preprocess_ungdc(args.path_to_downloaded_folder, PATH_TO_FINAL_FILE)
 
     # Quick local testing without CLI
-    preprocess_ungdc("/Downloads/TXT", PATH_TO_FINAL_FILE)
+    preprocess_ungdc(os.path.expanduser("~/Downloads/TXT"), PATH_TO_FINAL_FILE)
 
     os.system(f"du -sh {PATH_TO_FINAL_FILE}")

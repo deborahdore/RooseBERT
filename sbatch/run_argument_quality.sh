@@ -12,7 +12,7 @@ export WANDB_PROJECT="argument_quality"
 wandb offline
 wandb disabled
 
-export HF_HOME="/home/ddore/.cache/huggingface/hub/"
+export HF_HOME="/home/ddore/.cache/huggingface"
 
 # HYPERPARAMETERS -----------------------------
 MODEL_DIR=""

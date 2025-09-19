@@ -76,6 +76,6 @@ if __name__ == "__main__":
     # preprocess_aus_parliament(args.path_to_downloaded_folder, PATH_TO_FINAL_FILE)
 
     # Quick local testing without CLI
-    preprocess_aus_parliament("/Downloads/hansard-daily-csv", PATH_TO_FINAL_FILE)
+    preprocess_aus_parliament(os.path.expanduser("~/Downloads/hansard-daily-csv"), PATH_TO_FINAL_FILE)
 
     os.system(f"du -sh {PATH_TO_FINAL_FILE}")

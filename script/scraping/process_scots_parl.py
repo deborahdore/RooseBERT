@@ -66,6 +66,6 @@ if __name__ == "__main__":
     # preprocess_scots_parliament(args.path_to_downloaded_folder, PATH_TO_FINAL_FILE)
 
     # Quick local testing without CLI
-    preprocess_scots_parliament("/Downloads/", PATH_TO_FINAL_FILE)
+    preprocess_scots_parliament(os.path.expanduser("~/Downloads/"), PATH_TO_FINAL_FILE)
 
     os.system(f"du -sh {PATH_TO_FINAL_FILE}")

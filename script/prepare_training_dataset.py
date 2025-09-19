@@ -121,7 +121,7 @@ def load_and_process_data():
         df = split_sentences(df.pop('text'))
 
         # Split into train and dev
-        train, dev = train_test_split(df, test_size=0.1, random_state=42, shuffle=False)
+        train, dev = train_test_split(df, test_size=0.05, random_state=42, shuffle=False)
         #  held out dataset for perplexity
         dev, test = train_test_split(dev, test_size=0.01, random_state=42, shuffle=False)
 

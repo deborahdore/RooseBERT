@@ -1,17 +1,19 @@
 #!/bin/bash
-conda activate roosebert
+
+conda activate pytorch-gpu-custom
+
 export TOKENIZERS_PARALLELISM=false
-
-wandb offline
-export WANDB_MODE=offline
 export WANDB_PROJECT="Masked_Language_Modelling"
-
 export MASTER_PORT=6000
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
+export HF_HOME="/linkhome/rech/genzqh01/ubq61ty/.cache/huggingface"
+
+wandb disabled
 
 # ------------------ HYPERPARAMETERS ------------------
-MODEL_NAME="bert-base-uncased"
-MODEL_PATH="HuggingFace_Models/${MODEL_NAME}"
+MODEL_NAME="deberta-v3-base"
+MODEL_PATH="microsoft/${MODEL_NAME}"
+
 N_GPUS=8
 
 # FIRST TRAINING PHASE
@@ -61,7 +63,7 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --logging_steps 500 \
         --save_strategy "steps" \
         --save_steps 20000 \
-        --save_total_limit 3 \
+        --save_total_limit 1 \
         --seed 42 \
         --data_seed 42 \
         --fp16 \
@@ -76,7 +78,7 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --overwrite_cache
 
 # ------------------ TRAINING PHASE 2 ------------------
-CHECKPOINT_PATH="logs/${RUN_NAME}/checkpoint-120000"
+CHECKPOINT_PATH="logs/${RUN_NAME}/checkpoint-$MAX_STEPS_1"
 
 python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --node_rank=${SLURM_PROCID} \
@@ -108,7 +110,7 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --logging_steps 500 \
         --save_strategy "steps" \
         --save_steps 20000 \
-        --save_total_limit 3 \
+        --save_total_limit 1 \
         --seed 42 \
         --data_seed 42 \
         --fp16 \

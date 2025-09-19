@@ -68,6 +68,6 @@ if __name__ == '__main__':
     # preprocess_unsc(args.path_to_downloaded_folder, PATH_TO_FINAL_FILE)
 
     # Quick local testing without CLI
-    preprocess_unsc("/Downloads/speeches", PATH_TO_FINAL_FILE)
+    preprocess_unsc(os.path.expanduser("~/Downloads/speeches"), PATH_TO_FINAL_FILE)
 
     os.system(f"du -sh {PATH_TO_FINAL_FILE}")
