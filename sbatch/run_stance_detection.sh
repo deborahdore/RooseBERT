@@ -1,25 +1,25 @@
 #!/bin/bash
+#SBATCH --job-name=modernbert_stance_detection
+#SBATCH --gres=gpu:1
+
+#SBATCH --output=logs/modernbert_stance_detection.out
+#SBATCH --error=logs/modernbert_stance_detection.out
+
 set -e
 set -u
 
-module purge
-module load miniconda
-conda activate roosebert
-
 export TOKENIZERS_PARALLELISM=false
-export WANDB_PROJECT="sentiment_analysis"
+export WANDB_PROJECT="stance_detection"
 
-wandb offline
 wandb disabled
-
 export HF_HOME="/home/ddore/.cache/huggingface/hub"
 
 # HYPERPARAMETERS -----------------------------
-MODEL_DIR=""
-MODELS=("")
+MODEL_DIR="answerdotai"
+MODELS=("ModernBERT-base")
 LEARNING_RATES=(2e-5 3e-5 5e-5)
 WEIGHT_DECAYS=(0.01)
-BATCH_SIZES=(8 16 32)
+BATCH_SIZES=(8)
 EPOCHS=(2 3 4)
 # ---------------------------------------------
 for model in "${MODELS[@]}"; do
@@ -41,9 +41,9 @@ for model in "${MODELS[@]}"; do
             --cache_dir "$HF_HOME" \
             --logging_dir "./logs" \
             --output_dir "$OUTPUT_DIR" \
-            --train_file "./data/sentiment_analysis/train.csv" \
-            --validation_file "./data/sentiment_analysis/dev.csv" \
-            --test_file "./data/sentiment_analysis/test.csv" \
+            --train_file "./data/stance_detection/train.csv" \
+            --validation_file "./data/stance_detection/dev.csv" \
+            --test_file "./data/stance_detection/test.csv" \
             --eval_strategy "steps" \
             --eval_steps 1000 \
             --per_device_train_batch_size "$batch" \

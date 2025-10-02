@@ -234,6 +234,19 @@ def process_argument_quality(folder):
             dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
 
 
+def process_stance_detection(folder):
+    files = ["vast_dev.csv", "vast_test.csv", "vast_train.csv"]
+    for f in files:
+        path = os.path.join(folder, f)
+        df = pd.read_csv(path)[['post', 'new_topic', 'label']]
+        df['post'] = df['post'].apply(lambda x: x.strip().replace('"', ''))
+        df['text'] = df.apply(lambda row: f"TOPIC {row['new_topic']} [SEP] {row['post']}", axis=1)
+        df = df.drop(columns=['post', 'new_topic'])
+        df = df.dropna().drop_duplicates().reset_index(drop=True)
+        df.to_csv(os.path.join(folder, f.split("_")[-1]), index=False)
+        os.remove(path)
+
+
 if __name__ == "__main__":
     root = rootutils.find_root("")
     preprocess_argument_detection(os.path.join(root, "data/argument_detection"))
@@ -241,3 +254,4 @@ if __name__ == "__main__":
     preprocess_ner(os.path.join(root, "data/ner"))
     preprocess_sentiment_analysis(os.path.join(root, "data/sentiment_analysis"))
     process_argument_quality(os.path.join(root, "data/argument_quality"))
+    process_stance_detection(os.path.join(root, "data/stance_detection"))

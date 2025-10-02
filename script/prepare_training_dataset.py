@@ -123,11 +123,11 @@ def load_and_process_data():
         # Split into train and dev
         train, dev = train_test_split(df, test_size=0.05, random_state=42, shuffle=False)
         #  held out dataset for perplexity
-        dev, test = train_test_split(dev, test_size=0.01, random_state=42, shuffle=False)
+        # dev, test = train_test_split(dev, test_size=0.01, random_state=42, shuffle=False)
 
         all_train.append(train)
         all_dev.append(dev)
-        all_test.append(test)
+        # all_test.append(test)
 
     if not all_train or not all_dev:
         logger.error("No data processed. Exiting.")
@@ -135,7 +135,7 @@ def load_and_process_data():
 
     train = pd.concat(all_train).reset_index(drop=True)
     dev = pd.concat(all_dev).reset_index(drop=True)
-    test = pd.concat(all_test).reset_index(drop=True)
+    # test = pd.concat(all_test).reset_index(drop=True)
 
     train_128 = concatenate_in_chunks(train, 128)
     train_512 = concatenate_in_chunks(train, 512)
@@ -143,9 +143,9 @@ def load_and_process_data():
     dev_128 = concatenate_in_chunks(dev, 128)
     dev_512 = concatenate_in_chunks(dev, 512)
 
-    test_512 = concatenate_in_chunks(test, 512)
+    # test_512 = concatenate_in_chunks(test, 512)
 
-    return shuffle(train_128), shuffle(train_512), shuffle(dev_128), shuffle(dev_512), shuffle(test_512)
+    return shuffle(train_128), shuffle(train_512), shuffle(dev_128), shuffle(dev_512)  # , shuffle(test_512)
 
 
 def shuffle(df):
@@ -157,7 +157,8 @@ def main():
     Main workflow: Load, preprocess, split, save data.
 
     """
-    train_128, train_512, dev_128, dev_512, test_512 = load_and_process_data()
+    # train_128, train_512, dev_128, dev_512, test_512 = load_and_process_data()
+    train_128, train_512, dev_128, dev_512 = load_and_process_data()
 
     # Log dataset sizes
     logger.info("Train set size: %d", len(train_128))
@@ -174,11 +175,11 @@ def main():
     train_512.to_csv(os.path.join(DATA_DIR, 'max_512/train.csv'), index=False)
     dev_512.to_csv(os.path.join(DATA_DIR, 'max_512/dev.csv'), index=False)
 
-    test_512.to_csv(os.path.join(DATA_DIR, 'perplexity_test.csv'), index=False)
+    # test_512.to_csv(os.path.join(DATA_DIR, 'perplexity_test.csv'), index=False)
 
     os.system(f"du -sh {os.path.join(DATA_DIR, 'max_128/train.csv')}")
     os.system(f"du -sh {os.path.join(DATA_DIR, 'max_128/dev.csv')}")
-    os.system(f"du -sh {os.path.join(DATA_DIR, 'perplexity_test.csv')}")
+    # os.system(f"du -sh {os.path.join(DATA_DIR, 'perplexity_test.csv')}")
 
 
 if __name__ == '__main__':

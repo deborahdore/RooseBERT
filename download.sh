@@ -48,3 +48,9 @@ mv test.csv ../
 mv train.csv ../
 cd ../
 rm -rf "IBM_Debater_(R)_EviConv-ACL-2019.v1"
+
+cd ..
+cd stance_detection
+wget https://github.com/emilyallaway/zero-shot-stance/raw/refs/heads/master/data/VAST/vast_dev.csv
+wget https://github.com/emilyallaway/zero-shot-stance/raw/refs/heads/master/data/VAST/vast_test.csv
+wget https://github.com/emilyallaway/zero-shot-stance/raw/refs/heads/master/data/VAST/vast_train.csv
