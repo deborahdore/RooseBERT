@@ -12,7 +12,7 @@ export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="stance_detection"
 
 wandb disabled
-export HF_HOME="/home/ddore/.cache/huggingface/hub"
+export HF_HOME="/home/user/.cache/huggingface/hub"
 
 # HYPERPARAMETERS -----------------------------
 MODEL_DIR="answerdotai"

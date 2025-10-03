@@ -6,16 +6,16 @@
 
 ## Table of Contents
 
-- [1️⃣ Description](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#1%EF%B8%8F⃣-description)
-- [2️⃣ Datasets](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#2%EF%B8%8F⃣-datasets)
-- [3️⃣ Models](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#3%EF%B8%8F⃣-models)
-- [4️⃣ Installation](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#4%EF%B8%8F⃣-installation)
-- [5️⃣ How to Run](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#5%EF%B8%8F⃣-how-to-run)
-    - [🚀Download the Corpora](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-download-the-corpora)
-    - [🚀 Prepare the Dataset](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-prepare-the-dataset)
-    - [🚀 Running Continuous Pretraining for Masked Language Modeling](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-running-continuous-pretraining-for-masked-language-modeling)
-    - [🚀 Choose a Downstream Task](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-choose-a-downstream-task)
-- [6️⃣ Extract Results](https://github.com/deborahdore/RooseBERT?tab=readme-ov-file#-extract-results)
+- [1️⃣ Description]
+- [2️⃣ Datasets]
+- [3️⃣ Models]
+- [4️⃣ Installation]
+- [5️⃣ How to Run]
+    - [🚀Download the Corpora]
+    - [🚀 Prepare the Dataset]
+    - [🚀 Running Continuous Pretraining for Masked Language Modeling]
+    - [🚀 Choose a Downstream Task]
+- [6️⃣ Extract Results]
 
 ## 1️⃣ Description
 

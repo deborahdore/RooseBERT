@@ -9,7 +9,7 @@
 
 conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
-export HF_HOME="/home/ddore/.cache/huggingface/hub"
+export HF_HOME="/home/user/.cache/huggingface/hub"
 
 python src/fs_argument_detection.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"
 python src/fs_relation_classification.py --model_id "mistralai/Mistral-7B-Instruct-v0.3"

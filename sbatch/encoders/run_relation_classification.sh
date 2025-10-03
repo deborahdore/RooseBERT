@@ -12,7 +12,7 @@ export WANDB_PROJECT="relation_classification"
 wandb offline
 wandb disabled
 
-export HF_HOME="/home/ddore/.cache/huggingface/hub"
+export HF_HOME="/home/user/.cache/huggingface/hub"
 
 # HYPERPARAMETERS -----------------------------
 

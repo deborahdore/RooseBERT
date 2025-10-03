@@ -8,15 +8,12 @@
 
 export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="Perplexity"
-export HF_HOME="/home/ddore/.cache/huggingface/hub"
+export HF_HOME="/home/user/.cache/huggingface/hub"
 
 wandb disabled
 
 # ------------------ HYPERPARAMETERS ------------------
-MODELS=("FacebookAI/roberta-base" "allenai/longformer-base-4096" "answerdotai/ModernBERT-base" "ddore14/RooseBERT-cont-cased"
-"ddore14/RooseBERT-cont-uncased" "ddore14/RooseBERT-scr-cased" "ddore14/RooseBERT-scr-uncased" "google-bert/bert-base-cased"
-"google-bert/bert-base-uncased" "kornosk/polibertweet-political-twitter-roberta-mlm" "snowood1/ConfliBERT-cont-cased" "snowood1/ConfliBERT-cont-uncased"
-"snowood1/ConfliBERT-scr-cased" "snowood1/ConfliBERT-scr-uncased" "microsoft/deberta-v3-base" "microsoft/deberta-base")
+MODELS=()
 
 # FIRST TRAINING PHASE
 MAX_STEPS_1=100000
