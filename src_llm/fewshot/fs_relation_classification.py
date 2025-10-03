@@ -20,18 +20,12 @@ ID2LABEL_MAP = {0: 'support', 1: 'attack', 2: 'no_relation'}
 ALLOWED_LABELS = {"support", "attack", "neither", "none", "no relation"}
 
 prompt = (
-    "You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below. "
-    "The two arguments are separated by a period.\n\n"
-    "Output instructions:\n"
-    "- Output only one of the allowed relation types: support, attack, or neither\n"
-    "- Do not include punctuation, explanation, or formatting\n\n"
+    "You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below. The two arguments are separated by a [SEP] tag."
+    "Output only one of the allowed relation types: support, attack, or neither. Do not include punctuation, explanation, or formatting."
     "Examples:\n"
-    "Sentence: We're not going to support the $300 billion tax cut that they have for corporate America and the very wealthy. It didn't meet my test.\n"
-    "Output: neither\n\n"
-    "Sentence: They do have stakes in it. What we need now is a president who understands how to bring these other countries together to recognize their stakes in this.\n"
-    "Output: support\n\n"
-    "Sentence: I respect the belief about life and when it begins. I can't take what is an article of faith for me and legislate it for someone who doesn't share that article of faith, whether they be agnostic, atheist, Jew, Protestant, whatever.\n"
-    "Output: attack\n\n"
+    "1) Sentence: We're not going to support the $300 billion tax cut that they have for corporate America and the very wealthy. It didn't meet my test. Output: neither\n"
+    "2) Sentence: They do have stakes in it. What we need now is a president who understands how to bring these other countries together to recognize their stakes in this. Output: neither\n"
+    "3) Sentence: I respect the belief about life and when it begins. I can't take what is an article of faith for me and legislate it for someone who doesn't share that article of faith, whether they be agnostic, atheist, Jew, Protestant, whatever. Output: attack\n"
     "Sentence: %s"
 )
 
@@ -122,9 +116,9 @@ def main(model_id: str, dataset: pd.DataFrame, results_file: str, batch_size: in
 
     return {
         'accuracy': accuracy_score(labels_cleaned, preds),
-        'precision': precision_score(labels_cleaned, preds, zero_division=0),
-        'recall': recall_score(labels_cleaned, preds, zero_division=0),
-        'f1': f1_score(labels_cleaned, preds, zero_division=0),
+        'precision': precision_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
+        'recall': recall_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
+        'f1': f1_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
         'errors': errors
     }
 
@@ -142,10 +136,10 @@ if __name__ == "__main__":
 
     dataset = pd.read_csv("data/relation_classification/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
-    results_file = "logs/" + model_name + "/relation_classification_predictions.csv"
+    results_file = "logs/" + model_name + "/fs_relation_classification_predictions.csv"
     os.makedirs("logs/" + model_name, exist_ok=True)
 
-    metrics = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset, results_file)
+    metrics = main(model_id, dataset, results_file)
 
     print("\n############## RESULTS ##############")
     print(f"Model: {model_id}")

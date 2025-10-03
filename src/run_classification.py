@@ -477,8 +477,9 @@ def main():
 
     with open(file_path, 'a') as file:
         if write_header:
-            file.write('model,seed,f1_score\n')
-        file.write(f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']}\n")
+            file.write('model,seed,f1_score,accuracy\n')
+        file.write(
+            f"{model_args.model_name_or_path},{training_args.seed},{test_results.metrics['test_f1']},{test_results.metrics['test_accuracy']}\n")
 
     logger.info("*** Starting Testing on all ckpt***")
     metrics = []

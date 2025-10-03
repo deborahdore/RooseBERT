@@ -21,18 +21,12 @@ ID2LABEL_MAP = {0: 'negative', 1: 'positive'}
 ALLOWED_LABELS = {"positive", "negative"}
 
 prompt = (
-    "You are a sentiment classification assistant. Your task is to classify the sentiment of the given sentence. "
-    "The possible sentiment labels are: positive or negative.\n\n"
-    "Output instructions:\n"
-    "- Output only one of the allowed sentiment types: positive or negative\n"
-    "- Do not include punctuation, explanation, or formatting\n\n"
+    "You are a sentiment classification assistant. Your task is to classify the sentiment of the sentence. The possibile sentiments are: positive or negative."
+    "Output only one of the allowed relation types: positive or negative. Do not include punctuation, explanation, or formatting."
     "Examples:\n"
-    "Sentence: Do not the Government’s proposals introduce some quite substantial financial risks for local authorities... councils in the very tough position of deciding who are the deserving poor and who are not?\n"
-    "Output: negative\n\n"
-    "Sentence: It is a pleasure to follow the right hon Member... the Minister's ID card proposals do not meet that threshold...\n"
-    "Output: positive\n\n"
-    "Sentence: Today’s debate is not just about reform of the health service; it is about democracy, accountability and transparency... That is a disgrace, and we should all support the motion today.\n"
-    "Output: negative\n\n"
+    "1) Sentence: Do not the Government’s proposals introduce some quite substantial financial risks for local authorities... councils in the very tough position of deciding who are the deserving poor and who are not? Output: Negative\n"
+    "2) Sentence: It is a pleasure to follow the right hon Member... the Minister's ID card proposals do not meet that threshold... Output: Positive\n"
+    "3) Sentence: Today’s debate is not just about reform of the health service; it is about democracy, accountability and transparency... That is a disgrace, and we should all support the motion today. Output: Negative\n"
     "Sentence: %s"
 )
 
@@ -142,9 +136,9 @@ if __name__ == "__main__":
     dataset = pd.read_csv("data/sentiment_analysis/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
 
-    results_file = "logs/" + model_name + "/sentiment_analysis_predictions.csv"
+    results_file = "logs/" + model_name + "/fs_sentiment_analysis_predictions.csv"
     os.makedirs("logs/" + model_name, exist_ok=True)
-    metrics = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset, results_file)
+    metrics = main(model_id, dataset, results_file)
 
     print("\n############## RESULTS ##############")
     print(f"Model: {model_id}")

@@ -20,15 +20,13 @@ os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 prompt = (
-    "You are an argument analysis assistant. Your task is to identify and label argumentative spans in the input sentence according to the following types:\n"
-    "- <claim>: expresses a stance, opinion, or proposed policy\n"
-    "- <premise>: provides justification or support for a claim\n\n"
-    "Instructions:\n"
-    "1. Rewrite the entire sentence *without* changing or omitting any words.\n"
-    "2. Surround each identified span with the appropriate tag: <claim>...</claim> or <premise>...</premise>.\n"
-    "3. Tag only complete spans of meaning — do not tag partial words or sentence fragments.\n"
-    "4. Do not tag anything that does not clearly fit one of the defined types.\n"
-    "5. Output *only* the fully tagged sentence. Do not add any explanations or commentary.\n\n"
+    "You are an argument analysis assistant. Your task is to identify and label argumentative spans in the input sentence according to the following types: claim and premise. A claim expresses a stance, opinion, or proposed policy, while a premise provides justification or support for a claim. "
+    "Rewrite the entire sentence without changing or omitting any words. Surround each identified span with a tag indicating its type, using the format <claim>...</claim> or <premise>...</premise>."
+    "Only apply tags to complete spans of meaning, not to partial words or fragments. Do not tag anything that does not clearly belong to one of the listed types. Output only the fully tagged sentence, do not include any additional text."
+    "Examples:\n"
+    "1) Sentence: Yes, I voted for it, supported it. Output: <premise>Yes, I voted for it</premise>, <claim>supported it.</claim>\n"
+    "2) Sentence: Next question here for President Clinton. Yes, ma'am, here on the front row. Output: Next question here for President Clinton. Yes, ma'am, here on the front row.\n"
+    "3) Sentence: Not some of the military. That was the decision of the Joint Chiefs of Staff, recommended to us and agreed to by the president. That is a fact. Output: <claim>Not some of the military.</claim> <premise>That was the decision of the Joint Chiefs of Staff, recommended to us and agreed to by the president. That is a fact.</premise>\n"
     "Sentence: %s"
 )
 
@@ -151,16 +149,13 @@ if __name__ == "__main__":
     model_id = args.model_id
     model_name = model_id.split("/")[-1]
 
-    task = "argument_detection"
-    dataset = load_data(f"data/{task}/test.json")
+    dataset = load_data(f"data/argument_detection/test.json")
     dataset["prompt"] = dataset["sentence"].apply(lambda x: prompt % x)
 
     output_dir = os.path.join("logs", model_name)
     os.makedirs(output_dir, exist_ok=True)
-    results_file = os.path.join(output_dir, "argument_detection_predictions.csv")
-
-    metrics = main(model_id="/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset=dataset,
-                   results_file=results_file)
+    results_file = os.path.join(output_dir, "fs_argument_detection_predictions.csv")
+    metrics = main(model_id, dataset, results_file)
 
     logging.info("###################### RESULTS ######################")
     logging.info(f"Model: {model_name}")

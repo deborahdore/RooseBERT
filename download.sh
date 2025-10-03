@@ -10,13 +10,6 @@ mkdir argument_detection
 rm -rf sentiment_analysis
 mkdir sentiment_analysis
 
-rm -rf argument_quality
-mkdir argument_quality
-
-rm -rf ner
-mkdir ner
-
-
 cd relation_classification
 wget https://raw.githubusercontent.com/pierpaologoffredo/ElecDeb60to20/refs/heads/main/data/relation_data/latest_test.tsv
 wget https://raw.githubusercontent.com/pierpaologoffredo/ElecDeb60to20/refs/heads/main/data/relation_data/latest_train.tsv
@@ -31,23 +24,6 @@ wget https://raw.githubusercontent.com/crscardellino/argumentation-mining-transf
 cd ..
 cd sentiment_analysis
 wget https://data.mendeley.com/public-files/datasets/czjfwgs9tm/files/8f835544-9c55-40dc-b91f-829b8cb7c80c/file_downloaded
-
-cd ..
-cd ner
-wget https://raw.githubusercontent.com/zliucr/CrossNER/refs/heads/main/ner_data/politics/dev.txt
-wget https://raw.githubusercontent.com/zliucr/CrossNER/refs/heads/main/ner_data/politics/train.txt
-wget https://raw.githubusercontent.com/zliucr/CrossNER/refs/heads/main/ner_data/politics/test.txt
-
-cd ..
-cd argument_quality
-wget "https://www.research.ibm.com/haifa/dept/vst/files/IBM_Debater_(R)_EviConv-ACL-2019.v1.zip"
-unzip "IBM_Debater_(R)_EviConv-ACL-2019.v1.zip"
-rm -rf "IBM_Debater_(R)_EviConv-ACL-2019.v1.zip"
-cd "IBM_Debater_(R)_EviConv-ACL-2019.v1"
-mv test.csv ../
-mv train.csv ../
-cd ../
-rm -rf "IBM_Debater_(R)_EviConv-ACL-2019.v1"
 
 cd ..
 cd stance_detection

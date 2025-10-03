@@ -21,8 +21,8 @@ pattern = r"(.*?)-?EPOCH(\d+)-LR([\d\.e\-]+)-WD([\d\.]+)-B(\d+)"
 RESULTS_FOLDER = "logs/"
 
 if __name__ == '__main__':
-    tasks = [folder for folder in os.listdir(RESULTS_FOLDER) if os.path.isdir(os.path.join(RESULTS_FOLDER, folder))]
-
+    # tasks = [folder for folder in os.listdir(RESULTS_FOLDER) if os.path.isdir(os.path.join(RESULTS_FOLDER, folder))]
+    tasks = ["argument_detection", "sentiment_analysis", "relation_classification", "stance_detection"]
     results_file_name = "results.xlsx"
     with pd.ExcelWriter(results_file_name) as writer:
 

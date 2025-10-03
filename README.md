@@ -176,7 +176,7 @@ script adapted from the one by Hugging Face. The pretraining process consists of
 2. **Second phase**: Extending the sequence length to **512** and continuing training for a total of **150k steps**.
 
 Below is the recommended configuration, though you can modify parameters as needed. A ready-to-run script is
-provided [here](sbatch/run_mlm.sh).
+provided [here](sbatch/encoders/run_mlm.sh).
 
 #### **Phase 1: Training with Sequence Length 128**
 

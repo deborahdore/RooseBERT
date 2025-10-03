@@ -21,11 +21,8 @@ ID2LABEL_MAP = {0: 'negative', 1: 'positive'}
 ALLOWED_LABELS = {"positive", "negative"}
 
 prompt = (
-    "You are a sentiment classification assistant. Your task is to classify the sentiment of the given sentence. "
-    "The possible sentiment labels are: positive or negative.\n\n"
-    "Output instructions:\n"
-    "- Output only one of the allowed sentiment types: positive or negative\n"
-    "- Do not include punctuation, explanation, or formatting\n\n"
+    "You are a sentiment classification assistant. Your task is to classify the sentiment of the sentence. The possibile sentiments are: positive or negative."
+    "Output only one of the allowed relation types: positive or negative. Do not include punctuation, explanation, or formatting."
     "Sentence: %s"
 )
 
@@ -135,9 +132,9 @@ if __name__ == "__main__":
     dataset = pd.read_csv("data/sentiment_analysis/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
 
-    results_file = "logs/" + model_name + "/sentiment_analysis_predictions.csv"
+    results_file = "logs/" + model_name + "/zs_sentiment_analysis_predictions.csv"
     os.makedirs("logs/" + model_name, exist_ok=True)
-    metrics = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset, results_file)
+    metrics = main(model_id, dataset, results_file)
 
     print("\n############## RESULTS ##############")
     print(f"Model: {model_id}")

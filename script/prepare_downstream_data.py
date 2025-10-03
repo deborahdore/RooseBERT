@@ -138,48 +138,6 @@ def preprocess_relation_classification(folder):
         logging.info(f"Deleted TSV file: {os.path.join(folder, f)}")
 
 
-def preprocess_ner(folder):
-    """
-    Preprocess standard NER data from CONLL-style format.
-    Each line contains a token and a tag, and sentences are separated by blank lines.
-    Outputs train/dev/test splits in JSON format.
-    """
-    for f in ["dev", "test", "train"]:
-        data = []
-        file_path = os.path.join(folder, f"{f}.txt")
-        current_sentence = {"tokens": [], "ner_tags": []}
-
-        with open(file_path, 'r', encoding='utf-8') as file:
-            for line in file:
-                line = line.strip()
-                if line:
-                    token, tag = line.split('\t')
-                    token = unidecode(token)
-                    current_sentence["tokens"].append(token)
-                    current_sentence["ner_tags"].append(tag)
-                else:
-                    data.append(current_sentence)
-                    current_sentence = {"tokens": [], "ner_tags": []}
-            if current_sentence["tokens"]:
-                data.append(current_sentence)
-
-        # Remove the original file after reading
-        os.remove(file_path)
-        logging.info(f"Deleted CONLL file: {file_path}")
-
-        # Shuffle and split data
-        df = adjust_conll_data(pd.DataFrame(data).sample(frac=1, random_state=42).reset_index(drop=True))
-
-        # Avoid duplicates
-        df['tokens_tuple'] = df['tokens'].apply(tuple)
-        df['ner_tags_tuple'] = df['ner_tags'].apply(tuple)
-        df = df.drop_duplicates(subset=['tokens_tuple', 'ner_tags_tuple'])
-        df = df.drop(columns=['tokens_tuple', 'ner_tags_tuple'])
-        df = df.dropna().reset_index(drop=True)
-        # Save splits
-        save_conll_data(df, os.path.join(folder, f"{f}.json"))
-
-
 def preprocess_sentiment_analysis(folder):
     """
     Preprocess sentiment analysis dataset.
@@ -203,37 +161,6 @@ def preprocess_sentiment_analysis(folder):
     os.remove(file_path)
 
 
-def process_argument_quality(folder):
-    """
-    Preprocess argument quality dataset.
-    """
-    files = ["train.csv", "test.csv"]
-    for f in files:
-        path = os.path.join(folder, f)
-        df = pd.read_csv(path)[['topic', 'evidence_1', 'evidence_2', 'label']]
-
-        df['text'] = df.apply(lambda row: f"TOPIC: {row['topic']} [SEP] {row['evidence_1']} [SEP] {row['evidence_2']}",
-                              axis=1)
-        df["text"] = (
-            df["text"].str.replace(" [REF].", ".", regex=False)
-            .str.replace("[REF]", "", regex=False)
-            .str.replace(r"\s+", " ", regex=True)
-            .str.replace('"', '', regex=False))
-
-        df.drop(columns=['topic', 'evidence_1', 'evidence_2'], inplace=True)
-
-        df['label'] = df['label'] - 1
-
-        df = df.dropna().drop_duplicates().reset_index(drop=True)
-
-        if f == "test.csv":
-            df.to_csv(os.path.join(folder, f), index=False)
-        else:
-            train, dev = train_test_split(df, test_size=0.1, random_state=42)
-            train.to_csv(os.path.join(folder, "train.csv"), index=False)
-            dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
-
-
 def process_stance_detection(folder):
     files = ["vast_dev.csv", "vast_test.csv", "vast_train.csv"]
     for f in files:
@@ -251,7 +178,5 @@ if __name__ == "__main__":
     root = rootutils.find_root("")
     preprocess_argument_detection(os.path.join(root, "data/argument_detection"))
     preprocess_relation_classification(os.path.join(root, "data/relation_classification"))
-    preprocess_ner(os.path.join(root, "data/ner"))
     preprocess_sentiment_analysis(os.path.join(root, "data/sentiment_analysis"))
-    process_argument_quality(os.path.join(root, "data/argument_quality"))
     process_stance_detection(os.path.join(root, "data/stance_detection"))

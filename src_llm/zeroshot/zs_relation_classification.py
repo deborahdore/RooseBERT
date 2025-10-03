@@ -20,11 +20,8 @@ ID2LABEL_MAP = {0: 'support', 1: 'attack', 2: 'no_relation'}
 ALLOWED_LABELS = {"support", "attack", "neither", "none", "no relation"}
 
 prompt = (
-    "You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below. "
-    "The two arguments are separated by a period.\n\n"
-    "Output instructions:\n"
-    "- Output only one of the allowed relation types: support, attack, or neither\n"
-    "- Do not include punctuation, explanation, or formatting\n\n"
+    "You are a relation classification assistant. Your task is to determine the type of argumentative relation between two argument spans in the sentence below. The two arguments are separated by a [SEP] tag."
+    "Output only one of the allowed relation types: support, attack, or neither. Do not include punctuation, explanation, or formatting."
     "Sentence: %s"
 )
 
@@ -115,9 +112,9 @@ def main(model_id: str, dataset: pd.DataFrame, results_file: str, batch_size: in
 
     return {
         'accuracy': accuracy_score(labels_cleaned, preds),
-        'precision': precision_score(labels_cleaned, preds, zero_division=0),
-        'recall': recall_score(labels_cleaned, preds, zero_division=0),
-        'f1': f1_score(labels_cleaned, preds, zero_division=0),
+        'precision': precision_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
+        'recall': recall_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
+        'f1': f1_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
         'errors': errors
     }
 
@@ -135,10 +132,10 @@ if __name__ == "__main__":
 
     dataset = pd.read_csv("data/relation_classification/test.csv")
     dataset["prompt"] = dataset["text"].apply(lambda x: prompt % x)
-    results_file = "logs/" + model_name + "/relation_classification_predictions.csv"
+    results_file = "logs/" + model_name + "/zs_relation_classification_predictions.csv"
     os.makedirs("logs/" + model_name, exist_ok=True)
 
-    metrics = main("/lustre/fsmisc/dataset/HuggingFace_Models/" + model_id, dataset, results_file)
+    metrics = main(model_id, dataset, results_file)
 
     print("\n############## RESULTS ##############")
     print(f"Model: {model_id}")
