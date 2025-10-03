@@ -2,63 +2,7 @@
 
 # RooseBERT: A New Deal For Political Language Modelling
 
-[![Paper](http://img.shields.io/badge/paper-arxiv.2508.03250-B31B1B.svg)](https://arxiv.org/abs/2508.03250v1)
-
 </div>
-
-All pretrained models can be found in the
-HuggingFace [RooseBERT](https://huggingface.co/collections/ddore14/roosebert-68931c9b0db3d24e42051c74)'s collection!
-<div align="center">
-<img src="roosebert.jpeg" alt="drawing" width="200"/>
-</div>
-
-If you use this model, cite us:
-
-```bibtex 
-@misc{
-    dore2025roosebertnewdealpolitical, 
-    title={RooseBERT: A New Deal For Political Language Modelling}, 
-    author={Deborah Dore and Elena Cabrio and Serena Villata}, 
-    year={2025}, 
-    eprint={2508.03250}, 
-    archivePrefix={arXiv}, 
-    primaryClass={cs.CL}, 
-    url={https://arxiv.org/abs/2508.03250}, 
-} 
-```
-
-Load and use the models with HuggingFace:
-
-```python
-!pip install transformers torch
-
-from transformers import AutoModelForMaskedLM, AutoTokenizer
-import torch
-
-# Load the model and tokenizer
-model_name = "ddore14/RooseBERT-scr-uncased"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForMaskedLM.from_pretrained(model_name)
-
-# Example text from a political debate with a mask token
-text = "The government should focus on [MASK] healthcare."
-
-# Tokenize the input text
-inputs = tokenizer(text, return_tensors="pt")
-mask_token_index = torch.where(inputs.input_ids == tokenizer.mask_token_id)[1]
-
-# Perform inference
-with torch.no_grad():
-    outputs = model(**inputs)
-    predictions = outputs.logits
-
-# Get the top predicted tokens for the mask
-predicted_token_id = predictions[0, mask_token_index].argmax(axis=-1)
-predicted_token = tokenizer.decode(predicted_token_id)
-
-print(f"Original text: {text}")
-print(f"Predicted token: {predicted_token}")
-```
 
 ## Table of Contents
 
@@ -79,8 +23,7 @@ The goal of this project is to continue the pretraining of BERT on a curated dat
 By training BERT on a domain-specific content, we aim to generate embeddings that capture the nuanced language,
 rhetoric, and argumentation style unique to political discourse.
 The project will investigate whether these enhanced embeddings can improve performance in downstream tasks related to
-political debates such as sentiment analysis (binary), ner, argument classification and relation classification (3-class
-classification).
+political debates such as sentiment analysis, stance detection, argument classification and relation classification.
 
 **Objectives**:
 
@@ -110,9 +53,8 @@ The following datasets were used for pre-training:
     - Proceedings from each sitting day in the Australian Parliament from 1998 to 2022.
 * [📌 EU Speech](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XPCVEI)
     - Collection of 18,403 speeches from EU leaders from 2007 to 2015
-* [📌 ParlEE UK & IE Corpus](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZY3RV7&version=2.0)
-    - Contains the full-text speeches from eight legislative chambers for Ireland and the United Kingdom, covering
-      2009-2019.
+* [📌 ParlEE IE Corpus](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZY3RV7&version=2.0)
+    - Contains the full-text speeches from eight legislative chambers for Ireland, covering 2009-2019.
 * [📌 Scottish Parliament](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE)
     - Contains 1.8 million spoken contributions for the Scottish Parliament (up to 2021/02/03).
 * [📌 United Nations Security Council](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/KGVSYH&version=6.1)
@@ -134,7 +76,7 @@ This project fine-tunes **BERT** models:
 ```bash
 
 # clone project
-git clone https://github.com/deborahdore/RooseBERT
+git clone https://github.com/user/RooseBERT
 cd RooseBERT
 
 # create conda environment and install dependencies
@@ -279,8 +221,8 @@ analysis. Below is a summary of the tasks and their datasets:
 
 - **Sentiment Analysis**: Classify political statements as positive or negative using
   the [ParlVote](https://data.mendeley.com/datasets/czjfwgs9tm/1) Dataset (binary classification).
-- **Named Entity Recognition (NER)**: Identify and categorize named entities in political debates using
-  the [CrossNER](https://github.com/zliucr/CrossNER)  Dataset (political debates section).
+- **Stance Detection**: Identify and categorize the stance of a sentence using
+  the [VAST](https://github.com/emilyallaway/zero-shot-stance)  Dataset.
 - **Argument Detection**: Detect arguments and their structures in political speeches using
   the [ElecDeb60to20](https://github.com/pierpaologoffredo/ElecDeb60to20) Dataset.
 - **Relation Classification**: Identify relationships between arguments or entities using
@@ -297,9 +239,9 @@ do everything for you, just launch it.
 python script/prepare_downstream_data.py
 ```
 
-To run the _Argument Detection_ or _Named Entity Recognition (NER)_ downstream tasks, use the [
-`run_ner.py`](src/run_ner.py) script. To run the _Relation Classification_ and _Sentiment Analysis_ tasks, use the [
-`run_classification.py`](src/run_classification.py) script.
+To run the _Argument Detection_ downstream tasks, use the [
+`run_ner.py`](src/run_ner.py) script. To run the _Relation Classification_ and _Sentiment Analysis_ and _Stance
+Detection_ tasks, use the [`run_classification.py`](src/run_classification.py) script.
 An example of configuration files can be found in the [sbatch](sbatch) folder.
 
 ### 🚀 Extract Results
@@ -313,7 +255,7 @@ file.
 python extract_results.py
 ```
 
-Ig you have run the model multiple times with different seeds, use the [compute_stats.py](script/compute_stats.py)
+If you have run the model multiple times with different seeds, use the [compute_stats.py](script/compute_stats.py)
 script to extract mean and standard deviation.
 
 ```bash
