@@ -22,7 +22,7 @@ def extract_and_round(x):
 if __name__ == '__main__':
     # Each time a run_classification/run_ner is executed, it writes down the results in a csv file called random_seed_runs
     # After n runs, we can access it and extract mean and standard deviation
-    with pd.ExcelWriter("random_seed_runs.xlsx") as writer:
+    with pd.ExcelWriter("logs/random_seed_runs.xlsx") as writer:
         for tsk in ["argument_detection", "sentiment_analysis", "relation_classification", "stance_detection"]:
             models = []
             mean = []
@@ -46,5 +46,5 @@ if __name__ == '__main__':
                 std.append(extract_and_round(statistics.stdev(score)))
                 scores.append(score)
 
-            df = pd.DataFrame({'Models': models, 'Mean': mean, 'Std': std, 'Scores': scores})
-            df.to_excel(writer, sheet_name=tsk[:31], index=False)
+        df = pd.DataFrame({'Models': models, 'Mean': mean, 'Std': std, 'Scores': scores})
+        df.to_excel(writer, sheet_name=tsk[:31], index=False)
