@@ -1,12 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=llama
-#SBATCH --output=logs/llama.out
-
-#SBATCH --time=36:00:00
-#SBATCH --account=marianne
-#SBATCH --gpus=1
-#SBATCH --partition=gpu
-
 conda activate roosebert
 export TOKENIZERS_PARALLELISM=false
 export HF_HOME="/home/user/.cache/huggingface/hub"
