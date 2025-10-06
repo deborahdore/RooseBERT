@@ -6,13 +6,13 @@ export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="Masked_Language_Modelling"
 export MASTER_PORT=6000
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
-export HF_HOME="/linkhome/rech/genzqh01/ubq61ty/.cache/huggingface"
+export HF_HOME=".cache/huggingface"
 
 wandb disabled
 
 # ------------------ HYPERPARAMETERS ------------------
-MODEL_NAME="deberta-v3-base"
-MODEL_PATH="microsoft/${MODEL_NAME}"
+MODEL_NAME=""
+MODEL_PATH="model_path/${MODEL_NAME}"
 
 N_GPUS=8
 

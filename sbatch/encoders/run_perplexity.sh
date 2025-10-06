@@ -1,10 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=perplexity
-#SBATCH --gres=gpu:1
-
-#SBATCH --output=logs/perplexity_%j.out
-#SBATCH --error=logs/perplexity_%j.out
-
 
 export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="Perplexity"

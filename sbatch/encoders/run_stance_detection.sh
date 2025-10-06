@@ -1,10 +1,4 @@
 #!/bin/bash
-#SBATCH --job-name=modernbert_stance_detection
-#SBATCH --gres=gpu:1
-
-#SBATCH --output=logs/modernbert_stance_detection.out
-#SBATCH --error=logs/modernbert_stance_detection.out
-
 set -e
 set -u
 
@@ -15,8 +9,8 @@ wandb disabled
 export HF_HOME="/home/user/.cache/huggingface/hub"
 
 # HYPERPARAMETERS -----------------------------
-MODEL_DIR="answerdotai"
-MODELS=("ModernBERT-base")
+MODEL_DIR=""
+MODELS=("")
 LEARNING_RATES=(2e-5 3e-5 5e-5)
 WEIGHT_DECAYS=(0.01)
 BATCH_SIZES=(8)
