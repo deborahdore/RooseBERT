@@ -123,6 +123,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     model_id = args.model_id
 
+    print(f"!! Model: {model_id}")
+
     # Load train/val/test split
     dataset_dict = load_dataset("./data/argument_detection/")
     train_dataset = Dataset.from_pandas(dataset_dict['train'])
@@ -173,7 +175,7 @@ if __name__ == '__main__':
 
     # Save fine-tuned model
     now = datetime.now()
-    trainer_filepath = f"./logs/{model_id}/{now.strftime('%d/%m/%y:%H:%M')}"
+    trainer_filepath = f"./logs/{model_id}/argument_detection/{now.strftime('%d/%m/%y:%H:%M')}"
     trainer.save_model(trainer_filepath)
 
     del model, trainer
@@ -187,6 +189,9 @@ if __name__ == '__main__':
     batch_size = 8
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    merged_model.config.pad_token_id = tokenizer.pad_token_id
 
     texts = dataset_dict['test']['text'].tolist()
     labels = dataset_dict['test']['label'].tolist()
