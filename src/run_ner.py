@@ -452,6 +452,49 @@ def main():
         tokenized_inputs["labels"] = labels
         return tokenized_inputs
 
+    def tokenize_and_align_labels_slow(examples):
+        # Tokenize the input text with padding and truncation
+        tokenized_inputs = tokenizer(
+            examples[text_column_name],
+            padding='max_length',  # Ensure padding to max length
+            truncation=True,  # Truncate if sequence exceeds max length
+            max_length=max_seq_length,  # Define max sequence length
+            is_split_into_words=True,
+        )
+
+        labels = []
+
+        for i, label in enumerate(examples[label_column_name]):
+            word_ids = []
+            current_word_idx = 0
+            # Manually tokenize each word in the sentence
+            for word in examples[text_column_name][i]:
+                word_tokens = tokenizer.tokenize(word)  # Tokenize the word manually
+                word_ids.extend([current_word_idx] * len(word_tokens))
+                current_word_idx += 1
+
+            previous_word_idx = None
+            label_ids = []
+
+            for word_idx in word_ids:
+                if word_idx is None:
+                    label_ids.append(-100)
+                elif word_idx != previous_word_idx:
+                    label_ids.append(label_to_id[label[word_idx]])
+                else:
+                    if data_args.label_all_tokens:
+                        label_ids.append(b_to_i_label[label_to_id[label[word_idx]]])
+                    else:
+                        label_ids.append(-100)
+                previous_word_idx = word_idx
+
+            # Ensure labels are padded to match max_length
+            label_ids += [-100] * (max_seq_length - len(label_ids))  # Padding for labels
+            labels.append(label_ids[:max_seq_length])  # Truncate if longer than max_length
+
+        tokenized_inputs["labels"] = labels
+        return tokenized_inputs
+
     train_dataset = raw_datasets['train'].shuffle(seed=training_args.seed)
     eval_dataset = raw_datasets['validation']
     test_dataset = raw_datasets['test']
@@ -470,21 +513,21 @@ def main():
 
     with training_args.main_process_first(desc="train dataset map pre-processing"):
         train_dataset = train_dataset.map(
-            tokenize_and_align_labels,
+            tokenize_and_align_labels if "polibertweet" not in model_args.model_name_or_path else tokenize_and_align_labels_slow,
             batched=True,
             num_proc=data_args.preprocessing_num_workers,
             desc="Running tokenizer on train dataset",
         )
 
         eval_dataset = eval_dataset.map(
-            tokenize_and_align_labels,
+            tokenize_and_align_labels if "polibertweet" not in model_args.model_name_or_path else tokenize_and_align_labels_slow,
             batched=True,
             num_proc=data_args.preprocessing_num_workers,
             desc="Running tokenizer on validation dataset",
         )
 
         test_dataset = test_dataset.map(
-            tokenize_and_align_labels,
+            tokenize_and_align_labels if "polibertweet" not in model_args.model_name_or_path else tokenize_and_align_labels_slow,
             batched=True,
             num_proc=data_args.preprocessing_num_workers,
             desc="Running tokenizer on test dataset",
