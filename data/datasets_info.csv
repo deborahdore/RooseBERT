@@ -1,11 +1,13 @@
-dataset, link, years, GB,Cluster #
-US DEBATES,https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0,1960-2024,21M,0
-UNGDC,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y,1946-2024,197M,1
-UK Parliament,https://reshare.ukdataservice.ac.uk/854292/,1979-2019,2.5G,2
-Australian Parliament,https://zenodo.org/records/8121950,1998-2022,925M,3
-European Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XPCVEI,2007-2015,114M,3
-ParlEE plenary speeches,"https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0, https://dataverse.harvard.edu/file.xhtml?fileId=6435505&version=2.0",2009-2019,1.3G,3
-Scottish Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE,1999-2021,430M,3
-UN Security Council,https://dataverse.harvard.edu/file.xhtml?fileId=10809805&version=6.1,1992-2023,365M,1
-TOTAL,TRAINING,//,4.7G,
-TOTAL,VALIDATION,//,256M,
+dataset, link, years,GB
+Ghana and South Africa Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HISX4G,,573M
+Australian Parliament,https://zenodo.org/records/17351233,,1G
+Canadian Parliament,https://openparliament.ca/debates/,,1.1G
+European Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GKABNU,,110M
+Irish Parliament ,"https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0, https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/6MZN76",,3.4G
+New Zealand Parliament,https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0,,791M
+Scottish Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE&version=1.0,,443M
+UK Parliament,https://reshare.ukdataservice.ac.uk/854292/,,2.6G
+UNGDC,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y,,186M
+UNSC,https://dataverse.harvard.edu/file.xhtml?fileId=10809805&version=6.1,,387M
+US Debates,"https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0
+",,16M

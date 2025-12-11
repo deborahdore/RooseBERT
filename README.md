@@ -41,24 +41,32 @@ political debates such as sentiment analysis, stance detection, argument classif
 
 The following datasets were used for pre-training:
 
+* [📌 HOME Project Parliamentary Activity Datasets](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HISX4G)
+    * The HOME Project parliamentary activity datasets cover the Ghanaian Parliament (Parliament of Ghana), and the
+      South African Parliament (Parliament of the Republic of South Africa).
+* [📌 Australian Parliament](https://zenodo.org/records/17351233)
+    * Proceedings from each sitting day in the Australian Parliament from 1998 to 2025.
+* [📌 Canadian Parliament](https://openparliament.ca/debates/)
+    * Scraped speeches from the Canadian Parliament.
+* [📌 EU Speech](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XPCVEI)
+    * Collection of 18,403 speeches from EU leaders from 2007 to 2015
+* [📌 ParlEE IE Corpus](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZY3RV7&version=2.0)
+    * Contains the full-text speeches from eight legislative chambers for Ireland, covering 2009-2019.
+* [📌 Parliamentary Speeches in Ireland](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/6MZN76)
+    * Contains parliamentary speeches in Ireland from 1919 to 2023.
+* [📌 Parlaimentary Speeches in New Zealand](https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0)
+* [📌 Scottish Parliament](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE)
+    - Contains 1.8 million spoken contributions for the Scottish Parliament (up to 2021/02/03).
+* [📌House of Commons Parliamentary Debates](https://reshare.ukdataservice.ac.uk/854292/)
+    - Contains every parliamentary debates held in the House of Commons in UK between 1979 and 2019.
 * [📌UN General Debate Corpus (UNGDC)](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y)
     - A comprehensive collection of United Nations General Assembly debates from 1946 to 2023.
     - Includes over 10,000 speeches from representatives of 202 countries.
     - Accompanied by [visualization and analysis tools](https://www.ungdc.bham.ac.uk) developed by the authors.
-* [📌House of Commons Parliamentary Debates](https://reshare.ukdataservice.ac.uk/854292/)
-    - Contains every parliamentary debates held in the House of Commons between 1979 and 2019.
-* [📌Presidential Candidates Debates](https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0)
-    - A collection of US presidential debates spanning from 1960 to 2024.
-* [📌Australian Parliament](https://zenodo.org/records/8121950)
-    - Proceedings from each sitting day in the Australian Parliament from 1998 to 2022.
-* [📌 EU Speech](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/XPCVEI)
-    - Collection of 18,403 speeches from EU leaders from 2007 to 2015
-* [📌 ParlEE IE Corpus](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ZY3RV7&version=2.0)
-    - Contains the full-text speeches from eight legislative chambers for Ireland, covering 2009-2019.
-* [📌 Scottish Parliament](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE)
-    - Contains 1.8 million spoken contributions for the Scottish Parliament (up to 2021/02/03).
 * [📌 United Nations Security Council](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/KGVSYH&version=6.1)
     - A dataset of UN Security Council debates between January 1992 and December 2023.
+* [📌Presidential Candidates Debates](https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0)
+    - A collection of US presidential debates spanning from 1960 to 2024.
 
 ## 3️⃣ Models
 
@@ -66,8 +74,6 @@ This project fine-tunes **BERT** models:
 
 - `bert-base-cased`
 - `bert-base-uncased`
-- `bert-large-uncased`
-- `bert-large-cased`
 
 ## 4️⃣ Installation
 
@@ -90,18 +96,13 @@ conda activate rooseBERT
 
 ### 🚀 **Download the Corpora**
 
-Use the script located in the [scraping](script/scraping) folder to download the datasets required for continued BERT
-pre-training. Each script includes instructions at the top explaining where to obtain the datasets and how to execute
-the download process.
-
-### 🚀 **Prepare the Dataset**
-
-Use the [`prepare_training_dataset.py`](script/prepare_training_dataset.py) script to create the train/dev split from
-the raw dataset. When running the script, specify the maximum sequence length for each chunk of sentences.
+Use the [download_pretraining_data.sh](download_pretraining_data.sh) script to download and prepare the datasets
+required for continued BERT pre-training.
+This script will use the [`prepare_training_dataset.py`](script/prepare_training_dataset.py) script to create the
+train/dev split from the raw dataset.
 
 _💡 Hint: For optimal BERT pre-training, we use sequences of length 128 for 80% of the time, and sequences of length 512
-for
-the remaining 20%._
+for the remaining 20%._
 
 ```bash
 
@@ -214,23 +215,59 @@ python -m torch.distributed.launch --nproc_per_node=8 \
 - The **DeepSpeed** configuration file ([deepspeed_config.json](configs/deepspeed_config.json)) is used for optimization
   along with FP16 and gradient accumulation to speed up the training.
 
-### 🚀 Choose a Downstream Task
+### 🚀 Downstream Tasks
 
 We evaluated BERT on various downstream tasks relevant to natural language processing and political discourse
 analysis. Below is a summary of the tasks and their datasets:
 
-- **Sentiment Analysis**: Classify political statements as positive or negative using
-  the [ParlVote](https://data.mendeley.com/datasets/czjfwgs9tm/1) Dataset (binary classification).
-- **Stance Detection**: Identify and categorize the stance of a sentence using
-  the [VAST](https://github.com/emilyallaway/zero-shot-stance)  Dataset.
-- **Argument Detection**: Detect arguments and their structures in political speeches using
-  the [ElecDeb60to20](https://github.com/pierpaologoffredo/ElecDeb60to20) Dataset.
-- **Relation Classification**: Identify relationships between arguments or entities using
-  the [ElecDeb60to20](https://github.com/pierpaologoffredo/ElecDeb60to20) Dataset (multi-label classification).
+* **Stance classification: a comparative study and use case on Australian parliamentary debates** (binary
+  classification)
+    * Stance detection and cross-domain transferability on Australian Parliamentary Debates
+* **Get out the vote: Determining support or opposition from Congressional floor-debate transcripts** (binary
+  classification)
+    * Stance detection of US Congress Debates
+* **'Aye' or 'No'? Speech-level Sentiment Analysis of Hansard UK Parliamentary Debate Transcripts** (binary
+  classification)
+    * Sentiment Analysis of UK Parliamentary Debates
+* **ParlVote: A Corpus for Sentiment Analysis of Political Debates** (sentence-pair, binary classification)
+    * Sentiment Analysis of UK Parliamentary Debates usign both motion and speech
+* **Policy-focused Stance Detection in Parliamentary Debate Speeches** (multi class classification)
+    * Policy preference classification of UK Parliamentary Debates
+* **Argument-based detection and classification of fallacies in political debates**
+    * Two tasks: Argument Component Detection and Classification (sequence labelling) and Argument Component Relations
+      Prediction and Classification (sentence-pair, multi-class classification) in US Presidential Debates
+* **Policy Preference Detection in Parliamentary Debate Motions** (multi-class classification)
+    * Policy preference classification in UK Parliamentary speeches
+* **From Debates to Diplomacy: Argument Mining Across Political Registers**
+    * Two tasks: Argument Component Detection and Classification (sequence labelling) and Argument Component Relations
+      Prediction and Classification (sentence-pair, multi-class classification) in the UNSC.
 
-To download all the necessary dataset use the [download.sh](download.sh) script. Then, use
-the [prepare_downstream_data.py](script/prepare_downstream_data.py) script to process all the dataset. The script will
-do everything for you, just launch it.
+To sum up:
+
+|       **Task Type**        | **Count** |
+|:--------------------------:|-----------|
+|   binary classification    | 4         |
+| multi-class classification | 4         |
+|     sequence labelling     | 3         |
+
+|  **Task Type**  | **Count** |
+|:---------------:|-----------|
+| single sentence | 5         |
+|  sentence-pair  | 3         |
+|       ner       | 3         |
+
+|                       **Task Type**                       | **Count** |
+|:---------------------------------------------------------:|-----------|
+|                    sentiment analysis                     | 2         |
+|                     stance detection                      | 2         |
+|             policy preference classification              | 2         |    
+|      argument component detection and classification      | 2         | 
+| argument component relation prediction and classification | 2         |  
+|                            NER                            | 1         |
+
+To download all the necessary dataset use the [download_downstream_data.sh](download_downstream_data.sh) script. Then,
+use the [prepare_downstream_data.py](script/prepare_downstream_data.py) script to process all the dataset. The script
+will do everything for you, just launch it.
 
 ```bash
 
@@ -238,11 +275,6 @@ do everything for you, just launch it.
 
 python script/prepare_downstream_data.py
 ```
-
-To run the _Argument Detection_ downstream tasks, use the [
-`run_ner.py`](src/run_ner.py) script. To run the _Relation Classification_ and _Sentiment Analysis_ and _Stance
-Detection_ tasks, use the [`run_classification.py`](src/run_classification.py) script.
-An example of configuration files can be found in the [sbatch](sbatch) folder.
 
 ### 🚀 Extract Results
 

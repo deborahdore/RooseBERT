@@ -27,13 +27,14 @@ import math
 import os
 import sys
 from dataclasses import dataclass, field
-from itertools import chain
+from datetime import timedelta
 from typing import Optional
 
 import datasets
 import evaluate
 import rootutils
 import torch
+import torch.distributed as dist
 import torch.nn.functional as F
 import transformers
 from datasets import load_dataset
@@ -41,19 +42,21 @@ from transformers import (
     CONFIG_MAPPING,
     MODEL_FOR_MASKED_LM_MAPPING,
     AutoConfig,
-    AutoModelForMaskedLM,
     AutoTokenizer,
-    DataCollatorForLanguageModeling,
     HfArgumentParser,
     Trainer,
     TrainingArguments,
     is_torch_xla_available,
     set_seed, )
 from transformers.trainer_utils import get_last_checkpoint
-from transformers.utils import check_min_version, send_example_telemetry
+from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
+from src.data.collator_multitask import DataCollatorForMultiTaskPretraining
+from src.models.bert_multitask import BertForMultiTaskPretraining
+from src.callbacks.MultiTaskLoggingCallback import MultiTaskLoggingCallback
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.49.0.dev0")
@@ -103,7 +106,7 @@ class ModelArguments:
         default=None, metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"}
     )
     cache_dir: Optional[str] = field(
-        default=None,
+        default="cache/",
         metadata={"help": "Where do you want to store the pretrained models downloaded from huggingface.co"},
     )
     use_fast_tokenizer: bool = field(
@@ -172,9 +175,10 @@ class DataTrainingArguments:
     dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
     )
-    train_file: Optional[str] = field(default=None, metadata={"help": "The input training data file (a text file)."})
+    train_file: Optional[str] = field(default="data/training/max_128/train.csv",
+                                      metadata={"help": "The input training data file (a text file)."})
     validation_file: Optional[str] = field(
-        default=None,
+        default="data/training/max_128/dev.csv",
         metadata={"help": "An optional input evaluation data file to evaluate the perplexity on (a text file)."},
     )
     overwrite_cache: bool = field(
@@ -187,7 +191,7 @@ class DataTrainingArguments:
         },
     )
     max_seq_length: Optional[int] = field(
-        default=None,
+        default=512,
         metadata={
             "help": (
                 "The maximum total input sequence length after tokenization. Sequences longer "
@@ -196,7 +200,7 @@ class DataTrainingArguments:
         },
     )
     preprocessing_num_workers: Optional[int] = field(
-        default=None,
+        default=4,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
     mlm_probability: float = field(
@@ -263,7 +267,7 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
-    send_example_telemetry("run_mlm", model_args, data_args)
+    # send_example_telemetry("run_mlm", model_args, data_args)
 
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -288,7 +292,8 @@ def main():
     logger.info(f"Training/evaluation parameters {training_args}")
 
     last_checkpoint = None
-    if os.path.isdir(training_args.output_dir) and training_args.do_train and not training_args.overwrite_output_dir:
+    if os.path.isdir(
+            training_args.output_dir) and training_args.do_train:  # and not training_args.overwrite_output_dir:
         last_checkpoint = get_last_checkpoint(training_args.output_dir)
         if last_checkpoint is None and len(os.listdir(training_args.output_dir)) > 0:
             raise ValueError(
@@ -372,8 +377,11 @@ def main():
         "token": model_args.token,
         "trust_remote_code": model_args.trust_remote_code,
     }
+    add_prefix_space = False
     if model_args.config_name:
         config = AutoConfig.from_pretrained(model_args.config_name, **config_kwargs)
+        if any(x in model_args.config_name.lower() for x in ["longformer", "deberta"]):
+            add_prefix_space = True
     elif model_args.model_name_or_path:
         config = AutoConfig.from_pretrained(model_args.model_name_or_path, **config_kwargs)
     else:
@@ -383,10 +391,6 @@ def main():
             logger.info(f"Overriding config: {model_args.config_overrides}")
             config.update_from_string(model_args.config_overrides)
             logger.info(f"New config: {config}")
-
-    add_prefix_space = False
-    if any(x in model_args.config_name.lower() for x in ["longformer", "deberta"]):
-        add_prefix_space = True
 
     tokenizer_kwargs = {
         "cache_dir": model_args.cache_dir,
@@ -408,12 +412,13 @@ def main():
     assert tokenizer is not None
 
     if model_args.model_name_or_path:
+        logger.info(f"Training new model from {model_args.model_name_or_path} weights")
         torch_dtype = (
             model_args.torch_dtype
             if model_args.torch_dtype in ["auto", None]
             else getattr(torch, model_args.torch_dtype)
         )
-        model = AutoModelForMaskedLM.from_pretrained(
+        model = BertForMultiTaskPretraining.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -426,7 +431,7 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = AutoModelForMaskedLM.from_config(config, trust_remote_code=model_args.trust_remote_code)
+        model = BertForMultiTaskPretraining(config)
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -458,87 +463,37 @@ def main():
             )
         max_seq_length = min(data_args.max_seq_length, tokenizer.model_max_length)
 
-    #  DEFAULT LINE_BY_LINE IS TRUE
-    if data_args.line_by_line:
-        # Tokenize each nonempty line.
-        padding = "max_length" if data_args.pad_to_max_length else False
+    def tokenize_function(examples):
+        tokenized = tokenizer(
+            examples[text_column_name],
+            padding="max_length" if data_args.pad_to_max_length else False,
+            truncation=True,
+            max_length=max_seq_length,
+            return_special_tokens_mask=True,
+        )
+        # Preserve extra columns
+        if "same_speaker" in examples:
+            tokenized["scp_labels"] = [int(l) for l in examples["same_speaker"]]
+        if "same_debate" in examples:
+            tokenized["acm_labels"] = [int(l) for l in examples["same_debate"]]
+        return tokenized
 
-        def tokenize_function(examples):
-            # Remove empty lines
-            examples[text_column_name] = [
-                line for line in examples[text_column_name] if len(line) > 0 and not line.isspace()
-            ]
-            return tokenizer(
-                examples[text_column_name],
-                padding=padding,
-                truncation=True,
-                max_length=max_seq_length,
-                return_special_tokens_mask=True,
+    with training_args.main_process_first(desc="dataset map tokenization"):
+        if not data_args.streaming:
+            tokenized_datasets = raw_datasets.map(
+                tokenize_function,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=[text_column_name],
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on dataset line_by_line",
             )
-
-        with training_args.main_process_first(desc="dataset map tokenization"):
-            if not data_args.streaming:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    num_proc=data_args.preprocessing_num_workers,
-                    remove_columns=[text_column_name],
-                    load_from_cache_file=not data_args.overwrite_cache,
-                    desc="Running tokenizer on dataset line_by_line",
-                )
-            else:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    remove_columns=[text_column_name],
-                )
-    else:
-        # Tokenize every text, then concatenate them together before splitting them in smaller parts.
-        def tokenize_function(examples):
-            return tokenizer(examples[text_column_name], return_special_tokens_mask=True)
-
-        with training_args.main_process_first(desc="dataset map tokenization"):
-            if not data_args.streaming:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    num_proc=data_args.preprocessing_num_workers,
-                    remove_columns=column_names,
-                    load_from_cache_file=not data_args.overwrite_cache,
-                    desc="Running tokenizer on every text in dataset",
-                )
-            else:
-                tokenized_datasets = raw_datasets.map(
-                    tokenize_function,
-                    batched=True,
-                    remove_columns=column_names,
-                )
-
-        # Concatenate all texts from our dataset and generate chunks of max_seq_length.
-        def group_texts(examples):
-            concatenated_examples = {k: list(chain(*examples[k])) for k in examples.keys()}
-            total_length = len(concatenated_examples[list(examples.keys())[0]])
-            total_length = (total_length // max_seq_length) * max_seq_length
-            result = {
-                k: [t[i: i + max_seq_length] for i in range(0, total_length, max_seq_length)]
-                for k, t in concatenated_examples.items()
-            }
-            return result
-
-        with training_args.main_process_first(desc="grouping texts together"):
-            if not data_args.streaming:
-                tokenized_datasets = tokenized_datasets.map(
-                    group_texts,
-                    batched=True,
-                    num_proc=data_args.preprocessing_num_workers,
-                    load_from_cache_file=not data_args.overwrite_cache,
-                    desc=f"Grouping texts in chunks of {max_seq_length}",
-                )
-            else:
-                tokenized_datasets = tokenized_datasets.map(
-                    group_texts,
-                    batched=True,
-                )
+        else:
+            tokenized_datasets = raw_datasets.map(
+                tokenize_function,
+                batched=True,
+                remove_columns=[text_column_name],
+            )
 
     if training_args.do_train:
         if "train" not in tokenized_datasets:
@@ -557,26 +512,94 @@ def main():
             eval_dataset = eval_dataset.select(range(max_eval_samples))
 
         def preprocess_logits_for_metrics(logits, labels):
+            """
+            Preprocess logits from multi-task model
+            """
             if isinstance(logits, tuple):
-                # Depending on the model and config, logits may contain extra tensors,
-                # like past_key_values, but logits always come first
-                logits = logits[0]
-            return F.softmax(logits, dim=-1).argmax(dim=-1)
+                # Multi-task: (mlm_logits, scp_logits, acm_logits)
+                mlm_logits, scp_logits, acm_logits = logits[3], logits[4], logits[5]
 
-        metric = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
+                # Convert to predictions
+                mlm_preds = F.softmax(mlm_logits, dim=-1).argmax(dim=-1)
+                scp_preds = F.softmax(scp_logits, dim=-1).argmax(dim=-1)
+                acm_preds = F.softmax(acm_logits, dim=-1).argmax(dim=-1)
+
+                return (mlm_preds, scp_preds, acm_preds)
+            else:
+                # Single task fallback
+                return F.softmax(logits, dim=-1).argmax(dim=-1)
+
+        # Load metrics for each task
+        metric_mlm = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
+        metric_scp = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
+        metric_acm = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
 
         def compute_metrics(eval_preds):
+            """
+            Compute metrics for all three tasks
+            """
             preds, labels = eval_preds
-            labels = labels.reshape(-1)
-            preds = preds.reshape(-1)
-            mask = labels != -100
-            labels = labels[mask]
-            preds = preds[mask]
-            return metric.compute(predictions=preds, references=labels)
+
+            # Multi-task predictions
+            if isinstance(preds, tuple) and len(preds) == 3:
+                mlm_preds, scp_preds, acm_preds = preds
+                mlm_labels, scp_labels, acm_labels = labels
+
+                # MLM Accuracy (masked tokens only)
+                mlm_labels_flat = mlm_labels.reshape(-1)
+                mlm_preds_flat = mlm_preds.reshape(-1)
+                mlm_mask = mlm_labels_flat != -100
+                mlm_labels_filtered = mlm_labels_flat[mlm_mask]
+                mlm_preds_filtered = mlm_preds_flat[mlm_mask]
+
+                mlm_accuracy = metric_mlm.compute(
+                    predictions=mlm_preds_filtered,
+                    references=mlm_labels_filtered
+                )['accuracy']
+
+                # SCP Accuracy
+                scp_labels_flat = scp_labels.reshape(-1)
+                scp_preds_flat = scp_preds.reshape(-1)
+                scp_mask = scp_labels_flat != -100
+                scp_labels_filtered = scp_labels_flat[scp_mask]
+                scp_preds_filtered = scp_preds_flat[scp_mask]
+
+                scp_accuracy = metric_scp.compute(
+                    predictions=scp_preds_filtered,
+                    references=scp_labels_filtered
+                )['accuracy']
+
+                # ACM Accuracy
+                acm_labels_flat = acm_labels.reshape(-1)
+                acm_preds_flat = acm_preds.reshape(-1)
+                acm_mask = acm_labels_flat != -100
+                acm_labels_filtered = acm_labels_flat[acm_mask]
+                acm_preds_filtered = acm_preds_flat[acm_mask]
+
+                acm_accuracy = metric_acm.compute(
+                    predictions=acm_preds_filtered,
+                    references=acm_labels_filtered
+                )['accuracy']
+
+                return {
+                    'mlm_accuracy': mlm_accuracy,
+                    'scp_accuracy': scp_accuracy,
+                    'acm_accuracy': acm_accuracy,
+                    'avg_accuracy': (mlm_accuracy + scp_accuracy + acm_accuracy) / 3,
+                }
+
+            else:
+                # Single-task fallback
+                labels = labels.reshape(-1)
+                preds = preds.reshape(-1)
+                mask = labels != -100
+                labels = labels[mask]
+                preds = preds[mask]
+                return metric_mlm.compute(predictions=preds, references=labels)
 
     # Data collator
     pad_to_multiple_of_8 = data_args.line_by_line and training_args.fp16 and not data_args.pad_to_max_length
-    data_collator = DataCollatorForLanguageModeling(
+    data_collator = DataCollatorForMultiTaskPretraining(
         tokenizer=tokenizer,
         mlm_probability=data_args.mlm_probability,
         pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
@@ -594,6 +617,7 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_xla_available()
         else None,
+        callbacks=[MultiTaskLoggingCallback()]
     )
 
     # Training
@@ -648,8 +672,43 @@ def main():
         trainer.create_model_card(**kwargs)
 
 
+def is_distributed_env():
+    return ("RANK" in os.environ and "WORLD_SIZE" in os.environ and int(os.environ["WORLD_SIZE"]) > 1)
+
+
+def setup_distributed():
+    if not is_distributed_env():
+        return False
+
+    local_rank = int(os.environ.get("LOCAL_RANK", 0))
+
+    # Make sure CUDA uses the intended device for this process
+    if torch.cuda.is_available():
+        torch.cuda.set_device(local_rank)
+
+    # Only initialize once per process
+    if not dist.is_available():
+        raise RuntimeError("torch.distributed is not available")
+    if not dist.is_initialized():
+        # use env:// so torchrun / torch.distributed.run env vars are used automatically
+        dist.init_process_group(backend="nccl", init_method="env://", timeout=timedelta(minutes=300))
+    else:
+        # already initialized (avoid double-init)
+        pass
+
+    # Avoid the "devices unknown" warning — specify device_ids as a list
+    dist.barrier(device_ids=[local_rank])
+    return True
+
+
 if __name__ == "__main__":
     try:
+        distributed = setup_distributed()
+        if distributed:
+            print(
+                f"Initialized distributed: rank={os.environ.get('RANK')} local_rank={os.environ.get('LOCAL_RANK')} world_size={os.environ.get('WORLD_SIZE')}")
+        else:
+            print("Not running distributed")
         main()
     finally:
         if torch.distributed.is_initialized():

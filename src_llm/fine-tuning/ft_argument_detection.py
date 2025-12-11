@@ -225,32 +225,3 @@ if __name__ == '__main__':
 
     results_df = pd.DataFrame(results)
     results_df.to_csv(f"./logs/{model_id}/results_argument_detection.csv", index=False)
-
-    # Compute Metrics
-    # preds, labels_cleaned = [], []
-    # errors = 0
-    #
-    # for _, row in results_df.iterrows():
-    #     y_true, output = row['y_true'], row['y_pred']
-    #     try:
-    #         if not any(label in output for label in ALLOWED_LABELS):
-    #             raise ValueError("No valid label found in output.")
-    #
-    #         if "support" in output:
-    #             preds.append(LABEL2ID_MAP["support"])
-    #         elif "attack" in output:
-    #             preds.append(LABEL2ID_MAP['attack'])
-    #         else:
-    #             preds.append(LABEL2ID_MAP['no_relation'])
-    #         labels_cleaned.append(LABEL2ID_MAP[y_true])
-    #
-    #     except Exception:
-    #         errors += 1
-    #
-    # print({
-    #     'accuracy': accuracy_score(labels_cleaned, preds),
-    #     'precision': precision_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
-    #     'recall': recall_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
-    #     'f1': f1_score(labels_cleaned, preds, zero_division=0, avergae='macro'),
-    #     'errors': errors
-    # })

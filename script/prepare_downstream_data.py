@@ -2,22 +2,35 @@
 Run the download.sh script before this.
 This file will preprocess all the datasets needed for the downstream tasks.
 """
-
+import ast
 import json
 import logging
 import os
+import random
 import re
+import shutil
 
 import nltk
 import pandas as pd
 import rootutils
-from nltk.tokenize import sent_tokenize
+import spacy
 from sklearn.model_selection import train_test_split
 from unidecode import unidecode
 
+nlp = spacy.load("en_core_web_sm")
 nltk.download("punkt")
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+def clean_text(text):
+    # Remove spaces before punctuation
+    text = re.sub(r"\s+([,.;:!?])", r"\1", text)
+    # Collapse multiple spaces to a single space
+    text = re.sub(r"\s{2,}", " ", text)
+    # Strip leading/trailing spaces
+    text = text.strip()
+    return text
 
 
 def adjust_conll_data(df: pd.DataFrame):
@@ -53,28 +66,9 @@ def save_conll_data(df: pd.DataFrame, file_path: str):
     logging.info(f"Saved CONLL data to {file_path}")
 
 
-def matches_uppercase_name_colon(phrase: str) -> bool:
-    pattern = r'(?m)^(?:[A-Z]+(?:\s[A-Z]+)*)\s*:'
-    return re.match(pattern, phrase.strip()) is not None
-
-
-def insert_sep(text):
-    sentences = sent_tokenize(text)  # split into sentences
-    return " [SEP] ".join(s.strip() for s in sentences)  # join with [SEP]
-
-
-def preprocess_argument_detection(folder):
-    """
-    Preprocess argument detection data from CONLL-style text files.
-    Each line contains a token and its tag, and sentences are separated by blank lines.
-    Data is split into train/dev/test sets and saved in JSON format.
-    """
+def preprocess_elecdeb60to20_components(folder):
     files = os.listdir(folder)
-    file_map = {
-        'disputool-validation.conll': 'dev.json',
-        'disputool-test.conll': 'test.json',
-        'disputool-train.conll': 'train.json'
-    }
+
     for f in files:
         data = []
         file_path = os.path.join(folder, f)
@@ -82,71 +76,72 @@ def preprocess_argument_detection(folder):
 
         with open(file_path, 'r', encoding='utf-8') as file:
             for line in file:
-                # Group by speech turn
-                line = line.strip()
-                if line:
-                    token, tag = line.split('\t')[1], line.split('\t')[-1]
-                    token = unidecode(token)
-                    if matches_uppercase_name_colon(token):
-                        # new speech turn
-                        if len(current_sentence['tokens']) > 0:
-                            assert len(current_sentence['tokens']) == len(current_sentence['ner_tags'])
-                            data.append(current_sentence)
-                            current_sentence = {"tokens": [], "ner_tags": []}
-                    else:
-                        current_sentence["tokens"].append(token)
-                        current_sentence["ner_tags"].append(tag)
+                line = line.rstrip("\n")
+
+                # NEW: blank line triggers new speech turn
+                if line == "":
+                    # close current turn if it has content
+                    if current_sentence["tokens"]:
+                        assert len(current_sentence["tokens"]) == len(current_sentence["ner_tags"])
+                        data.append(current_sentence)
+
+                    # reset and start skipping first two speaker lines
+                    current_sentence = {"tokens": [], "ner_tags": []}
+                    continue
+
+                # Normal token/tag line
+                parts = line.split("\t")
+                token, tag = parts[0], parts[-1]
+                token = unidecode(token)
+
+                current_sentence["tokens"].append(token)
+                current_sentence["ner_tags"].append(tag)
+
+            # Add last sentence if not empty
             if current_sentence["tokens"]:
-                assert len(current_sentence['tokens']) == len(current_sentence['ner_tags'])
+                assert len(current_sentence["tokens"]) == len(current_sentence["ner_tags"])
                 data.append(current_sentence)
 
-        # Remove the original file after reading
+        # Remove original file
         os.remove(file_path)
         logging.info(f"Deleted CONLL file: {file_path}")
 
-        # Shuffle and split data
-        df = adjust_conll_data(pd.DataFrame(data).sample(frac=1, random_state=42).reset_index(drop=True))
-        save_conll_data(df, os.path.join(folder, file_map.get(f)))
+        # Shuffle + split
+        df = pd.DataFrame(data).sample(frac=1, random_state=42).reset_index(drop=True)
+        save_conll_data(df, os.path.join(folder, f"{f.split('.')[0]}.json"))
 
 
-def preprocess_relation_classification(folder):
+def preprocess_elecdeb60to20_relations(folder):
     """
-    Preprocess relation classification data from TSV format to CSV.
-    Assumes the TSV files are named latest_train.tsv, latest_dev.tsv, and latest_test.tsv.
-    Drops duplicates and nulls, renames 'merged_sent' to 'text'.
+    The authors frame this task as multi-class classification problem.
     """
-    split_dict = {
-        'dev': 'latest_dev.tsv',
-        'train': 'latest_train.tsv',
-        'test': 'latest_test.tsv'
-    }
-
-    for split, f in split_dict.items():
-        # Load TSV into DataFrame
-        df = pd.read_csv(os.path.join(folder, f), sep='\t')
-        df.rename({'merged_sent': 'text'}, inplace=True, axis=1)
-        df["text"] = df["text"].apply(insert_sep)
-        df = df.dropna().drop_duplicates().reset_index(drop=True)
-
-        # Save cleaned DataFrame as CSV
-        csv_path = os.path.join(folder, f"{split}.csv")
-        df.to_csv(csv_path, index=False)
-        logging.info(f"{split} dataset saved as CSV at {csv_path}")
-
-        # Remove original TSV file
-        os.remove(os.path.join(folder, f))
-        logging.info(f"Deleted TSV file: {os.path.join(folder, f)}")
+    files = [f for f in os.listdir(folder) if f.endswith('.csv')]
+    labels = None
+    for file in files:
+        file_path = os.path.join(folder, file)
+        df = pd.read_csv(file_path)
+        os.remove(file_path)
+        df.rename({'relation_type': 'label'}, axis='columns', inplace=True)
+        if labels is None:
+            labels = {key: idx for idx, key in enumerate(sorted(set(df['label'].tolist())))}
+        df['text'] = df['subject'] + " [SEP] " + df['object']
+        df['label'] = df['label'].map(labels)
+        df = df[['text', 'label']].dropna().drop_duplicates().reset_index(drop=True)
+        df.to_csv(file_path, index=False)
 
 
-def preprocess_sentiment_analysis(folder):
+def preprocess_parl_vote(folder):
     """
-    Preprocess sentiment analysis dataset.
-    Assumes there is a single CSV file containing 'speech' and 'vote' columns.
-    Renames them to 'text' and 'label', splits into train/dev/test, and saves.
+    The authors of ParlVote perform sentiment analysis on UK Parliamentary Debates. They achieve the best result using
+    Bert + MLP with a concatenation of Motion+Speech text (Accuracy - 67.31)
     """
     file_path = os.path.join(folder, os.listdir(folder)[0])
-    df = pd.read_csv(file_path)[['speech', 'vote']]
-    df.rename({"speech": "text", "vote": "label"}, inplace=True, axis=1)
+    df = pd.read_csv(file_path)[['speech', 'motion_text', 'vote']]
+    df['text'] = df['motion_text'] + " " + df['speech']
+    df['text'] = df['text'].apply(lambda s: clean_text(s))
+    df.rename({"vote": "label"}, inplace=True, axis=1)
+    df.drop(['speech', 'motion_text'], axis=1, inplace=True)
+    df = df.dropna().drop_duplicates().reset_index(drop=True)
 
     # Split the dataset
     train, test = train_test_split(df, test_size=0.2, random_state=42)
@@ -161,22 +156,271 @@ def preprocess_sentiment_analysis(folder):
     os.remove(file_path)
 
 
-def process_stance_detection(folder):
-    files = ["vast_dev.csv", "vast_test.csv", "vast_train.csv"]
-    for f in files:
-        path = os.path.join(folder, f)
-        df = pd.read_csv(path)[['post', 'new_topic', 'label']]
-        df['post'] = df['post'].apply(lambda x: x.strip().replace('"', ''))
-        df['text'] = df.apply(lambda row: f"TOPIC {row['new_topic']} [SEP] {row['post']}", axis=1)
-        df = df.drop(columns=['post', 'new_topic'])
-        df = df.dropna().drop_duplicates().reset_index(drop=True)
-        df.to_csv(os.path.join(folder, f.split("_")[-1]), index=False)
-        os.remove(path)
+def process_aus_hansard(folder: str):
+    """
+    The authors of the paper *Stance Classification: A Comparative Study and Use Case on Australian Parliamentary Debates*
+    annotated a portion of the Australian Hansard for stance detection, using the speakers' votes as labels.
+    Their goal was to frame this as a cross-domain challenge: models were trained on augmented versions of
+    ParlVote + HanDeSet, and then evaluated on the Australian Hansard dataset they collected. The evaluation
+    metrics included Accuracy, F1 score, and AUROC.
+    """
+    parlvote_df = pd.read_csv(os.path.join(folder, "parlvote_features.csv"))[['speech', 'label']]
+    parlvote_df.rename({'speech': 'text'}, inplace=True, axis=1)
+
+    handeset_df = pd.read_csv(os.path.join(folder, "handeset_features.csv"))[['speech', 'label']]
+    handeset_df.rename({'speech': 'text'}, inplace=True, axis=1)
+
+    aus_df = pd.read_csv(os.path.join(folder, "aus_augmented_features.csv"))[['hypothesis', 'label']]
+    aus_df.rename({'hypothesis': 'text'}, inplace=True, axis=1)
+    aus_df = aus_df.dropna().drop_duplicates().reset_index(drop=True)
+
+    full_df = pd.concat([parlvote_df, handeset_df], axis=0).dropna().drop_duplicates().reset_index(drop=True)
+    train, dev = train_test_split(full_df, test_size=0.2, random_state=42)
+
+    train.to_csv(os.path.join(folder, "train.csv"), index=False)
+    dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
+    aus_df.to_csv(os.path.join(folder, "test.csv"), index=False)
+
+    os.remove(os.path.join(folder, "parlvote_features.csv"))
+    os.remove(os.path.join(folder, "handeset_features.csv"))
+    os.remove(os.path.join(folder, "aus_augmented_features.csv"))
+
+
+def process_con_vote(folder: str):
+    """
+    The authors of the paper *Get out the vote: Determining support or opposition from congressional floor-debate transcripts.*
+    annotated a dataset of Us Congressional floor debates for stance classification purposes using the vote of the politician.
+    Their dataset is annotated at the speech level. In our work, we only use the speeches, not the relations.
+    Bets result with only speeches: Acc 0.6605
+    """
+    folders = {
+        'train': 'training_set',
+        'dev': 'development_set',
+        'test': 'test_set'
+    }
+    label2id = None
+    for key, value in folders.items():
+        dataset = []
+        files = os.listdir(os.path.join(folder, "convote_v1.1/data_stage_three", value))
+        for file in files:
+            with open(os.path.join(folder, "convote_v1.1/data_stage_three", value, file), 'r') as f:
+                text = f.read()
+            label = file.split("_")[-1][2]
+            dataset.append({
+                'text': text,
+                'label': label
+            })
+        df = pd.DataFrame(dataset).dropna().drop_duplicates().reset_index(drop=True)
+        assert len(df['label'].unique().tolist()) == 2
+        if label2id is None:
+            label2id = {key: idx for idx, key in enumerate(sorted(set(df['label'].tolist())))}
+        df['label'] = df['label'].map(label2id)
+        df['text'] = df['text'].apply(clean_text)
+        df.to_csv(os.path.join(folder, f"{key}.csv"), index=False)
+
+    shutil.rmtree(os.path.join(folder, "convote_v1.1"))
+
+
+def process_han_de_set(folder: str):
+    """
+    The authors of the paper *'Aye' or 'No'? Speech-level Sentiment Analysis of Hansard UK Parliamentary Debate Transcripts*
+    classify the sentiment polarity of politicians towards motions (positive/negative) using their votes.
+    They classify the sentiment of both speeches and motions. They do it at the speech level.
+    They use a 2-step model but in our work we will use only the speeches in a one-step manner.
+    Best performance with 1-step model: 0.699 (vote labels) and 0.713 (manual labels).
+    """
+    df = pd.read_csv(os.path.join(folder, "file_downloaded"))[['manual speech', 'utt1', 'utt2', 'utt3', 'utt4', 'utt5']]
+
+    dataset = []
+    for _, row in df.iterrows():
+        utt = []
+        for i in range(1, 6):
+            text = str(row['utt' + str(i)])
+            if text is not None and len(str(text)) > 0:
+                utt.append(text)
+        dataset.append({
+            'text': clean_text(' '.join(utt)),
+            'label': row['manual speech'],
+        })
+
+    df = pd.DataFrame(dataset).dropna().drop_duplicates().reset_index(drop=True)
+    train, test = train_test_split(df, test_size=0.2, random_state=42)
+    test, dev = train_test_split(test, test_size=0.5, random_state=42)
+
+    train.to_csv(os.path.join(folder, "train.csv"), index=False)
+    dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
+    test.to_csv(os.path.join(folder, "test.csv"), index=False)
+
+    os.remove(os.path.join(folder, "file_downloaded"))
+
+
+def preprocess_parl_vote_plus(folder: str):
+    """
+    The authors classify the policy of the parliament members towards speeches (positive/negative) using annotated dataset.
+    The task is multi-classification. BWe can also do multi-label classification by classifying both sentiment and policy preferences.
+    """
+    df = pd.read_csv(os.path.join(folder, "ParlVote2_1.csv"))
+    df = df[['speech', 'policy_preference', 'vote']]
+
+    df['multi_label'] = df.apply(lambda row: f"{row['policy_preference']}, {row['vote']}", axis=1)
+    df.rename({'policy_preference': 'label', 'speech': 'text'}, axis=1, inplace=True)
+    df = df[['text', 'label', 'multi_label']].dropna().drop_duplicates().reset_index(drop=True)
+
+    train, test = train_test_split(df, test_size=0.2, random_state=42)
+    dev, test = train_test_split(test, test_size=0.5, random_state=42)
+
+    train.to_csv(os.path.join(folder, "train.csv"), index=False)
+    dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
+    test.to_csv(os.path.join(folder, "test.csv"), index=False)
+
+    os.remove(os.path.join(folder, "ParlVote2_1.csv"))
+
+
+def preprocess_motion_policy_preferences(folder: str):
+    df = pd.read_csv(os.path.join(folder, "MotionPolicyPreferences - Gold.csv"),
+                     names=['quasi-sentence ID', 'debate title', 'motion text',
+                            'quasi-sentence policy preference code label', 'motion policy preference code label'])
+    df.rename({'motion text': 'text', 'quasi-sentence policy preference code label': 'label'}, axis=1, inplace=True)
+    df.drop([col for col in df.columns if col not in ['label', 'text']], axis=1, inplace=True)
+    train, test = train_test_split(df, test_size=0.2, random_state=42)
+    test, dev = train_test_split(test, test_size=0.5, random_state=42)
+    train.to_csv(os.path.join(folder, "train.csv"), index=False)
+    dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
+    test.to_csv(os.path.join(folder, "test.csv"), index=False)
+    os.remove(os.path.join(folder, "MotionPolicyPreferences - Gold.csv"))
+
+
+def preprocess_ArgUNSC(folder: str):
+    df = pd.read_csv(os.path.join(folder % "sequence_labelling", "base.csv"))
+
+    def process_argument_detection(df: pd.DataFrame):
+        df_components = df[['Full_Sentence', 'Component', 'Component_Type']]
+        dataset = []
+        malformed = 0
+        for row_idx, row in df_components.iterrows():
+            speech = row['Full_Sentence']
+            speech = speech.strip().replace("\r", "").replace("\n", " ")
+            try:
+                component = ast.literal_eval(row['Component'])[-1]
+                component = component.strip().replace("\r", "").replace("\n", " ")
+            except:
+                malformed += 1
+                continue
+            label = row['Component_Type']
+
+            doc = nlp(speech)
+            tokens = [tok.text for tok in doc]
+
+            # Initialize O-tags
+            ner_tags = ["O"] * len(tokens)
+
+            if label == "non-arg":
+                # Non argumentative component
+                dataset.append({"tokens": tokens, "ner_tags": ner_tags})
+                continue
+
+            # Find the character span of the component inside the sentence
+            comp_start = speech.find(component)
+            if comp_start == -1:
+                # Component not found → leave all O-tags
+                dataset.append({"tokens": tokens, "ner_tags": ner_tags})
+                continue
+
+            comp_end = comp_start + len(component)
+
+            # Assign BIO tags based on token offsets
+            for i, tok in enumerate(doc):
+                tok_start, tok_end = tok.idx, tok.idx + len(tok)
+
+                # Check overlap between token span and component span
+                if tok_end <= comp_start or tok_start >= comp_end:
+                    continue  # no overlap
+
+                if not any(tag.endswith(label) for tag in ner_tags):
+                    ner_tags[i] = f"B-{label}"
+                else:
+                    ner_tags[i] = f"I-{label}"
+
+            dataset.append({"id": row_idx, "tokens": tokens, "ner_tags": ner_tags})
+        new_df = pd.DataFrame(dataset).reset_index(drop=True)
+        train, test = train_test_split(new_df, test_size=0.2, random_state=42)
+        dev, test = train_test_split(test, test_size=0.5, random_state=42)
+
+        save_conll_data(train, os.path.join(folder % "sequence_labelling", "train.json"))
+        save_conll_data(dev, os.path.join(folder % "sequence_labelling", "dev.json"))
+        save_conll_data(test, os.path.join(folder % "sequence_labelling", "test.json"))
+
+    def relation_prediction(df_original):
+        df = df_original[(df_original["Component"] != "non-arg") & (df_original['Premises'] != "standalone")].copy()
+        df["Component"] = df["Component"].apply(ast.literal_eval)
+        df["Premises"] = df["Premises"].apply(lambda x: ast.literal_eval(x))
+
+        df_components = (
+            df["Component"]
+            .apply(lambda x: {"id": x[0], "component": x[-1]})
+            .apply(pd.Series)
+            .drop_duplicates()
+            .reset_index(drop=True)
+        )
+        comp_ids = set(df_components["id"])
+
+        dataset_pos = []
+        for comp_row, prem_row in zip(df["Component"], df["Premises"]):
+            comp_id = comp_row[0]
+
+            for key, value in prem_row.items():
+                if key in comp_ids:
+                    dataset_pos.append((comp_id, key, value))
+
+        dataset_pos = pd.DataFrame(dataset_pos, columns=["comp1", "comp2", "label"])
+        pos_pairs = set(zip(dataset_pos["comp1"], dataset_pos["comp2"]))
+
+        all_pairs = {(a, b) for a in comp_ids for b in comp_ids}
+        neg_candidates = list(all_pairs - pos_pairs)
+
+        target = len(dataset_pos) * 2
+        random.shuffle(neg_candidates)
+        neg_samples = neg_candidates[:target]
+
+        dataset_neg = pd.DataFrame(neg_samples, columns=["comp1", "comp2"])
+        dataset_neg["label"] = "no_relation"
+
+        dataset = (
+            pd.concat([dataset_pos, dataset_neg], ignore_index=True)
+            .drop_duplicates()
+            .reset_index(drop=True)
+        )
+
+        dataset['comp1'] = dataset['comp1'].apply(
+            lambda x: df_components[df_components["id"] == x]['component'].values[0])
+        dataset['comp2'] = dataset['comp2'].apply(
+            lambda x: df_components[df_components["id"] == x]['component'].values[0])
+
+        dataset['text'] = dataset['comp1'] + " [SEP] " + dataset['comp2']
+        dataset['text'] = dataset['text'].apply(lambda x: x.strip().replace("\r", "").replace("\n", " "))
+        dataset = dataset[['text', 'label']].dropna().drop_duplicates().reset_index(drop=True)
+
+        train, test = train_test_split(dataset, test_size=0.2, random_state=42)
+        dev, test = train_test_split(test, test_size=0.5, random_state=42)
+
+        out_dir = folder % "multi_class_classification"
+        train.to_csv(os.path.join(out_dir, "train.csv"), index=False)
+        dev.to_csv(os.path.join(out_dir, "dev.csv"), index=False)
+        test.to_csv(os.path.join(out_dir, "test.csv"), index=False)
+
+    process_argument_detection(df.copy())
+    relation_prediction(df.copy())
+    os.remove(os.path.join(folder % "sequence_labelling", "base.csv"))
 
 
 if __name__ == "__main__":
     root = rootutils.find_root("")
-    preprocess_argument_detection(os.path.join(root, "data/argument_detection"))
-    preprocess_relation_classification(os.path.join(root, "data/relation_classification"))
-    preprocess_sentiment_analysis(os.path.join(root, "data/sentiment_analysis"))
-    process_stance_detection(os.path.join(root, "data/stance_detection"))
+    process_aus_hansard(os.path.join(root, "data/binary_classification/AusHansard"))
+    process_con_vote(os.path.join(root, "data/binary_classification/ConVote"))
+    process_han_de_set(os.path.join(root, "data/binary_classification/HanDeSeT"))
+    preprocess_parl_vote(os.path.join(root, "data/binary_classification/ParlVote"))
+    preprocess_parl_vote_plus(os.path.join(root, "data/multi_class_classification/ParlVote+"))
+    preprocess_elecdeb60to20_relations(os.path.join(root, "data/multi_class_classification/ElecDeb60to20-relations"))
+    preprocess_motion_policy_preferences(os.path.join(root, "data/multi_class_classification/MotionPolicyPreference"))
+    preprocess_elecdeb60to20_components(os.path.join(root, "data/sequence_labelling/ElecDeb60to20-components"))
+    preprocess_ArgUNSC(os.path.join(root, "data/%s/ArgUNSC"))
