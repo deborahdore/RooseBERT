@@ -159,3 +159,4 @@ data/training
 sbatch/dr1.sh
 sbatch/azzurra.sh
 sbatch/jeanzay.sh
+/data/
