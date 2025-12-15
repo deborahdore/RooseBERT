@@ -118,12 +118,12 @@ if __name__ == '__main__':
     # model_id = "meta-llama/Llama-3.1-8B-Instruct"
     # model_id = "google/gemma-3-4b-it"
     # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model_id", type=str, required=True, help="Model identifier or path")
-    args = parser.parse_args()
-    model_id = args.model_id
 
-    print(f"!! Model: {model_id}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", type=str, default="google/gemma-3-1b-it", help="Model identifier or path")
+    args = parser.parse_args()
+
+    print(f"!! Model: {args.model}")
 
     # Load train/val/test split
     dataset_dict = load_dataset("./data/argument_detection/")
@@ -142,7 +142,7 @@ if __name__ == '__main__':
         bnb_4bit_compute_dtype=torch.bfloat16
     )
     model = AutoModelForCausalLM.from_pretrained(
-        model_id,
+        args.model,
         quantization_config=bnb_config,
         device_map={"": 0}).to(device)
 
@@ -165,7 +165,7 @@ if __name__ == '__main__':
             load_best_model_at_end=True,
             fp16=True,
             gradient_checkpointing=True,
-            output_dir=f"./logs/{model_id}",
+            output_dir=f"./logs/{args.model}",
             report_to="none"
         ),
         peft_config=lora_config,
@@ -175,11 +175,11 @@ if __name__ == '__main__':
 
     # Save fine-tuned model
     now = datetime.now()
-    trainer_filepath = f"./logs/{model_id}/argument_detection/{now.strftime('%d/%m/%y:%H:%M')}"
+    trainer_filepath = f"./logs/{args.model}/argument_detection/{now.strftime('%d/%m/%y:%H:%M')}"
     trainer.save_model(trainer_filepath)
 
     del model, trainer
-    model = AutoModelForCausalLM.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(args.model)
 
     merged_model = PeftModel.from_pretrained(model, trainer_filepath)
     merged_model = merged_model.merge_and_unload()
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     results = []
     batch_size = 8
 
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     merged_model.config.pad_token_id = tokenizer.pad_token_id
@@ -224,4 +224,4 @@ if __name__ == '__main__':
             })
 
     results_df = pd.DataFrame(results)
-    results_df.to_csv(f"./logs/{model_id}/results_argument_detection.csv", index=False)
+    results_df.to_csv(f"./logs/{args.model}/results_argument_detection.csv", index=False)

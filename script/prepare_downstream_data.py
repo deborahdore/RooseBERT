@@ -116,6 +116,7 @@ def preprocess_elecdeb60to20_relations(folder):
     The authors frame this task as multi-class classification problem.
     """
     files = [f for f in os.listdir(folder) if f.endswith('.csv')]
+    id2labels = {0: 'attack', 1: 'support', 2: 'no_relation'}
     labels = None
     for file in files:
         file_path = os.path.join(folder, file)
@@ -127,6 +128,7 @@ def preprocess_elecdeb60to20_relations(folder):
         df['text'] = df['subject'] + " [SEP] " + df['object']
         df['label'] = df['label'].map(labels)
         df = df[['text', 'label']].dropna().drop_duplicates().reset_index(drop=True)
+        df['label_value'] = df['label'].map(id2labels)
         df.to_csv(file_path, index=False)
 
 
@@ -261,11 +263,48 @@ def preprocess_parl_vote_plus(folder: str):
     """
     df = pd.read_csv(os.path.join(folder, "ParlVote2_1.csv"))
     df = df[['speech', 'policy_preference', 'vote']]
-
-    df['multi_label'] = df.apply(lambda row: f"{row['policy_preference']}, {row['vote']}", axis=1)
     df.rename({'policy_preference': 'label', 'speech': 'text'}, axis=1, inplace=True)
-    df = df[['text', 'label', 'multi_label']].dropna().drop_duplicates().reset_index(drop=True)
+    labels2id = {key: idx for idx, key in enumerate(sorted(set(df['label'].tolist())))}
+    id2_labels_value = {104.0: 'Military: Positive',
+                        105.0: 'Military: Negative',
+                        106.0: 'Peace',
+                        108.0: 'European Union: Positive',
+                        110.0: 'European Union: Negative',
+                        201.2: 'Human Rights',
+                        202.4: 'Direct Democracy: Positive',
+                        203.0: 'Constitutionalism: Positive',
+                        204.0: 'Constitutionalism: Negative',
+                        301.0: 'Decentralisation: Positive',
+                        302.0: 'Centralisation: Positive',
+                        304.0: 'Political Corruption',
+                        305.1: 'Political Authority: Party',
+                        305.2: 'Political Authority: Personal',
+                        401.0: 'Free Market Economy',
+                        402.0: 'Incentives: Positive',
+                        403.0: 'Market Regulation',
+                        411.0: 'Technology: Positive',
+                        413.0: 'Nationalisation',
+                        501.0: 'Environmental Protection',
+                        503.0: 'Equality: Positive',
+                        504.0: 'Welfare State Expansion',
+                        505.0: 'Welfare State Limitation',
+                        506.0: 'Education Expansion',
+                        507.0: 'Education Limitation',
+                        601.2: 'Immigration: Negative',
+                        602.2: 'Immigration: Positive',
+                        603.0: 'Traditional Morality: Positive',
+                        604.0: 'Traditional Morality: Negative',
+                        605.1: 'Law and Order: Positive',
+                        605.2: 'Law and Order: Negative',
+                        701.0: 'Labour Groups: Positive',
+                        702.0: 'Labour Groups: Negative',
+                        706.0: 'Underprivileged Minority Groups'
+                        }
 
+    df['label_value'] = df['label'].map(id2_labels_value)
+    df['label'] = df['label'].map(labels2id)
+    df['multi_label'] = df.apply(lambda row: f"policy:{row['label']};vote:{row['vote']}", axis=1)
+    df[['text', 'label', 'label_value', 'multi_label']].dropna().drop_duplicates().reset_index(drop=True)
     train, test = train_test_split(df, test_size=0.2, random_state=42)
     dev, test = train_test_split(test, test_size=0.5, random_state=42)
 
@@ -280,8 +319,59 @@ def preprocess_motion_policy_preferences(folder: str):
     df = pd.read_csv(os.path.join(folder, "MotionPolicyPreferences - Gold.csv"),
                      names=['quasi-sentence ID', 'debate title', 'motion text',
                             'quasi-sentence policy preference code label', 'motion policy preference code label'])
-    df.rename({'motion text': 'text', 'quasi-sentence policy preference code label': 'label'}, axis=1, inplace=True)
-    df.drop([col for col in df.columns if col not in ['label', 'text']], axis=1, inplace=True)
+    df.rename({'motion text': 'text'}, axis=1, inplace=True)
+    labels2id = {key: idx for idx, key in
+                 enumerate(sorted(set(df['quasi-sentence policy preference code label'].tolist())))}
+    id2_labels_value = {104: 'Military: Positive',
+                        105: 'Military: Negative',
+                        106: 'Peace',
+                        107: 'Internationalism: Positive',
+                        108: 'European Union: Positive',
+                        110: 'European Union: Negative',
+                        201: 'Human Rights',
+                        202: 'Direct Democracy: Positive',
+                        203: 'Constitutionalism: Positive',
+                        204: 'Constitutionalism: Negative',
+                        301: 'Decentralisation: Positive',
+                        302: 'Centralisation: Positive',
+                        303: 'Governative and Administrative Efficiency',
+                        304: 'Political Corruption',
+                        305: 'Political Authority: Party',
+                        401: 'Free Market Economy',
+                        402: 'Incentives: Positive',
+                        403: 'Market Regulation',
+                        404: 'Economic Planning',
+                        405: 'Corporatism/Mixed Economy',
+                        407: 'Protectionism: Negative',
+                        408: 'Economic Goals',
+                        409: 'Keynesian Demand Management',
+                        410: 'Economic Growth: Positive',
+                        411: 'Technology and Infrastructure: Positive',
+                        412: 'Controlled Economy',
+                        413: 'Nationalisation',
+                        414: 'Economic Orthodoxy',
+                        501: 'Environmental Protection',
+                        502: 'Culture: Positive',
+                        503: 'Equality: Positive',
+                        504: 'Welfare State Expansion',
+                        505: 'Welfare State Limitation',
+                        506: 'Education Expansion',
+                        601: 'National Way of Life: Positive',
+                        602: 'National Way of Life: Negative',
+                        605: 'Law and Order: Positive',
+                        606: 'Civic Mindedness: Positive',
+                        607: 'Multiculturalism: Positive',
+                        608: 'Multiculturalism: Negative',
+                        701: 'Labour Groups: Positive',
+                        703: 'Agriculture and Farmers: Positive',
+                        704: 'Middle Class and Professional Groups',
+                        705: 'Underprivileged Minority Groups',
+                        706: 'Non-economic Demographic Groups'
+                        }
+    df['label_value'] = df['quasi-sentence policy preference code label'].map(id2_labels_value)
+    df['label'] = df['quasi-sentence policy preference code label'].map(labels2id)
+    df.drop([col for col in df.columns if col not in ['label', 'label_value', 'text']], axis=1, inplace=True)
+    df = df.dropna().drop_duplicates().reset_index(drop=True)
     train, test = train_test_split(df, test_size=0.2, random_state=42)
     test, dev = train_test_split(test, test_size=0.5, random_state=42)
     train.to_csv(os.path.join(folder, "train.csv"), index=False)
@@ -399,6 +489,10 @@ def preprocess_ArgUNSC(folder: str):
         dataset['text'] = dataset['comp1'] + " [SEP] " + dataset['comp2']
         dataset['text'] = dataset['text'].apply(lambda x: x.strip().replace("\r", "").replace("\n", " "))
         dataset = dataset[['text', 'label']].dropna().drop_duplicates().reset_index(drop=True)
+
+        labels2id = {key: idx for idx, key in enumerate(sorted(set(df_components["label"])))}
+        dataset['label_value'] = dataset['label'].copy()
+        dataset['label'] = dataset['label'].map(labels2id)
 
         train, test = train_test_split(dataset, test_size=0.2, random_state=42)
         dev, test = train_test_split(test, test_size=0.5, random_state=42)

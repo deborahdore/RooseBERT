@@ -74,12 +74,6 @@ wget https://raw.githubusercontent.com/deborahdore/ElecDeb60to20/refs/heads/main
 wget https://raw.githubusercontent.com/deborahdore/ElecDeb60to20/refs/heads/main/data/components/test.conll
 cd ..
 
-# UNSC-NE: A Named Entity Extension to the UN Security Council Debates Corpus
-mkdir UNSC-NE
-cd UNSC-NE
-# download from https://dataverse.harvard.edu/file.xhtml?fileId=6311829&version=2.0
-cd ..
-
 # From Debates to Diplomacy: Argument Mining Across Political Registers
 mkdir ArgUNSC
 cd ArgUNSC
