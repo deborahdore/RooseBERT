@@ -3,12 +3,15 @@ import os
 from datetime import datetime
 
 import pandas as pd
+import rootutils
 import torch
 from datasets import Dataset
 from peft import LoraConfig, PeftModel
 from tqdm import tqdm
 from transformers import BitsAndBytesConfig, AutoModelForCausalLM, TrainingArguments, AutoTokenizer
 from trl import SFTTrainer
+
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 
 def create_model(args):
@@ -30,25 +33,71 @@ def run(args):
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
     output_dir = f"logs/{args.model}/{args.dataset}"
 
-    train_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/train.csv")
-    dev_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/dev.csv")
-    test_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/test.csv")
+    train_df = pd.read_csv(f"data/binary_classification/{args.dataset}/train.csv")
+    dev_df = pd.read_csv(f"data/binary_classification/{args.dataset}/dev.csv")
+    test_df = pd.read_csv(f"data/binary_classification/{args.dataset}/test.csv")
 
     train_dataset = Dataset.from_pandas(train_df)
     dev_dataset = Dataset.from_pandas(dev_df)
 
-    model = create_model(args)
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
+    model = create_model(args)
+    model.config.pad_token_id = tokenizer.pad_token_id
     label_str = ", ".join(sorted(set(train_df[args.label_col].tolist())))
 
-    def formatting_func(example):
-        return (
+    def preprocess(example):
+        prompt = (
             "Task: Classify the sentence.\n"
             f"Choose exactly one label from: {label_str}.\n"
-            "Do not explain your answer. Only output the label.\n\n"
+            "Only output the label.\n\n"
             f"Sentence:\n{example[args.text_col]}\n\n"
-            f"Output:\n{example[args.label_col]}"
+            "Output:\n"
         )
+
+        prompt_enc = tokenizer(
+            prompt,
+            truncation=True,
+            max_length=512,
+            add_special_tokens=True,
+        )
+
+        label_enc = tokenizer(
+            example[args.label_col],
+            add_special_tokens=False,
+        )
+
+        input_ids = (
+                prompt_enc["input_ids"]
+                + label_enc["input_ids"]
+                + [tokenizer.eos_token_id]
+        )
+
+        labels = (
+                [-100] * len(prompt_enc["input_ids"])
+                + label_enc["input_ids"]
+                + [tokenizer.eos_token_id]
+        )
+
+        attention_mask = [1] * len(input_ids)
+
+        return {
+            "input_ids": input_ids,
+            "labels": labels,
+            "attention_mask": attention_mask,
+        }
+
+    train_dataset = train_dataset.map(
+        preprocess,
+        remove_columns=train_dataset.column_names,
+    )
+
+    dev_dataset = dev_dataset.map(
+        preprocess,
+        remove_columns=dev_dataset.column_names,
+    )
 
     trainer = SFTTrainer(
         model=model,
@@ -66,17 +115,17 @@ def run(args):
             save_strategy="epoch",
             eval_strategy="epoch",
             load_best_model_at_end=True,
-            fp16=True,
             gradient_checkpointing=True,
             output_dir=output_dir,
-            report_to="none"
+            report_to="none",
+            bf16=True,
+            fp16=False,
         ),
         peft_config=LoraConfig(
             r=8,
             target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
             task_type="CAUSAL_LM",
-        ),
-        formatting_func=formatting_func,
+        )
     )
 
     trainer.train()
@@ -94,51 +143,42 @@ def run(args):
     merged_model = merged_model.to(device)
 
     results = []
-    batch_size = 8
-
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     merged_model.config.pad_token_id = tokenizer.pad_token_id
 
-    test_df['prompt'] = test_df[args.text_col].apply(
-        lambda row:
-        "Task: Classify the sentence.\n"
-        f"Choose exactly one label from: {label_str}.\n"
-        "Do not explain your answer. Only output the label.\n\n"
-        f"Sentence:\n{row[args.text_col]}\n\n"
-        f"Output: "
-        , axis=1)
-
-    texts = test_df['prompt'].tolist()
-    labels = test_df[args.label_col].tolist()
-
-    for i in tqdm(range(0, len(texts), batch_size)):
-        batch_texts = texts[i:i + batch_size]
-        batch_labels = labels[i:i + batch_size]
+    for idx, row in tqdm(test_df.iterrows(), total=len(test_df)):
+        prompt = (
+            "Task: Classify the sentence.\n"
+            f"Choose exactly one label from: {label_str}.\n"
+            "Only output the label.\n\n"
+            f"Sentence:\n{row[args.text_col]}\n\n"
+            "Output:\n"
+        )
 
         inputs = tokenizer(
-            batch_texts,
+            prompt,
             return_tensors="pt",
-            padding=True,
             truncation=True,
-            max_length=512
+            max_length=512,
         ).to(device)
 
         with torch.no_grad():
-            outputs = merged_model.generate(
+            output = merged_model.generate(
                 **inputs,
-                max_new_tokens=50
+                max_new_tokens=50,
+                do_sample=False,
             )
 
-        predictions = tokenizer.batch_decode(outputs, skip_special_tokens=True)
+        prediction = tokenizer.decode(
+            output[0][inputs["input_ids"].shape[-1]:],
+            skip_special_tokens=True,
+        ).strip()
 
-        for text, label, pred in zip(batch_texts, batch_labels, predictions):
-            results.append({
-                'text': text,
-                'label': label,
-                'prediction': pred
-            })
+        results.append({
+            "text": row[args.text_col],
+            "label": row[args.label_col],
+            "prediction": prediction,
+        })
+
     results_df = pd.DataFrame(results)
     out_file = f"{output_dir}/fine_tuning_multi_class_classification.csv"
 

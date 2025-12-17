@@ -143,6 +143,7 @@ def preprocess_parl_vote(folder):
     df['text'] = df['text'].apply(lambda s: clean_text(s))
     df.rename({"vote": "label"}, inplace=True, axis=1)
     df.drop(['speech', 'motion_text'], axis=1, inplace=True)
+    df['label_value'] = df['label'].map({0: 'Negative', 1: 'Positive'})
     df = df.dropna().drop_duplicates().reset_index(drop=True)
 
     # Split the dataset
@@ -168,13 +169,16 @@ def process_aus_hansard(folder: str):
     """
     parlvote_df = pd.read_csv(os.path.join(folder, "parlvote_features.csv"))[['speech', 'label']]
     parlvote_df.rename({'speech': 'text'}, inplace=True, axis=1)
+    parlvote_df['label_value'] = parlvote_df['label'].map({0: 'Negative', 1: 'Positive'})
 
     handeset_df = pd.read_csv(os.path.join(folder, "handeset_features.csv"))[['speech', 'label']]
     handeset_df.rename({'speech': 'text'}, inplace=True, axis=1)
+    handeset_df['label_value'] = handeset_df['label'].map({0: 'Negative', 1: 'Positive'})
 
     aus_df = pd.read_csv(os.path.join(folder, "aus_augmented_features.csv"))[['hypothesis', 'label']]
     aus_df.rename({'hypothesis': 'text'}, inplace=True, axis=1)
     aus_df = aus_df.dropna().drop_duplicates().reset_index(drop=True)
+    aus_df['label_value'] = aus_df['label'].map({0: 'Oppose', 1: 'Support'})
 
     full_df = pd.concat([parlvote_df, handeset_df], axis=0).dropna().drop_duplicates().reset_index(drop=True)
     train, dev = train_test_split(full_df, test_size=0.2, random_state=42)
@@ -218,6 +222,7 @@ def process_con_vote(folder: str):
             label2id = {key: idx for idx, key in enumerate(sorted(set(df['label'].tolist())))}
         df['label'] = df['label'].map(label2id)
         df['text'] = df['text'].apply(clean_text)
+        df['label_value'] = df['label'].map({0: 'Oppose', 1: 'Support'})
         df.to_csv(os.path.join(folder, f"{key}.csv"), index=False)
 
     shutil.rmtree(os.path.join(folder, "convote_v1.1"))
@@ -246,6 +251,7 @@ def process_han_de_set(folder: str):
         })
 
     df = pd.DataFrame(dataset).dropna().drop_duplicates().reset_index(drop=True)
+    df['label_value'] = df['label'].map({0: 'Negative', 1: 'Positive'})
     train, test = train_test_split(df, test_size=0.2, random_state=42)
     test, dev = train_test_split(test, test_size=0.5, random_state=42)
 
@@ -304,14 +310,16 @@ def preprocess_parl_vote_plus(folder: str):
     df['label_value'] = df['label'].map(id2_labels_value)
     df['label'] = df['label'].map(labels2id)
     df['multi_label'] = df.apply(lambda row: f"policy:{row['label']};vote:{row['vote']}", axis=1)
+    df['multi_label_value'] = df.apply(
+        lambda row: f"policy:{row['label_value']};vote:{'Support' if row['vote'] == 1 else 'Oppose'}", axis=1)
     df[['text', 'label', 'label_value', 'multi_label']].dropna().drop_duplicates().reset_index(drop=True)
+
     train, test = train_test_split(df, test_size=0.2, random_state=42)
     dev, test = train_test_split(test, test_size=0.5, random_state=42)
 
     train.to_csv(os.path.join(folder, "train.csv"), index=False)
     dev.to_csv(os.path.join(folder, "dev.csv"), index=False)
     test.to_csv(os.path.join(folder, "test.csv"), index=False)
-
     os.remove(os.path.join(folder, "ParlVote2_1.csv"))
 
 
@@ -498,7 +506,6 @@ def preprocess_ArgUNSC(folder: str):
         dev, test = train_test_split(test, test_size=0.5, random_state=42)
 
         out_dir = folder % "multi_class_classification"
-        os.mkdir(out_dir)
         train.to_csv(os.path.join(out_dir, "train.csv"), index=False)
         dev.to_csv(os.path.join(out_dir, "dev.csv"), index=False)
         test.to_csv(os.path.join(out_dir, "test.csv"), index=False)

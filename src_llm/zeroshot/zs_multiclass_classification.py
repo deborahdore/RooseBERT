@@ -16,6 +16,7 @@ from transformers import (
     BitsAndBytesConfig,
 )
 
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 # Setup
 warnings.filterwarnings("ignore")
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"

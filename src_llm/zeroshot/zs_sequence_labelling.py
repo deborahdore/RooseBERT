@@ -18,6 +18,8 @@ from transformers import (
 
 from utils import flatten, load_data
 
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"

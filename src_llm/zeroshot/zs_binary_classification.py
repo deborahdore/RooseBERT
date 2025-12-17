@@ -16,17 +16,12 @@ from transformers import (
     BitsAndBytesConfig,
 )
 
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
 # Setup
 warnings.filterwarnings("ignore")
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
-
-LABELS2ID = {
-    "AusHansard": {'support': 1, 'oppose': 0},
-    "ConVote": {'oppose': 0, 'support': 1},
-    "ParlVote": {'positive': 1, 'negative': 0},
-    "HanDeSet": {'positive': 1, 'negative': 0},
-}
 
 INSTRUCTION_PROMPT = {
     "HanDeSeT": (
@@ -129,7 +124,7 @@ def run(args):
     df.to_csv(out_file, index=False)
     print(f"\nSaved predictions to: {out_file}")
 
-    metrics = compute_metrics(gold_labels, [LABELS2ID[args.dataset][x] for x in predictions])
+    metrics = compute_metrics(gold_labels, predictions)
     print("###################### RESULTS ######################")
     print(f"\nEvaluation - binary classification - {args.dataset}:")
     for k, v in metrics.items():
@@ -143,7 +138,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, choices=INSTRUCTION_PROMPT.keys(), default="ParlVote")
 
     parser.add_argument("--text-col", type=str, default="text")
-    parser.add_argument("--label-col", type=str, default="label")
+    parser.add_argument("--label-col", type=str, default="label_value")
 
     args = parser.parse_args()
     run(args)
