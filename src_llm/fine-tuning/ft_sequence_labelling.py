@@ -4,18 +4,26 @@ import re
 from datetime import datetime
 
 import pandas as pd
-import rootutils
 import torch
-import transformers
 from datasets import Dataset
 from peft import LoraConfig, PeftModel
 from tqdm import tqdm
-from transformers import BitsAndBytesConfig, AutoModelForCausalLM, AutoTokenizer
+from transformers import BitsAndBytesConfig, AutoModelForCausalLM, TrainingArguments, AutoTokenizer
 from trl import SFTTrainer
 
-os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'expandable_segments:True'
-rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def create_model(args):
+    # Model configuration
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16
+    )
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model,
+        quantization_config=bnb_config,
+        device_map={"": 0}).to(torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu"))
+    return model
 
 
 def integrate_ner_tags(tokens, tags):
@@ -78,80 +86,41 @@ def integrate_ner_tags(tokens, tags):
     return re.sub(r' +', ' ', final_text).strip()
 
 
-def load_dataset(base_path):
-    dataset_dict = {}
-    for file in ["train.json", "dev.json", "test.json"]:
-        df = pd.read_json(os.path.join(base_path, file))
-        df['text'] = df.apply(lambda row: " ".join(row.tokens), axis=1)
-        df['label'] = df.apply(lambda row: integrate_ner_tags(row.tokens, row.ner_tags), axis=1)
-        dataset_dict[file.split(".")[0]] = df
-
-    return dataset_dict
+def convert(df_json):
+    df_json['text'] = df_json.apply(lambda row: " ".join(row.tokens), axis=1)
+    df_json['label'] = df_json.apply(lambda row: integrate_ner_tags(row.tokens, row.ner_tags), axis=1)
+    return df_json
 
 
-# def format_dataset(examples):
-#     if isinstance(examples["prompt"], list):
-#         output_texts = []
-#         for i in range(len(examples["prompt"])):
-#             converted_sample = [
-#                 {"role": "user", "content": examples["prompt"][i]},
-#                 {"role": "assistant", "content": examples["completion"][i]},
-#                 {"role": "user", "content": "Output: "}
-#             ]
-#             output_texts.append(converted_sample)
-#         return {'messages': output_texts}
-#         # return output_texts
-#     else:
-#         converted_sample = [
-#             {"role": "user", "content": examples["prompt"]},
-#             {"role": "assistant", "content": examples["completion"]},
-#         ]
-#         return {'messages': converted_sample}
+def run(args):
+    print("Chosen Model:", args.model)
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    output_dir = f"logs/{args.model}/{args.dataset}"
+    output_file = f"{output_dir}/fine_tuning_sequence_labelling.csv"
 
+    train_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/train.csv"))
+    dev_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/dev.csv"))
+    test_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/test.csv"))
 
-def formatting_func(example):
-    text = f"Sentence: {example['text']}\nArgument components: {example['label']}"
-    return text
+    train_dataset = Dataset.from_pandas(train_df)
+    dev_dataset = Dataset.from_pandas(dev_df)
 
+    model = create_model(args)
 
-if __name__ == '__main__':
-    # model_id = "meta-llama/Llama-3.1-8B-Instruct"
-    # model_id = "google/gemma-3-4b-it"
-    # model_id = "mistralai/Mistral-7B-Instruct-v0.3"
+    def formatting_func(example):
+        return (
+            "Task: Identify argumentative components in the sentence.\n"
+            "Tag each span using <claim>...</claim> and <premise>...</premise>.\n"
+            "Do not add or remove text.\n\n"
+            f"Sentence:\n{example['text']}\n\n"
+            f"Output:\n{example['label']}"
+        )
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--model", type=str, default="google/gemma-3-1b-it", help="Model identifier or path")
-    args = parser.parse_args()
-
-    print(f"!! Model: {args.model}")
-
-    # Load train/val/test split
-    dataset_dict = load_dataset("./data/argument_detection/")
-    train_dataset = Dataset.from_pandas(dataset_dict['train'])
-    dev_dataset = Dataset.from_pandas(dataset_dict['dev'])
-
-    # Configure Model
-    lora_config = LoraConfig(
-        r=8,
-        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
-        task_type="CAUSAL_LM",
-    )
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.bfloat16
-    )
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model,
-        quantization_config=bnb_config,
-        device_map={"": 0}).to(device)
-
-    #  Load Trainer
     trainer = SFTTrainer(
         model=model,
         train_dataset=train_dataset,
         eval_dataset=dev_dataset,
-        args=transformers.TrainingArguments(
+        args=TrainingArguments(
             per_device_train_batch_size=1,
             gradient_accumulation_steps=16,
             learning_rate=2e-5,
@@ -165,24 +134,29 @@ if __name__ == '__main__':
             load_best_model_at_end=True,
             fp16=True,
             gradient_checkpointing=True,
-            output_dir=f"./logs/{args.model}",
+            output_dir=output_file,
             report_to="none"
         ),
-        peft_config=lora_config,
+        peft_config=LoraConfig(
+            r=8,
+            target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
+            task_type="CAUSAL_LM",
+        ),
         formatting_func=formatting_func,
     )
+
     trainer.train()
 
     # Save fine-tuned model
     now = datetime.now()
-    trainer_filepath = f"./logs/{args.model}/argument_detection/{now.strftime('%d/%m/%y:%H:%M')}"
+    trainer_filepath = f"{output_file}/{now.strftime('%d/%m/%y:%H:%M')}"
     trainer.save_model(trainer_filepath)
 
     del model, trainer
     model = AutoModelForCausalLM.from_pretrained(args.model)
-
     merged_model = PeftModel.from_pretrained(model, trainer_filepath)
     merged_model = merged_model.merge_and_unload()
+    device = torch.device("cuda:0") if torch.cuda.is_available() else torch.device("cpu")
     merged_model = merged_model.to(device)
 
     results = []
@@ -193,8 +167,16 @@ if __name__ == '__main__':
         tokenizer.pad_token = tokenizer.eos_token
     merged_model.config.pad_token_id = tokenizer.pad_token_id
 
-    texts = dataset_dict['test']['text'].tolist()
-    labels = dataset_dict['test']['label'].tolist()
+    test_df['prompt'] = test_df['text'].apply(
+        lambda row:
+        "Task: Identify argumentative components in the sentence.\n"
+        "Tag each span using <claim>...</claim> and <premise>...</premise>.\n"
+        "Do not add or remove text.\n\n"
+        f"Sentence:\n{row['text']}\n\n"
+        f"Output: "
+        , axis=1)
+    texts = test_df['prompt'].tolist()
+    labels = test_df['label'].tolist()
 
     for i in tqdm(range(0, len(texts), batch_size)):
         batch_texts = texts[i:i + batch_size]
@@ -211,7 +193,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             outputs = merged_model.generate(
                 **inputs,
-                max_new_tokens=50
+                max_new_tokens=512
             )
 
         predictions = tokenizer.batch_decode(outputs, skip_special_tokens=True)
@@ -222,6 +204,15 @@ if __name__ == '__main__':
                 'label': label,
                 'prediction': pred
             })
-
     results_df = pd.DataFrame(results)
-    results_df.to_csv(f"./logs/{args.model}/results_argument_detection.csv", index=False)
+    results_df.to_csv(output_file, index=False)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
+    parser.add_argument("--dataset", type=str, choices=['ElecDeb60to20-components', 'ArgUNSC'], default="ArgUNSC")
+
+    args = parser.parse_args()
+    run(args)

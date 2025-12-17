@@ -24,7 +24,11 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 INSTRUCTION_PROMPT = {
     "ElecDeb60to20-relations": (
         "You are a relation classification assistant. Classify the sentences separated by [SEP] using the labels: support, attack, no_relation\n\n"
-        "{examples}"
+        "Sentence: {sentence}\n"
+        "Output:"
+    ),
+    "ArgUNSC": (
+        "You are a relation classification assistant. Classify the sentences separated by [SEP] using the labels: support, attack, no_relation\n\n"
         "Sentence: {sentence}\n"
         "Output:"
     ),
@@ -46,7 +50,6 @@ INSTRUCTION_PROMPT = {
         "Multiculturalism: Negative, Labour Groups: Positive, Agriculture and Farmers: Positive, "
         "Middle Class and Professional Groups, Underprivileged Minority Groups, "
         "Non-economic Demographic Groups\n\n"
-        "{examples}"
         "Sentence: {sentence}\n"
         "Output:"
     ),
@@ -65,7 +68,6 @@ INSTRUCTION_PROMPT = {
         "Law and Order: Positive, Law and Order: Negative, "
         "Labour Groups: Positive, Labour Groups: Negative, "
         "Underprivileged Minority Groups\n\n"
-        "{examples}"
         "Sentence: {sentence}\n"
         "Output:"
     ),
@@ -159,12 +161,15 @@ def run(args):
         predictions.append(label)
 
     df["prediction"] = predictions
-    output_path = f"logs/fs_binary_classification_{args.dataset}.csv"
-    df.to_csv(output_path, index=False)
-    print(f"\nSaved predictions to: {output_path}")
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    out_file = f"logs/{args.model}/{args.dataset}/zero_shot_multi_class_classification.csv"
+
+    df.to_csv(out_file, index=False)
+    print(f"\nSaved predictions to: {out_file}")
 
     metrics = compute_metrics(gold_labels, predictions)
-    print("\nEvaluation:")
+    print("###################### RESULTS ######################")
+    print(f"\nEvaluation - multiclass classification - {args.dataset}:")
     for k, v in metrics.items():
         print(f"{k}: {v:.4f}")
 

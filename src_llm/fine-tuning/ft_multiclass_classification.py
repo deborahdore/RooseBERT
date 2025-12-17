@@ -1,4 +1,5 @@
 import argparse
+import os
 from datetime import datetime
 
 import pandas as pd
@@ -26,7 +27,8 @@ def create_model(args):
 
 def run(args):
     print("Chosen Model:", args.model)
-    output_dir = f"./logs/{args.model}/multi_class_classification_{args.dataset}/"
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    output_dir = f"logs/{args.model}/{args.dataset}"
 
     train_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/train.csv")
     dev_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/dev.csv")
@@ -37,9 +39,16 @@ def run(args):
 
     model = create_model(args)
 
+    label_str = ", ".join(sorted(set(train_df[args.label_col].tolist())))
+
     def formatting_func(example):
-        text = f"Sentence: {example[args.text_col]}\nOutput: {example[args.label_col]}"
-        return text
+        return (
+            "Task: Classify the sentence.\n"
+            f"Choose exactly one label from: {label_str}.\n"
+            "Do not explain your answer. Only output the label.\n\n"
+            f"Sentence:\n{example[args.text_col]}\n\n"
+            f"Output:\n{example[args.label_col]}"
+        )
 
     trainer = SFTTrainer(
         model=model,
@@ -92,7 +101,16 @@ def run(args):
         tokenizer.pad_token = tokenizer.eos_token
     merged_model.config.pad_token_id = tokenizer.pad_token_id
 
-    texts = test_df[args.text_col].tolist()
+    test_df['prompt'] = test_df[args.text_col].apply(
+        lambda row:
+        "Task: Classify the sentence.\n"
+        f"Choose exactly one label from: {label_str}.\n"
+        "Do not explain your answer. Only output the label.\n\n"
+        f"Sentence:\n{row[args.text_col]}\n\n"
+        f"Output: "
+        , axis=1)
+
+    texts = test_df['prompt'].tolist()
     labels = test_df[args.label_col].tolist()
 
     for i in tqdm(range(0, len(texts), batch_size)):
@@ -122,14 +140,17 @@ def run(args):
                 'prediction': pred
             })
     results_df = pd.DataFrame(results)
-    results_df.to_csv(f"{output_dir}/results.csv", index=False)
+    out_file = f"{output_dir}/fine_tuning_multi_class_classification.csv"
+
+    results_df.to_csv(out_file, index=False)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
-    parser.add_argument("--dataset", type=str, choices=['AusHansard', 'HanDeSeT', 'ParlVote', 'ConVote'],
+    parser.add_argument("--dataset", type=str,
+                        choices=['ArgUNSC', 'ElecDeb60to20-relations', 'MotionPolicyPreference', 'ParlVote+'],
                         default="ParlVote")
 
     parser.add_argument("--text-col", type=str, default="text")

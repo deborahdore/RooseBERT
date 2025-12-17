@@ -54,10 +54,26 @@ EXAMPLES = {
         """Sentence: I speak on behalf of those who are prepared to accept the Government's proposals—or to be bought off, as the hon Member for Kingston and Surbiton  suggests. I shall explain why. I am pleased that we are having this debate. My direct involvement in this Bill began when I chaired the Joint Scrutiny Committee—with the Home Affairs Committee and the Work and Pensions Committee—on it. Perhaps I should not say so as the Chairman of that Committee, but its work showed the value of draft scrutiny, because many other issues were sorted out before the Bill was introduced. I wish that we did that more often. The issue before the House is one of the few outstanding issues on which the Committee took a different view from the Government on what should be in the Bill. I argued the same case on Report and I have seen amendments passed in the other place, and I welcome the efforts that the Minister has made to get us to where we are tonight. I know—and from comments that have been made, the House knows—how much work it has required from him to get us to this position. For some people, who have followed the Bill from the perspective of losing friends or relatives in accidents such as the Marchioness disaster or train crashes, this subject appears to be a late entry into the Bill, which has given rise to concerns that the Bill itself may be threatened by our desire to extend it to cover custody. The Minister has done his best to get us to a position where the principle of covering deaths in custody is covered by the Bill without putting it under threat. He deserves the thanks of the House for that. Why am I prepared to accept this when, from the amendments that I tabled last time, it is evident that my preference would be a straightforward amendment to the Bill? The answer is that I believe that the amendment the Minister has tabled today will trigger a process that will lead inexorably to deaths in custody being brought within the scope of the Bill. Whether or not he feels he has the freedom tonight to talk about time scales, the fact is that the process, once started, will be unstoppable. The Minister is also responsible for prisons, and I do not believe that when he next meets the director of the Prison Service, he will say to him, "I've got you out of that problem for the next few years, so I wouldn't worry about it if I were you. Instead, the Minister will say that deaths in custody could be included at any time and the Prison Service will have to be ready for that. Many of us would accept that, even if the provision had been on the face of the Bill, some delay in commencement would have been necessary to get the Prison Service to face up to its responsibilities in a way that it has not done so far. That is how the conversation will go. I do not wish to prejudge inquests in the pipeline, but there are some whose verdicts could make it untenable for the Government not to bring forward the resolution necessary under the amendment, however much the Government may prefer to consider the statutory ombudsman first and the forum next. I fear that there will be other inquests beyond those. That is the historical record, and the result will be that it will not be tenable for this or any Government not to enact this change. I believe that those of us who, a year or so ago, set out to bring this matter within the scope of the Bill are going to achieve our objective tonight. It is for that reason that I recommend to the House that we support the Government's proposal, which takes us a long way forward. As ever when Governments are asked to take a very different position from the one that they started with, there is a certain choreography about how such matters must be handled, but the amendment in lieu in the end gets us to where we want to go and delivers the result that we want. I am therefore very grateful to the Minister for everything that he has done.\n"""
         "Output: Law and Order: Positive\n",
     ],
+    "ArgUNSC": [
+        "Sentence: the facilitation of contacts between the warring parties, are a positive sign but they are not enough. [SEP] we will remain vigilant to ensure that support for the separatists finally ceases, that the weakening of the State and the rule of law is checked, and that the ceasefire is fully respected.\n"
+        "Output: no_relation\n",
+
+        "Sentence: the separatists trained, supplied and supported by  Russia are launching a full-scale attack on the strategic city of Debaltseve, inside Ukrainian-controlled territory, in blatant violation of the 19 September Minsk ceasefire lines, in an attemp to gain control of a significant rail juncture. [SEP] It is dangerous because Russia continues to train and equip separatists with heavy weapons and to fight by their side, in flagrant violation of the September Minsk agreement, Ukrainian sovereignty and international law.\n"
+        "Output: support\n",
+
+        "Sentence: I would repeat that Russia would never refuse to implement any useful document agreed upon during the crisis, including the 21 February agreement. [SEP] Regarding what one colleague said, that Russia is refusing to implement the 17 April Geneva statement\n"
+        "Output: attack\n"
+    ]
 }
 
 INSTRUCTION_PROMPT = {
     "ElecDeb60to20-relations": (
+        "You are a relation classification assistant. Classify the sentences separated by [SEP] using the labels: support, attack, no_relation\n\n"
+        "{examples}"
+        "Sentence: {sentence}\n"
+        "Output:"
+    ),
+    "ArgUNSC": (
         "You are a relation classification assistant. Classify the sentences separated by [SEP] using the labels: support, attack, no_relation\n\n"
         "{examples}"
         "Sentence: {sentence}\n"
@@ -195,12 +211,15 @@ def run(args):
         predictions.append(label)
 
     df["prediction"] = predictions
-    output_path = f"logs/fs_binary_classification_{args.dataset}.csv"
-    df.to_csv(output_path, index=False)
-    print(f"\nSaved predictions to: {output_path}")
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    out_file = f"logs/{args.model}/{args.dataset}/few_shot_multi_class_classification.csv"
+
+    df.to_csv(out_file, index=False)
+    print(f"\nSaved predictions to: {out_file}")
 
     metrics = compute_metrics(gold_labels, predictions)
-    print("\nEvaluation:")
+    print("###################### RESULTS ######################")
+    print(f"\nEvaluation - multiclass classification - {args.dataset}:")
     for k, v in metrics.items():
         print(f"{k}: {v:.4f}")
 

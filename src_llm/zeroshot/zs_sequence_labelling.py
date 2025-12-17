@@ -34,7 +34,6 @@ PROMPT_TEMPLATES = {
         "Only tag spans that clearly match one of the types.\n"
         "Do not add, remove, or change any words.\n\n"
         "Output the fully tagged sentence only.\n\n"
-        "{examples}"
         "Sentence: {sentence}\n"
         "Output:"
     )
@@ -177,18 +176,18 @@ if __name__ == "__main__":
     # Prepare output directory
     model_name = args.model.split("/")[-1]
     out_dir = os.path.join("logs", model_name)
-    os.makedirs(out_dir, exist_ok=True)
-    results_file = os.path.join(out_dir, f"fs_sequence_labelling_{args.dataset}.csv")
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    out_file = f"logs/{args.model}/{args.dataset}/zero_shot_sequence_labelling.csv"
 
     # Run model
     generator = load_model_and_pipeline(args.model)
-    results_df = run_model(generator, dataset, results_file)
+    results_df = run_model(generator, dataset, out_file)
 
     # Evaluate
     metrics = evaluate(results_df)
 
     logging.info("###################### RESULTS ######################")
-    logging.info(f"Model: {model_name}")
+    print(f"\nEvaluation - sequence labelling - {args.dataset}:")
     for k, v in metrics.items():
         logging.info(f"{k.capitalize()}: {v}")
     logging.info("######################################################")

@@ -171,12 +171,15 @@ def run(args):
         predictions.append(label)
 
     df["prediction"] = predictions
-    output_path = f"logs/fs_binary_classification_{args.dataset}.csv"
-    df.to_csv(output_path, index=False)
-    print(f"\nSaved predictions to: {output_path}")
+    os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
+    out_file = f"logs/{args.model}/{args.dataset}/few_shot_binary_classification.csv"
+
+    df.to_csv(out_file, index=False)
+    print(f"\nSaved predictions to: {out_file}")
 
     metrics = compute_metrics(gold_labels, [LABELS2ID[args.dataset][x] for x in predictions])
-    print("\nEvaluation:")
+    print("###################### RESULTS ######################")
+    print(f"\nEvaluation - binary classification - {args.dataset}:")
     for k, v in metrics.items():
         print(f"{k}: {v:.4f}")
 

@@ -1,4 +1,24 @@
 #!/bin/bash
+#SBATCH --job-name=bert_base_uncased_cont_3e-4
+#SBATCH -C a100
+#SBATCH --ntasks=8
+#SBATCH --ntasks-per-node=8
+#SBATCH --gres=gpu:8
+#SBATCH --cpus-per-task=8
+
+#SBATCH --time=20:00:00
+#SBATCH --output=logs/bert_base_uncased_cont_3e-4_%j.out
+#SBATCH --error=logs/bert_base_uncased_cont_3e-4_%j.out
+
+#SBATCH --hint=nomultithread
+
+#SBATCH --mail-user=deborah.dore@inria.fr
+#SBATCH --mail-type=END,FAIL
+
+module purge
+module load arch/a100
+module load cuda/12.4.1
+module load miniforge/24.9.0
 
 conda activate pytorch-gpu-custom
 
@@ -6,13 +26,12 @@ export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="Masked_Language_Modelling"
 export MASTER_PORT=6000
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
-export HF_HOME=".cache/huggingface"
-
-wandb disabled
+export HF_HOME="/linkhome/rech/genzqh01/ubq61ty/.cache/huggingface"
+wandb offline
 
 # ------------------ HYPERPARAMETERS ------------------
-MODEL_NAME=""
-MODEL_PATH="model_path/${MODEL_NAME}"
+MODEL_NAME="bert-base-uncased"
+MODEL_PATH="/lustre/fsmisc/dataset/HuggingFace_Models/${MODEL_NAME}"
 
 N_GPUS=8
 
@@ -21,16 +40,16 @@ MAX_STEPS_1=120000
 MAX_SEQ_LEN_1=128
 BATCH=64
 GRAD_ACC=4
-LR=1e-4
+LR=3e-4
 
 # SECOND TRAINING PHASE
 MAX_STEPS_2=150000
 MAX_SEQ_LEN_2=512
 
-RUN_NAME="${MODEL_NAME}-batch$((BATCH * N_GPUS * GRAD_ACC))-lr${LR}"
+RUN_NAME="${MODEL_NAME}-cont-batch$((BATCH * N_GPUS * GRAD_ACC))-lr${LR}"
 printf "Starting training run: %s\n" "$RUN_NAME"
 
-mkdir -p "logs/${RUN_NAME}" "cache/${RUN_NAME}"
+mkdir -p "logs/${RUN_NAME}" "cache/${RUN_NAME}-${MAX_STEPS_1}"
 
 # ------------------ TRAINING PHASE 1 ------------------
 
@@ -41,12 +60,13 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --rdzv_endpoint=${MASTER_ADDR}:${MASTER_PORT} --rdzv_backend=c10d \
         src/run_mlm.py \
         --model_name_or_path "$MODEL_PATH" \
-        --cache_dir "cache/$RUN_NAME/" \
+        --cache_dir "cache/${RUN_NAME}-${MAX_STEPS_1}" \
         --train_file "data/training/max_128/train.csv" \
         --validation_file "data/training/max_128/dev.csv" \
         --max_seq_length "$MAX_SEQ_LEN_1" \
-        --preprocessing_num_workers 4 \
+        --preprocessing_num_workers 8 \
         --output_dir "logs/$RUN_NAME/" \
+        --overwrite_output_dir  \
         --do_train \
         --do_eval \
         --eval_strategy "steps" \
@@ -60,22 +80,21 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --warmup_steps 10000 \
         --logging_dir "logs/$RUN_NAME/" \
         --logging_strategy "steps" \
-        --logging_steps 500 \
+        --logging_steps 1000 \
         --save_strategy "steps" \
-        --save_steps 20000 \
+        --save_steps 10000 \
         --save_total_limit 1 \
         --seed 42 \
         --data_seed 42 \
         --fp16 \
         --local_rank 0 \
-        --eval_steps 1000 \
+        --eval_steps 2000 \
         --dataloader_num_workers 8 \
         --run_name "$RUN_NAME" \
         --deepspeed "configs/deepspeed_config.json" \
         --report_to "wandb" \
         --eval_on_start \
-        --log_level "detail" \
-        --overwrite_cache
+        --log_level "detail"
 
 # ------------------ TRAINING PHASE 2 ------------------
 CHECKPOINT_PATH="logs/${RUN_NAME}/checkpoint-$MAX_STEPS_1"
@@ -89,11 +108,11 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --model_name_or_path "$CHECKPOINT_PATH" \
         --overwrite_output_dir  \
         --resume_from_checkpoint "$CHECKPOINT_PATH" \
-        --cache_dir "cache/$RUN_NAME/" \
+        --cache_dir "cache/${RUN_NAME}-${MAX_STEPS_2}" \
         --train_file "data/training/max_512/train.csv" \
         --validation_file "data/training/max_512/dev.csv" \
         --max_seq_length "$MAX_SEQ_LEN_2" \
-        --preprocessing_num_workers 4 \
+        --preprocessing_num_workers 8 \
         --output_dir "logs/$RUN_NAME/" \
         --do_train \
         --do_eval \
@@ -107,19 +126,18 @@ python -m torch.distributed.launch --nproc_per_node=${N_GPUS} \
         --max_steps $MAX_STEPS_2 \
         --logging_dir "logs/$RUN_NAME/" \
         --logging_strategy "steps" \
-        --logging_steps 500 \
+        --logging_steps 1000 \
         --save_strategy "steps" \
-        --save_steps 20000 \
+        --save_steps 10000 \
         --save_total_limit 1 \
         --seed 42 \
         --data_seed 42 \
         --fp16 \
         --local_rank 0 \
-        --eval_steps 1000 \
+        --eval_steps 2000 \
         --dataloader_num_workers 8 \
         --run_name "$RUN_NAME" \
         --deepspeed "configs/deepspeed_config.json" \
         --report_to "wandb" \
         --eval_on_start \
-        --log_level "detail" \
-        --overwrite_cache
+        --log_level "detail"

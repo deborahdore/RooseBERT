@@ -490,7 +490,7 @@ def preprocess_ArgUNSC(folder: str):
         dataset['text'] = dataset['text'].apply(lambda x: x.strip().replace("\r", "").replace("\n", " "))
         dataset = dataset[['text', 'label']].dropna().drop_duplicates().reset_index(drop=True)
 
-        labels2id = {key: idx for idx, key in enumerate(sorted(set(df_components["label"])))}
+        labels2id = {key: idx for idx, key in enumerate(sorted(set(dataset["label"])))}
         dataset['label_value'] = dataset['label'].copy()
         dataset['label'] = dataset['label'].map(labels2id)
 
@@ -498,6 +498,7 @@ def preprocess_ArgUNSC(folder: str):
         dev, test = train_test_split(test, test_size=0.5, random_state=42)
 
         out_dir = folder % "multi_class_classification"
+        os.mkdir(out_dir)
         train.to_csv(os.path.join(out_dir, "train.csv"), index=False)
         dev.to_csv(os.path.join(out_dir, "dev.csv"), index=False)
         test.to_csv(os.path.join(out_dir, "test.csv"), index=False)
