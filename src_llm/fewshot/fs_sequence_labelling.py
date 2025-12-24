@@ -205,10 +205,10 @@ if __name__ == "__main__":
     results_df = run_model(generator, dataset, out_file)
 
     # Evaluate
-    metrics = evaluate(results_df)
-
-    logging.info("###################### RESULTS ######################")
-    print(f"\nEvaluation - sequence labelling - {args.dataset}:")
-    for k, v in metrics.items():
-        logging.info(f"{k.capitalize()}: {v}")
-    logging.info("######################################################")
+    # metrics = evaluate(results_df)
+    #
+    # logging.info("###################### RESULTS ######################")
+    # print(f"\nEvaluation - sequence labelling - {args.dataset}:")
+    # for k, v in metrics.items():
+    #     logging.info(f"{k.capitalize()}: {v}")
+    # logging.info("######################################################")

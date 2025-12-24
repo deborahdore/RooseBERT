@@ -33,9 +33,9 @@ def run(args):
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
     output_dir = f"logs/{args.model}/{args.dataset}"
 
-    train_df = pd.read_csv(f"data/binary_classification/{args.dataset}/train.csv")
-    dev_df = pd.read_csv(f"data/binary_classification/{args.dataset}/dev.csv")
-    test_df = pd.read_csv(f"data/binary_classification/{args.dataset}/test.csv")
+    train_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/train.csv")
+    dev_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/dev.csv")
+    test_df = pd.read_csv(f"data/multi_class_classification/{args.dataset}/test.csv")
 
     train_dataset = Dataset.from_pandas(train_df)
     dev_dataset = Dataset.from_pandas(dev_df)

@@ -101,9 +101,9 @@ def run(args):
     output_dir = f"logs/{args.model}/{args.dataset}"
     output_file = f"{output_dir}/fine_tuning_sequence_labelling.csv"
 
-    train_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/train.csv"))
-    dev_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/dev.csv"))
-    test_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/test.csv"))
+    train_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/train.json"))
+    dev_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/dev.json"))
+    test_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/test.json"))
 
     train_dataset = Dataset.from_pandas(train_df)
     dev_dataset = Dataset.from_pandas(dev_df)
@@ -190,9 +190,10 @@ def run(args):
             save_strategy="epoch",
             eval_strategy="epoch",
             load_best_model_at_end=True,
-            fp16=True,
+            bf16=True,
+            fp16=False,
             gradient_checkpointing=True,
-            output_dir=output_file,
+            output_dir=output_dir,
             report_to="none"
         ),
         peft_config=LoraConfig(
@@ -207,7 +208,7 @@ def run(args):
 
     # Save fine-tuned model
     now = datetime.now()
-    trainer_filepath = f"{output_file}/{now.strftime('%d/%m/%y:%H:%M')}"
+    trainer_filepath = f"{output_dir}/{now.strftime('%d/%m/%y:%H:%M')}"
     trainer.save_model(trainer_filepath)
 
     del model, trainer

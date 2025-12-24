@@ -170,11 +170,11 @@ def run(args):
     df.to_csv(out_file, index=False)
     print(f"\nSaved predictions to: {out_file}")
 
-    metrics = compute_metrics(gold_labels, predictions)
-    print("###################### RESULTS ######################")
-    print(f"\nEvaluation - binary classification - {args.dataset}:")
-    for k, v in metrics.items():
-        print(f"{k}: {v:.4f}")
+    # metrics = compute_metrics(gold_labels, predictions)
+    # print("###################### RESULTS ######################")
+    # print(f"\nEvaluation - binary classification - {args.dataset}:")
+    # for k, v in metrics.items():
+    #     print(f"{k}: {v:.4f}")
 
 
 if __name__ == "__main__":

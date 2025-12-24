@@ -13,10 +13,10 @@ def load_data(filepath):
         raw_data = json.load(f)
     records = []
     for entry in raw_data:
-        sentence = " ".join(entry['tokens']).strip()
-        ner_tag = " ".join(entry['ner_tags']).strip()
+        text = " ".join(entry['tokens']).strip()
+        ner_tag = " ".join(entry['ner_tags']).strip().lower()
         records.append({
-            "sentence": sentence,
+            "text": text,
             "ner_tag": ner_tag
         })
     return pd.DataFrame(records)

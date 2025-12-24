@@ -162,7 +162,7 @@ def build_prompt(dataset: str, sentence: str) -> str:
     return template.format(examples=examples, sentence=sentence)
 
 
-def extract_label_ElecDeb60to20_relations(text: str) -> str:
+def extract_label_relations(text: str) -> str:
     match = re.search(r"(support|attack|no_relation|no relation|no rel)", text.lower())
     return match.group(1) if match else "none"
 
@@ -199,9 +199,10 @@ def run(args):
     sentences = df[args.text_col].tolist()
 
     extract_label = {
-        'ElecDeb60to20-relations': extract_label_ElecDeb60to20_relations,
+        'ElecDeb60to20-relations': extract_label_relations,
         'MotionPolicyPreference': extract_label_MotionPolicyPreference,
         'ParlVote+': extract_label_ParlVotePlus,
+        'ArgUNSC': extract_label_relations
     }
 
     for s in tqdm(sentences, desc="Classifying"):
@@ -217,11 +218,11 @@ def run(args):
     df.to_csv(out_file, index=False)
     print(f"\nSaved predictions to: {out_file}")
 
-    metrics = compute_metrics(gold_labels, predictions)
-    print("###################### RESULTS ######################")
-    print(f"\nEvaluation - multiclass classification - {args.dataset}:")
-    for k, v in metrics.items():
-        print(f"{k}: {v:.4f}")
+    # metrics = compute_metrics(gold_labels, predictions)
+    # print("###################### RESULTS ######################")
+    # print(f"\nEvaluation - multiclass classification - {args.dataset}:")
+    # for k, v in metrics.items():
+    #     print(f"{k}: {v:.4f}")
 
 
 if __name__ == "__main__":
