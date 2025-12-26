@@ -3,69 +3,141 @@ Extracts evaluation results from model training logs in the `logs/` directory.
 
 For each task and model, it reads metrics from `all_results.json` files,
 parses run configurations from folder names, and compiles everything into
-an Excel file (`results.xlsx`), with one sheet per task.
+Excel files:
+- `results.xlsx`: all runs
+- `best_results.xlsx`: best run per model and task
 """
 
 import json
-import os
 import re
+from pathlib import Path
 
 import pandas as pd
 import rootutils
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
-# Define the regular expression pattern
-pattern = r"(.*?)-?EPOCH(\d+)-LR([\d\.e\-]+)-WD([\d\.]+)-B(\d+)"
+RESULTS_FOLDER = Path("logs")
+RESULTS_FILE = Path("logs") / "results.xlsx"
+BEST_RESULTS_FILE = Path("logs") / "best_results.xlsx"
 
-RESULTS_FOLDER = "logs/"
+RUN_PATTERN = re.compile(
+    r"(.*?)-?EPOCH(?P<epoch>\d+)-LR(?P<lr>[\d.e\-]+)-WD(?P<wd>[\d.e\-]+)-B(?P<batch>\d+)"
+)
 
-if __name__ == '__main__':
-    # tasks = [folder for folder in os.listdir(RESULTS_FOLDER) if os.path.isdir(os.path.join(RESULTS_FOLDER, folder))]
-    tasks = ["argument_detection", "sentiment_analysis", "relation_classification", "stance_detection"]
-    results_file_name = "results.xlsx"
-    with pd.ExcelWriter(results_file_name) as writer:
+METRICS = [
+    "test_f1",
+    "test_precision",
+    "test_recall",
+    "test_accuracy",
+]
 
-        for task in tasks:
-            task_path = os.path.join(RESULTS_FOLDER, task)
-            models = [model for model in os.listdir(task_path) if os.path.isdir(os.path.join(task_path, model))]
-            data = []
 
-            for model in models:
-                model_path = os.path.join(task_path, model)
-                runs = [run for run in os.listdir(model_path) if os.path.isdir(os.path.join(model_path, run))]
+def parse_run_name(run_name: str) -> dict | None:
+    """Extract hyperparameters from a run directory name."""
+    match = RUN_PATTERN.search(run_name)
+    if not match:
+        return None
 
-                for run in runs:
-                    run_path = os.path.join(model_path, run)
+    return {
+        "epoch": int(match.group("epoch")),
+        "learning_rate": float(match.group("lr")),
+        "weight_decay": float(match.group("wd")),
+        "batch_size": int(match.group("batch")),
+    }
 
-                    # Search for the pattern in the string
-                    match = re.search(pattern, str(run))
-                    epoch = int(match.group(2))
-                    learning_rate = float(match.group(3))
-                    weight_decay = float(match.group(4))
-                    batch_size = int(match.group(5))
-                    type = None
 
-                    with open(os.path.join(run_path, "all_results.json"), "r") as file:
-                        all_results = json.load(file)
+def load_results(run_path: Path) -> dict | None:
+    """Load all_results.json if it exists."""
+    results_file = run_path / "all_results.json"
+    if not results_file.exists():
+        return None
 
-                    results = {
-                        "run": run,
-                        "model": model,
-                        "type": model.split("-")[-1],
-                        "epoch": epoch,
-                        "batch_size": batch_size,
-                        "learning_rate": learning_rate,
-                        "weight_decay": weight_decay,
-                        "test_f1": all_results.get("test_f1", None),
-                        "test_precision": all_results.get("test_precision", None),
-                        "test_recall": all_results.get("test_recall", None),
-                        "test_accuracy": all_results.get("test_accuracy", None),
-                    }
-                    data.append(results)
+    with results_file.open() as f:
+        return json.load(f)
 
-            if data:
-                df = pd.DataFrame(data)
-                df.to_excel(writer, sheet_name=task[:31], index=False)
 
-    print(f"Results saved to '{results_file_name}'")
+def is_better(task: str, score: float, best_score: float) -> bool:
+    """Decide whether a score is better depending on the task."""
+    if task.startswith("binary"):
+        return score > best_score
+    return score > best_score
+
+
+def main() -> None:
+    tasks = [p for p in RESULTS_FOLDER.iterdir() if p.is_dir()]
+
+    all_results = {}
+    best_results = {}
+
+    for task_path in tasks:
+        task = task_path.name
+        all_rows = []
+        best_rows = []
+
+        for model_path in task_path.iterdir():
+            if not model_path.is_dir():
+                continue
+
+            model = model_path.name
+            best_score = float("-inf")
+            best_row = None
+
+            for run_path in model_path.iterdir():
+                if not run_path.is_dir():
+                    continue
+
+                run_name = run_path.name
+                params = parse_run_name(run_name)
+                if params is None:
+                    continue
+
+                results = load_results(run_path)
+                if results is None:
+                    continue
+
+                row = {
+                    "task": task,
+                    "model": model,
+                    "type": model.split("-")[-1],
+                    "run": run_name,
+                    **params,
+                }
+
+                for metric in METRICS:
+                    row[metric] = results.get(metric)
+
+                # Select metric used for best model
+                score = (
+                    row["test_accuracy"]
+                    if task.startswith("binary")
+                    else row["test_f1"]
+                )
+
+                if score is not None and is_better(task, score, best_score):
+                    best_score = score
+                    best_row = row
+
+                all_rows.append(row)
+
+            if best_row is not None:
+                best_rows.append(best_row)
+
+        if all_rows:
+            all_results[task] = pd.DataFrame(all_rows)
+        if best_rows:
+            best_results[task] = pd.DataFrame(best_rows)
+
+    with pd.ExcelWriter(RESULTS_FILE) as writer:
+        for task, df in all_results.items():
+            df.to_excel(writer, sheet_name=task[:31], index=False)
+
+    with pd.ExcelWriter(BEST_RESULTS_FILE) as writer:
+        for task, df in best_results.items():
+            df.to_excel(writer, sheet_name=task[:31], index=False)
+
+    print(f"Results saved to '{RESULTS_FILE}' and '{BEST_RESULTS_FILE}'")
+
+
+if __name__ == "__main__":
+    main()
