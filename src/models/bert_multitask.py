@@ -54,7 +54,7 @@ class BertForMultiTaskPretraining(BertPreTrainedModel):
             nn.Linear(config.hidden_size, 2)  # Binary: same_debate or different
         )
 
-        # Loss weights (you can tune these)
+        # Loss weights
         self.mlm_weight = 1.0
         self.scp_weight = 0.3
         self.acm_weight = 0.3

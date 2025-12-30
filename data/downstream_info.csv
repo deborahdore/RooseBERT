@@ -1,0 +1,12 @@
+paper, task_type, task,task granularity,split, labels, metrics, performance
+Stance classification: a comparative study and use case on Australian parliamentary debates,binary classification,stance detection,cross-domain transferability,"80, 10, 10","1(positive), 0(negative)","accuracy,f1,auroc",0.79 (Accuracy)
+"Get out the vote: Determining support or opposition from Congressional floor-debate transcripts
+
+",binary classification,stance detection,single-sentence,"70, 20(test), 10(dev)","'yay'(positive), 'nay'(negative)",accuracy,"70.81 with agreement links, otherwise 66.05 with text only"
+'Aye' or 'No'? Speech-level Sentiment Analysis of Hansard UK Parliamentary Debate Transcripts,binary classification,sentiment analysis,single-sentence,"90, 10","1/'Aye'(positive), 0/'No'(negative)","Accuracy, F1",67.3 (Accuracy with manual labels)
+ParlVote: A Corpus for Sentiment Analysis of Political Debates,binary classification,sentiment analysis,sentence-pair classification,"80, 10, 10","Aye(positive), No(negative)",accuracy,67.31 (Accuracy with motion + speech)
+Policy-focused Stance Detection in Parliamentary Debate Speeches,multi-class classification,policy-preference classification (multi-class) and policy focused stance detection (multi-label),single-sentence,"80, 10, 10","support (positive), oppose (negative)","macro f1, accuracy","0.58 (Macro f1 - motion independent, single task) "
+Argument-based detection and classification of fallacies in political debates,multi-class/multi-label classification,argument component relation prediction and classification,sentence-pair classification,provided,"support, attack, no_relation",Macro F1,0.6
+Policy Preference Detection in Parliamentary Debate Motions,multi-class classification,policy-preference classification,single-sentence,"80, 10, 10",multiple,Macro F1,0.47 (Motions)
+From Debates to Diplomacy: Argument Mining Across Political Registers,sequence-labelling & multi-class classification,argument detection and relation classification,NER + sentence-pair classification,,"Claim/Premise, Support/Attack/No Rel",,
+Argument-based detection and classification of fallacies in political debates,sequence-labelling,argument detection,NER,already defined,Claim/Premise,,

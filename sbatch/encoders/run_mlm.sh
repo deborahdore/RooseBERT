@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=bert_base_uncased_cont_3e-4
+#SBATCH --job-name={job_name}
 #SBATCH -C a100
 #SBATCH --ntasks=8
 #SBATCH --ntasks-per-node=8
@@ -7,31 +7,22 @@
 #SBATCH --cpus-per-task=8
 
 #SBATCH --time=20:00:00
-#SBATCH --output=logs/bert_base_uncased_cont_3e-4_%j.out
-#SBATCH --error=logs/bert_base_uncased_cont_3e-4_%j.out
+#SBATCH --output=logs/{job_name}_%j.out
+#SBATCH --error=logs/{job_name}_%j.out
 
 #SBATCH --hint=nomultithread
 
-#SBATCH --mail-user=deborah.dore@inria.fr
-#SBATCH --mail-type=END,FAIL
-
-module purge
-module load arch/a100
-module load cuda/12.4.1
-module load miniforge/24.9.0
-
-conda activate pytorch-gpu-custom
+conda activate roosebert
 
 export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="Masked_Language_Modelling"
 export MASTER_PORT=6000
 export MASTER_ADDR=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
-export HF_HOME="/linkhome/rech/genzqh01/ubq61ty/.cache/huggingface"
 wandb offline
 
 # ------------------ HYPERPARAMETERS ------------------
 MODEL_NAME="bert-base-uncased"
-MODEL_PATH="/lustre/fsmisc/dataset/HuggingFace_Models/${MODEL_NAME}"
+MODEL_PATH="HuggingFace_Models/${MODEL_NAME}"
 
 N_GPUS=8
 

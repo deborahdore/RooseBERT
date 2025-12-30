@@ -9,9 +9,11 @@ Excel files:
 """
 
 import json
+import os
 import re
 from pathlib import Path
 
+import openpyxl
 import pandas as pd
 import rootutils
 
@@ -31,6 +33,138 @@ METRICS = [
     "test_recall",
     "test_accuracy",
 ]
+
+script_classification = """#!/bin/bash
+#SBATCH --job-name={task}_{dataset}
+#SBATCH --output=logs/{task}_{dataset}_%j.out
+#SBATCH --error=logs/{task}_{dataset}_%j.out
+#SBATCH --partition=gpu
+#SBATCH --gpus=h100:1
+#SBATCH --time=36:00:00
+
+#SBATCH --account=marianne
+
+set -e
+module load miniconda
+conda activate roosebert
+
+export TOKENIZERS_PARALLELISM=false
+export WANDB_PROJECT="{task}_{dataset}"
+wandb disabled
+
+export HF_HOME="/home/ddore/.cache/huggingface"
+
+MODEL_DIR="{model_dir}"
+SEEDS=()
+wd=0.1
+
+model="{model}"
+lr={learning_rate}
+batch={batch_size}
+epoch={epoch}
+
+for seed in "${{SEEDS[@]}}"; do
+
+  RUN_NAME=$(printf "%s-EPOCH%s-LR%s-WD%s-B%s" "$model" "$epoch" "$lr" "$wd" "$batch")
+  OUTPUT_DIR="./logs/$WANDB_PROJECT/$model/$RUN_NAME"
+
+  mkdir -p "$OUTPUT_DIR"
+
+  python src/run_classification.py \\
+    --run_name "$RUN_NAME" \\
+    --model_name_or_path "$MODEL_DIR/$model" \\
+    --config_name "$MODEL_DIR/$model" \\
+    --tokenizer_name "$MODEL_DIR/$model" \\
+    --cache_dir "./cache/" \\
+    --logging_dir "./logs/" \\
+    --output_dir "$OUTPUT_DIR" \\
+    --train_file "./data/{task}/{dataset}/train.csv" \\
+    --validation_file "./data/{task}/{dataset}/dev.csv" \\
+    --test_file "./data/{task}/{dataset}/test.csv" \\
+    --eval_strategy "steps" \\
+    --eval_steps 2000 \\
+    --logging_steps 1000 \\
+    --save_total_limit 1 \\
+    --per_device_train_batch_size "$batch" \\
+    --per_device_eval_batch_size "$batch" \\
+    --learning_rate "$lr" \\
+    --weight_decay "$wd" \\
+    --num_train_epochs "$epoch" \\
+    --logging_strategy "steps" \\
+    --save_strategy "epoch" \\
+    --seed "$seed" \\
+    --report_to "wandb" \\
+    --text_column_name "text" \\
+    --label_column_name "label" \\
+    --eval_on_start \\
+    --remove_unused_columns
+done
+    """
+# todo
+script_ner = """#!/bin/bash
+#SBATCH --job-name=sequence_labelling_{dataset}
+#SBATCH --output=logs/sequence_labelling_{dataset}_%j.out
+#SBATCH --error=logs/sequence_labelling_{dataset}_%j.out
+#SBATCH --partition=gpu
+#SBATCH --gpus=h100:1
+#SBATCH --time=36:00:00
+
+#SBATCH --account=marianne
+
+set -e
+module load miniconda
+conda activate roosebert
+
+export TOKENIZERS_PARALLELISM=false
+export WANDB_PROJECT="sequence_labelling_{dataset}"
+wandb disabled
+
+export HF_HOME="/home/ddore/.cache/huggingface"
+
+MODEL_DIR="{model}"
+SEEDS=()
+wd=0.1
+
+model="{model}"
+lr={learning_rate}
+batch={batch_size}
+epoch={epoch}
+
+for seed in "${{SEEDS[@]}}"; do
+
+    RUN_NAME=$(printf "%s-EPOCH%s-LR%s-WD%s-B%s" "$model" "$epoch" "$lr" "$wd" "$batch")
+    OUTPUT_DIR="./logs/$WANDB_PROJECT/$model/$RUN_NAME"
+    
+    mkdir -p "$OUTPUT_DIR"
+    
+    python src/run_ner.py \\
+    --run_name "$RUN_NAME" \\
+    --model_name_or_path "$MODEL_DIR/$model" \\
+    --config_name "$MODEL_DIR/$model" \\
+    --tokenizer_name "$MODEL_DIR/$model" \\
+    --cache_dir "./cache/" \\
+    --logging_dir "./logs/" \\
+    --output_dir "$OUTPUT_DIR" \\
+    --train_file "./data/sequence_labelling/{dataset}/train.json" \\
+    --validation_file "./data/sequence_labelling/{dataset}/dev.json" \\
+    --test_file "./data/sequence_labelling/{dataset}/test.json" \\
+    --eval_strategy "steps" \\
+    --eval_steps 2000 \\
+    --logging_steps 1000 \\
+    --per_device_train_batch_size "$batch" \\
+    --per_device_eval_batch_size "$batch" \\
+    --learning_rate "$lr" \\
+    --weight_decay "$wd" \\
+    --num_train_epochs "$epoch" \\
+    --logging_strategy "steps" \\
+    --save_strategy "epoch" \\
+    --save_total_limit 1 \\
+    --seed "$seed" \\
+    --report_to "wandb" \\
+    --eval_on_start \\
+    --remove_unused_columns
+done
+"""
 
 
 def parse_run_name(run_name: str) -> dict | None:
@@ -64,7 +198,7 @@ def is_better(task: str, score: float, best_score: float) -> bool:
     return score > best_score
 
 
-def main() -> None:
+def extract_result() -> None:
     tasks = [p for p in RESULTS_FOLDER.iterdir() if p.is_dir()]
 
     all_results = {}
@@ -130,14 +264,77 @@ def main() -> None:
 
     with pd.ExcelWriter(RESULTS_FILE) as writer:
         for task, df in all_results.items():
-            df.to_excel(writer, sheet_name=task[:31], index=False)
+            sheet_name = (task.replace("binary_classification", "binary")
+                          .replace("multi_class_classification", "multi_class")
+                          .replace("sequence_labelling", "ner"))
+            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
 
     with pd.ExcelWriter(BEST_RESULTS_FILE) as writer:
         for task, df in best_results.items():
-            df.to_excel(writer, sheet_name=task[:31], index=False)
+            sheet_name = (task.replace("binary_classification", "binary")
+                          .replace("multi_class_classification", "multi_class")
+                          .replace("sequence_labelling", "ner"))
+            df.to_excel(writer, sheet_name=sheet_name[:31], index=False)
 
     print(f"Results saved to '{RESULTS_FILE}' and '{BEST_RESULTS_FILE}'")
 
 
+# todo
+MODELS2DIR = {
+    'polibertweet-political-twitter-roberta-mlm': 'kornosk',
+    'ConfliBERT-scr-uncased': 'snowood1',
+    'ConfliBERT-scr-cased': 'snowood1',
+    'ConfliBERT-cont-cased': 'snowood1',
+    'ConfliBERT-cont-uncased': 'snowood1',
+    'deberta-base': 'microsoft',
+    'roberta-base': 'FacebookAI',
+    'NEWRooseBERT-cont-uncased': 'ddore14',
+    'NEWRooseBERT-cont-cased': 'ddore14',
+    'NEWRooseBERT-scr-uncased': 'ddore14',
+    'NEWRooseBERT-scr-cased': 'ddore14',
+    'bert-base-uncased': 'google-bert',
+    'bert-base-cased': 'google-bert'
+}
+
+
+def write_sbatch():
+    tasks = openpyxl.load_workbook(BEST_RESULTS_FILE).sheetnames
+    for t in tasks:
+        os.makedirs(f"./sbatch/all/{t}", exist_ok=True)
+        df = pd.read_excel(BEST_RESULTS_FILE, sheet_name=t)
+        for _, row in df.iterrows():
+            script_task = None
+            dataset = row.task.split("_")[-1]
+            task = row.task.replace(f"_{dataset}", "")
+            model = row.model
+            model_dir = MODELS2DIR[model]
+            learning_rate = row.learning_rate
+            batch_size = row.batch_size
+            epoch = row.epoch
+            if "classification" in task:
+                script_task = script_classification.format(
+                    dataset=dataset,
+                    task=task,
+                    model=model,
+                    model_dir=model_dir,
+                    learning_rate=learning_rate,
+                    batch_size=batch_size,
+                    epoch=epoch,
+                )
+            else:
+                script_task = script_ner.format(
+                    dataset=dataset,
+                    model=model,
+                    model_dir=model_dir,
+                    learning_rate=learning_rate,
+                    batch_size=batch_size,
+                    epoch=epoch,
+                )
+            # write to sh file
+            with open(f"./sbatch/all/{t}/{model}.sh", "w") as text_file:
+                print(script_task, file=text_file)
+
+
 if __name__ == "__main__":
-    main()
+    extract_result()
+    write_sbatch()
