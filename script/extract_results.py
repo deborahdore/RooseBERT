@@ -121,7 +121,7 @@ wandb disabled
 
 export HF_HOME="/home/ddore/.cache/huggingface"
 
-MODEL_DIR="{model}"
+MODEL_DIR="{model_dir}"
 SEEDS=()
 wd=0.1
 
