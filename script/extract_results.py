@@ -19,9 +19,9 @@ import rootutils
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
-RESULTS_FOLDER = Path("logs")
-RESULTS_FILE = Path("logs") / "results.xlsx"
-BEST_RESULTS_FILE = Path("logs") / "best_results.xlsx"
+RESULTS_FOLDER = Path("logs/encoders/")
+RESULTS_FILE = Path("logs/encoders/") / "results.xlsx"
+BEST_RESULTS_FILE = Path("logs/encoders/") / "best_results.xlsx"
 
 RUN_PATTERN = re.compile(
     r"(.*?)-?EPOCH(?P<epoch>\d+)-LR(?P<lr>[\d.e\-]+)-WD(?P<wd>[\d.e\-]+)-B(?P<batch>\d+)"
@@ -297,44 +297,37 @@ MODELS2DIR = {
 }
 
 
+def get_script_template(task_type: str) -> str:
+    if task_type in {"binary_classification", "multi_class_classification"}:
+        return script_classification
+    elif task_type == "sequence_labelling":
+        return script_ner
+    else:
+        raise ValueError(f"Unknown task type: {task_type}")
+
+
 def write_sbatch():
     tasks = openpyxl.load_workbook(BEST_RESULTS_FILE).sheetnames
     for t in tasks:
         os.makedirs(f"./sbatch/all/{t}", exist_ok=True)
         df = pd.read_excel(BEST_RESULTS_FILE, sheet_name=t)
         for _, row in df.iterrows():
-            script_task = None
-            dataset = row.task.split("_")[-1]
-            task = row.task.replace(f"_{dataset}", "")
-            model = row.model
-            model_dir = MODELS2DIR[model]
-            learning_rate = row.learning_rate
-            batch_size = row.batch_size
-            epoch = row.epoch
-            if "classification" in task:
-                script_task = script_classification.format(
-                    dataset=dataset,
-                    task=task,
-                    model=model,
-                    model_dir=model_dir,
-                    learning_rate=learning_rate,
-                    batch_size=batch_size,
-                    epoch=epoch,
-                )
-            else:
-                script_task = script_ner.format(
-                    dataset=dataset,
-                    model=model,
-                    model_dir=model_dir,
-                    learning_rate=learning_rate,
-                    batch_size=batch_size,
-                    epoch=epoch,
-                )
+            params = {
+                "dataset": row.task.split("_")[-1],
+                "task": row.task.replace(f"_{row.task.split('_')[-1]}", ""),
+                "model": row.model,
+                "model_dir": MODELS2DIR[row.model],
+                "learning_rate": row.learning_rate,
+                "batch_size": row.batch_size,
+                "epoch": row.epoch,
+            }
+            template = get_script_template(params['task'])
+            script = template.format(**params)
             # write to sh file
-            with open(f"./sbatch/all/{t}/{model}.sh", "w") as text_file:
-                print(script_task, file=text_file)
+            with open(f"./sbatch/all/{t}/{t}_{params['model']}.sh", "w") as text_file:
+                print(script, file=text_file)
 
 
 if __name__ == "__main__":
-    extract_result()
+    # extract_result()
     write_sbatch()
