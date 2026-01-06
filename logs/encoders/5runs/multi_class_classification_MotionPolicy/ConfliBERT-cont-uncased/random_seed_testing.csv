@@ -1,0 +1,6 @@
+model,seed,f1_score,accuracy
+snowood1/ConfliBERT-cont-uncased,42,0.416994870226989,0.5476190476190477
+snowood1/ConfliBERT-cont-uncased,12,0.31055003602665326,0.47619047619047616
+snowood1/ConfliBERT-cont-uncased,16,0.3529811141860654,0.5
+snowood1/ConfliBERT-cont-uncased,48,0.3679221525098494,0.5119047619047619
+snowood1/ConfliBERT-cont-uncased,33,0.4358431751548683,0.5714285714285714

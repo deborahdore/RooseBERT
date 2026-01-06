@@ -22,14 +22,16 @@ def extract_and_round(x):
 if __name__ == '__main__':
     # Each time a run_classification/run_ner is executed, it writes down the results in a csv file called random_seed_runs
     # After n runs, we can access it and extract mean and standard deviation
-    with pd.ExcelWriter("logs/random_seed_runs.xlsx") as writer:
-        for tsk in ["argument_detection", "sentiment_analysis", "relation_classification", "stance_detection"]:
+    base_path = os.path.join(rootutils.find_root(__file__), "logs/encoders/5runs")
+    with pd.ExcelWriter(f"{base_path}/random_seed_runs.xlsx") as writer:
+        for tsk in os.listdir(base_path):
+            if tsk.endswith(".xlsx"): continue
             models = []
             mean = []
             std = []
             scores = []
 
-            path = os.path.join("logs", tsk)
+            path = os.path.join(base_path, tsk)
             models_list = [model for model in os.listdir(path) if os.path.isdir(os.path.join(path, model))]
             for model in models_list:
                 final_path = os.path.join(path, model)
@@ -37,7 +39,7 @@ if __name__ == '__main__':
                 assert (len(results) == 5)
 
                 models.append(model)
-                if tsk == 'sentiment_analysis':
+                if tsk.startswith("binary_"):
                     score = results['accuracy'].tolist()
                 else:
                     score = results['f1_score'].tolist()
@@ -46,5 +48,6 @@ if __name__ == '__main__':
                 std.append(extract_and_round(statistics.stdev(score)))
                 scores.append(score)
 
-        df = pd.DataFrame({'Models': models, 'Mean': mean, 'Std': std, 'Scores': scores})
-        df.to_excel(writer, sheet_name=tsk[:31], index=False)
+            df = pd.DataFrame({'Models': models, 'Mean': mean, 'Std': std, 'Scores': scores})
+            tsk = tsk.replace("classification_", "").replace("labelling_", "")
+            df.to_excel(writer, sheet_name=tsk, index=False)

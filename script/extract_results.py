@@ -19,9 +19,9 @@ import rootutils
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
-RESULTS_FOLDER = Path("logs/encoders/")
-RESULTS_FILE = Path("logs/encoders/") / "results.xlsx"
-BEST_RESULTS_FILE = Path("logs/encoders/") / "best_results.xlsx"
+RESULTS_FOLDER = Path("logs/encoders/seed42/")
+RESULTS_FILE = Path("logs/encoders/seed42/") / "results.xlsx"
+BEST_RESULTS_FILE = Path("logs/encoders/seed42/") / "best_results.xlsx"
 
 RUN_PATTERN = re.compile(
     r"(.*?)-?EPOCH(?P<epoch>\d+)-LR(?P<lr>[\d.e\-]+)-WD(?P<wd>[\d.e\-]+)-B(?P<batch>\d+)"
@@ -42,8 +42,6 @@ script_classification = """#!/bin/bash
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
 
-#SBATCH --account=marianne
-
 set -e
 module load miniconda
 conda activate roosebert
@@ -52,10 +50,8 @@ export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="{task}_{dataset}"
 wandb disabled
 
-export HF_HOME="/home/ddore/.cache/huggingface"
-
 MODEL_DIR="{model_dir}"
-SEEDS=()
+SEEDS=(42 12 16 48 33)
 wd=0.1
 
 model="{model}"
@@ -99,8 +95,7 @@ for seed in "${{SEEDS[@]}}"; do
     --eval_on_start \\
     --remove_unused_columns
 done
-    """
-# todo
+"""
 script_ner = """#!/bin/bash
 #SBATCH --job-name=sequence_labelling_{dataset}
 #SBATCH --output=logs/sequence_labelling_{dataset}_%j.out
@@ -108,8 +103,6 @@ script_ner = """#!/bin/bash
 #SBATCH --partition=gpu
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
-
-#SBATCH --account=marianne
 
 set -e
 module load miniconda
@@ -119,10 +112,8 @@ export TOKENIZERS_PARALLELISM=false
 export WANDB_PROJECT="sequence_labelling_{dataset}"
 wandb disabled
 
-export HF_HOME="/home/ddore/.cache/huggingface"
-
 MODEL_DIR="{model_dir}"
-SEEDS=()
+SEEDS=(42 12 16 48 33)
 wd=0.1
 
 model="{model}"
@@ -279,7 +270,6 @@ def extract_result() -> None:
     print(f"Results saved to '{RESULTS_FILE}' and '{BEST_RESULTS_FILE}'")
 
 
-# todo
 MODELS2DIR = {
     'polibertweet-political-twitter-roberta-mlm': 'kornosk',
     'ConfliBERT-scr-uncased': 'snowood1',
@@ -288,10 +278,10 @@ MODELS2DIR = {
     'ConfliBERT-cont-uncased': 'snowood1',
     'deberta-base': 'microsoft',
     'roberta-base': 'FacebookAI',
-    'NEWRooseBERT-cont-uncased': 'ddore14',
-    'NEWRooseBERT-cont-cased': 'ddore14',
-    'NEWRooseBERT-scr-uncased': 'ddore14',
-    'NEWRooseBERT-scr-cased': 'ddore14',
+    'NEWRooseBERT-cont-uncased': 'user',
+    'NEWRooseBERT-cont-cased': 'user',
+    'NEWRooseBERT-scr-uncased': 'user',
+    'NEWRooseBERT-scr-cased': 'user',
     'bert-base-uncased': 'google-bert',
     'bert-base-cased': 'google-bert'
 }
@@ -329,5 +319,5 @@ def write_sbatch():
 
 
 if __name__ == "__main__":
-    # extract_result()
+    extract_result()
     write_sbatch()

@@ -1,13 +1,13 @@
 dataset, link, years,GB
-Ghana and South Africa Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HISX4G,,573M
-Australian Parliament,https://zenodo.org/records/17351233,,1G
-Canadian Parliament,https://openparliament.ca/debates/,,1.1G
-European Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GKABNU,,110M
-Irish Parliament ,"https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0, https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/6MZN76",,3.4G
-New Zealand Parliament,https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0,,791M
-Scottish Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE&version=1.0,,443M
-UK Parliament,https://reshare.ukdataservice.ac.uk/854292/,,2.6G
-UNGDC,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y,,186M
-UNSC,https://dataverse.harvard.edu/file.xhtml?fileId=10809805&version=6.1,,387M
+Ghana and South Africa Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HISX4G,1999-2024,573M
+Australian Parliament,https://zenodo.org/records/17351233,1998-2025,1G
+Canadian Parliament,https://openparliament.ca/debates/,1994-2025,1.1G
+European Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/GKABNU,2007-2015,110M
+Irish Parliament ,"https://dataverse.harvard.edu/file.xhtml?fileId=6435506&version=2.0, https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/6MZN76",2009-2019,3.4G
+New Zealand Parliament,https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0,1987-2019,791M
+Scottish Parliament,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE&version=1.0,1999-2021,443M
+UK Parliament,https://reshare.ukdataservice.ac.uk/854292/,1979-2019,2.6G
+UNGDC,https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/0TJX8Y,1946-2023,186M
+UNSC,https://dataverse.harvard.edu/file.xhtml?fileId=10809805&version=6.1,1992-2023,387M
 US Debates,"https://www.presidency.ucsb.edu/documents/presidential-documents-archive-guidebook/presidential-campaigns-debates-and-endorsements-0
-",,16M
+",1960-2024,16M
