@@ -79,3 +79,8 @@ mkdir ArgUNSC
 cd ArgUNSC
 wget https://raw.githubusercontent.com/mpoiaganova/political-argument-mining/refs/heads/main/data/base.csv
 cd ..
+
+cd ..
+mkdir ner
+cd ner
+mkdir nerex
