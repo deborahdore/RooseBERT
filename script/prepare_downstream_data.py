@@ -9,6 +9,7 @@ import os
 import random
 import re
 import shutil
+import xml.etree.ElementTree as ET
 
 import nltk
 import pandas as pd
@@ -515,6 +516,36 @@ def preprocess_ArgUNSC(folder: str):
     os.remove(os.path.join(folder % "sequence_labelling", "base.csv"))
 
 
+def preprocess_nerex(final_folder):
+    # 37 ner tags
+    path_to_original_folder = os.path.expanduser("~/Downloads/PresidentialDebates/")
+    files = [f for f in os.listdir(path_to_original_folder) if f.endswith(".xml")]
+    train, test = train_test_split(files, test_size=0.2, random_state=42)
+    dev, test = train_test_split(test, test_size=0.5, random_state=42)
+
+    def extract_data(split, split_name):
+        sentence = []
+        idx = 0
+        for file in split:
+            tree = ET.parse(path_to_original_folder + file)
+            root = tree.getroot()
+            for s in root.iter("sentence"):
+                lexeme = []
+                tag = []
+                for du in s.findall("discourse_unit"):
+                    for le in du.findall("lexeme"):
+                        lexeme.append(le.text)
+                        tag.append(le.attrib.get("pos"))
+                sentence.append({"id": idx, "tokens": lexeme, "ner_tags": tag})
+                idx += 1
+        with open(final_folder + f"/{split_name}.json", 'w') as f:
+            json.dump(sentence, f, indent=2)
+
+    extract_data(train, "train")
+    extract_data(dev, "dev")
+    extract_data(test, "test")
+
+
 if __name__ == "__main__":
     root = rootutils.find_root("")
     process_aus_hansard(os.path.join(root, "data/binary_classification/AusHansard"))
@@ -526,3 +557,4 @@ if __name__ == "__main__":
     preprocess_motion_policy_preferences(os.path.join(root, "data/multi_class_classification/MotionPolicyPreference"))
     preprocess_elecdeb60to20_components(os.path.join(root, "data/sequence_labelling/ElecDeb60to20"))
     preprocess_ArgUNSC(os.path.join(root, "data/%s/ArgUNSC"))
+    preprocess_nerex(os.path.join(root, "data/ner/nerex"))

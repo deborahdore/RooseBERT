@@ -1,7 +1,7 @@
 """
 Script used to prepare data for the masked language modelling task.
 """
-
+import argparse
 import logging
 import os
 import random
@@ -28,7 +28,6 @@ nltk.download('punkt_tab', quiet=True)
 # Setup project root and data directory
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 BASE_PATH = rootutils.find_root(search_from=__file__, indicator=".project-root")
-DATA_DIR = os.path.join(BASE_PATH, 'data/training')
 
 
 # ------------------- Helpers -------------------
@@ -150,15 +149,15 @@ def clean_df(df: pd.DataFrame, text_column_name: str) -> pd.DataFrame:
 
 # ------------------- Main Workflow -------------------
 
-def load_and_process_data(max_sequences: List[int] = [64, 128, 256, 512]) -> Tuple:
+def load_and_process_data(data_dir, max_sequences: List[int] = [64, 128, 256, 512]) -> Tuple:
     """Load CSVs, split sentences, create chunks, split into train/dev."""
     all_train, all_dev = [], []
 
-    files = [f for f in os.listdir(DATA_DIR) if f.endswith(".csv") and not f.startswith(("train", "dev"))]
-    logger.info("Found %d CSV files in %s", len(files), DATA_DIR)
+    files = [f for f in os.listdir(data_dir) if f.endswith(".csv") and not f.startswith(("train", "dev"))]
+    logger.info("Found %d CSV files in %s", len(files), data_dir)
 
     for file in tqdm(files, desc="Processing files"):
-        file_path = os.path.join(DATA_DIR, file)
+        file_path = os.path.join(data_dir, file)
         try:
             df = pd.read_csv(file_path)
         except Exception as e:
@@ -190,10 +189,10 @@ def load_and_process_data(max_sequences: List[int] = [64, 128, 256, 512]) -> Tup
     return train_chunks, dev_chunks
 
 
-def main():
+def main(data_dir: str):
     for size in [128, 512]:
-        train_chunks, dev_chunks = load_and_process_data(max_sequences=[size // 2, size])
-        os.makedirs(os.path.join(DATA_DIR, f"max_{size}"), exist_ok=True)
+        train_chunks, dev_chunks = load_and_process_data(data_dir, max_sequences=[size // 2, size])
+        os.makedirs(os.path.join(data_dir, f"max_{size}"), exist_ok=True)
         train = train_chunks[size]
         dev = dev_chunks[size]
 
@@ -221,7 +220,7 @@ def main():
 
         # Concatenate and save
         if size == 512:
-            dev.to_csv(os.path.join(DATA_DIR, "perplexity_test.csv"), index=False)
+            dev.to_csv(os.path.join(data_dir, "perplexity_test.csv"), index=False)
 
         train_full = pd.concat([train, train_diff_speaker, train_diff_debate], axis=0)
         train_full = clean_df(train_full, 'text')
@@ -229,12 +228,16 @@ def main():
         dev_full = pd.concat([dev, dev_diff_speaker, dev_diff_debate], axis=0)
         dev_full = clean_df(dev_full, 'text')
 
-        train_full.to_csv(os.path.join(DATA_DIR, f'max_{size}/train.csv'), index=False)
-        dev_full.to_csv(os.path.join(DATA_DIR, f'max_{size}/dev.csv'), index=False)
+        train_full.to_csv(os.path.join(data_dir, f'max_{size}/train.csv'), index=False)
+        dev_full.to_csv(os.path.join(data_dir, f'max_{size}/dev.csv'), index=False)
 
         logger.info("Saved datasets for max_sequence=%d", size)
         logger.info("Train size: %d | Dev size: %d", len(train_full), len(dev_full))
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset", type=str, default="training")
+    args = parser.parse_args()
+
+    main(os.path.join(BASE_PATH, f'{rootutils.find_root(__file__)}/data/{args.dataset}'))

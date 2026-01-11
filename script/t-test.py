@@ -1,68 +1,66 @@
+import ast
+import json
+
+import openpyxl
+import pandas as pd
+import rootutils
 from scipy.stats import ttest_rel
+
+rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 
 def ttest(my_model, comparison_model):
     t_stat, p_value = ttest_rel(my_model, comparison_model)
     # Interpretation
-    if p_value < 0.05:
-        print("✅ Statistically significant improvement (p < 0.05)")
-    else:
-        print("⚠️ No statistically significant difference (p ≥ 0.05)")
+    # if p_value < 0.05:
+    #     print("✅ Statistically significant improvement (p < 0.05)")
+    # else:
+    #     print("⚠️ No statistically significant difference (p ≥ 0.05)")
 
-    print(f"T-statistic: {t_stat:.5f}")
-    print(f"P-value: {p_value:.5f}")
+    # print(f"T-statistic: {t_stat:.5f}")
+    # print(f"P-value: {p_value:.5f}")
+    return p_value
 
 
 if __name__ == '__main__':
-    #  SENTIMENT ANALYSS  ----------------------------------------------------------------------------------------------
-    print(f"Sentiment Analysis".upper())
-    best_roosebert = [0.7002390914524805, 0.7020322773460849, 0.7083084279737, 0.6972504482964734, 0.7017334130304842]
-    best_bert = [0.6288105200239091, 0.6108786610878661, 0.6195457262402869, 0.6291093843395099, 0.625821876867902]
-    best_conflibert = [0.6524208009563658, 0.6569037656903766, 0.6569037656903766, 0.6607890017931859,
-                       0.661685594739988]
-
-    print("RooseBERT vs BERT:")
-    ttest(best_roosebert, best_bert)
-
-    del best_bert
-
-    print("RooseBERT vs ConfliBERT:")
-    ttest(best_roosebert, best_conflibert)
-
-    del best_roosebert
-    del best_conflibert
-    #  ARGUMENT DETECTION ----------------------------------------------------------------------------------------------
-    print(f"Argument Detection".upper())
-    best_roosebert = [0.480125293612682, 0.4804703933080648, 0.4798378570599032, 0.4808326567886277, 0.4793058764283013]
-    best_bert = [0.4695875544555282, 0.4665518908439708, 0.4656770301817344, 0.4663864303982151, 0.4617379823398828]
-    best_conflibert = [0.4672975275177311, 0.4649378841182792, 0.4591647718944465, 0.4633626894671906,
-                       0.4656779816369374]
-
-    print("RooseBERT vs BERT:")
-    ttest(best_roosebert, best_bert)
-
-    del best_bert
-
-    print("RooseBERT vs ConfliBERT:")
-    ttest(best_roosebert, best_conflibert)
-
-    del best_roosebert
-    del best_conflibert
-
-    #  RELATION CLASSIFICATION  ----------------------------------------------------------------------------------------------
-    print(f"Relation Classification ".upper())
-    best_roosebert = [0.6776738338495907, 0.6758947481456635, 0.6690721704710937, 0.6723456739634033,
-                      0.6751992255159696]
-    best_bert = [0.6653531347701714, 0.6702338433630088, 0.6597793320456513, 0.6526710525974705, 0.6621778828234155]
-    best_polibert = [0.6735475620614918, 0.6621611286226843, 0.6665943150331736, 0.6630980991650038, 0.6671327096726647]
-
-    print("RooseBERT vs BERT:")
-    ttest(best_roosebert, best_bert)
-
-    del best_bert
-
-    print("RooseBERT vs PoliBERT:")
-    ttest(best_roosebert, best_polibert)
-
-    del best_roosebert
-    del best_polibert
+    file_path = "./logs/encoders/5runs/random_seed_runs.xlsx"
+    tasks = openpyxl.load_workbook(file_path).sheetnames
+    for t in ['ner_nerex']:
+        statistically_significant = {}
+        df = pd.read_excel(file_path, sheet_name=t)
+        df['Scores'] = df['Scores'].apply(ast.literal_eval)
+        best_model = df.iloc[df['Mean'].idxmax()]
+        print(f"Best model: {best_model['Models']} with task {t}")
+        df.sort_values(by="Models", ascending=True, inplace=True)
+        for _, row in df.iterrows():
+            if row['Models'] == best_model['Models']: continue
+            p_value = ttest(my_model=best_model['Scores'], comparison_model=row['Scores'])
+            if p_value < 0.01:
+                statistically_significant[row['Models']] = {
+                    "p_value": "p<0.01",
+                    "value": "*" * 3,
+                    "mean": row['Mean'],
+                    "std": row['Std']
+                }
+            elif p_value < 0.05:
+                statistically_significant[row['Models']] = {
+                    "p_value": "p<0.05",
+                    "value": "*" * 2,
+                    "mean": row['Mean'],
+                    "std": row['Std']
+                }
+            elif p_value < 0.1:
+                statistically_significant[row['Models']] = {
+                    "p_value": "p<0.1",
+                    "value": "*" * 1,
+                    "mean": row['Mean'],
+                    "std": row['Std']
+                }
+            else:
+                statistically_significant[row['Models']] = {
+                    "p_value": p_value,
+                    "value": "not significant",
+                    "mean": row['Mean'],
+                    "std": row['Std']
+                }
+        print(json.dumps(statistically_significant, sort_keys=False, indent=4))

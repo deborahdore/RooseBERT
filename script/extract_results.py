@@ -20,8 +20,8 @@ import rootutils
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 RESULTS_FOLDER = Path("logs/encoders/seed42/")
-RESULTS_FILE = Path("logs/encoders/seed42/") / "results.xlsx"
-BEST_RESULTS_FILE = Path("logs/encoders/seed42/") / "best_results.xlsx"
+RESULTS_FILE = Path("logs/encoders/") / "results.xlsx"
+BEST_RESULTS_FILE = Path("logs/encoders/") / "best_results.xlsx"
 
 RUN_PATTERN = re.compile(
     r"(.*?)-?EPOCH(?P<epoch>\d+)-LR(?P<lr>[\d.e\-]+)-WD(?P<wd>[\d.e\-]+)-B(?P<batch>\d+)"
@@ -96,7 +96,7 @@ for seed in "${{SEEDS[@]}}"; do
     --remove_unused_columns
 done
 """
-script_ner = """#!/bin/bash
+script_sequence_labelling = """#!/bin/bash
 #SBATCH --job-name=sequence_labelling_{dataset}
 #SBATCH --output=logs/sequence_labelling_{dataset}_%j.out
 #SBATCH --error=logs/sequence_labelling_{dataset}_%j.out
@@ -139,6 +139,66 @@ for seed in "${{SEEDS[@]}}"; do
     --train_file "./data/sequence_labelling/{dataset}/train.json" \\
     --validation_file "./data/sequence_labelling/{dataset}/dev.json" \\
     --test_file "./data/sequence_labelling/{dataset}/test.json" \\
+    --eval_strategy "steps" \\
+    --eval_steps 2000 \\
+    --logging_steps 1000 \\
+    --per_device_train_batch_size "$batch" \\
+    --per_device_eval_batch_size "$batch" \\
+    --learning_rate "$lr" \\
+    --weight_decay "$wd" \\
+    --num_train_epochs "$epoch" \\
+    --logging_strategy "steps" \\
+    --save_strategy "epoch" \\
+    --save_total_limit 1 \\
+    --seed "$seed" \\
+    --report_to "wandb" \\
+    --eval_on_start \\
+    --remove_unused_columns
+done
+"""
+script_ner = """#!/bin/bash
+#SBATCH --job-name=ner_nerex
+#SBATCH --output=logs/ner_nerex_%j.out
+#SBATCH --error=logs/ner_nerex_%j.out
+#SBATCH --partition=gpu
+#SBATCH --gpus=h100:1
+#SBATCH --time=36:00:00
+
+set -e
+module load miniconda
+conda activate roosebert
+
+export TOKENIZERS_PARALLELISM=false
+export WANDB_PROJECT="ner_nerex"
+wandb disabled
+
+MODEL_DIR="{model_dir}"
+SEEDS=(42 12 16 48 33)
+wd=0.1
+
+model="{model}"
+lr={learning_rate}
+batch={batch_size}
+epoch={epoch}
+
+for seed in "${{SEEDS[@]}}"; do
+
+    RUN_NAME=$(printf "%s-EPOCH%s-LR%s-WD%s-B%s" "$model" "$epoch" "$lr" "$wd" "$batch")
+    OUTPUT_DIR="./logs/$WANDB_PROJECT/$model/$RUN_NAME"
+
+    mkdir -p "$OUTPUT_DIR"
+
+    python src/run_ner.py \\
+    --run_name "$RUN_NAME" \\
+    --model_name_or_path "$MODEL_DIR/$model" \\
+    --config_name "$MODEL_DIR/$model" \\
+    --tokenizer_name "$MODEL_DIR/$model" \\
+    --cache_dir "./cache/" \\
+    --logging_dir "./logs/" \\
+    --output_dir "$OUTPUT_DIR" \\
+    --train_file "./data/ner/nerex/train.json" \\
+    --validation_file "./data/ner/nerex/dev.json" \\
+    --test_file "./data/ner/nerex/test.json" \\
     --eval_strategy "steps" \\
     --eval_steps 2000 \\
     --logging_steps 1000 \\
@@ -291,9 +351,9 @@ def get_script_template(task_type: str) -> str:
     if task_type in {"binary_classification", "multi_class_classification"}:
         return script_classification
     elif task_type == "sequence_labelling":
-        return script_ner
+        return script_sequence_labelling
     else:
-        raise ValueError(f"Unknown task type: {task_type}")
+        return script_ner
 
 
 def write_sbatch():
