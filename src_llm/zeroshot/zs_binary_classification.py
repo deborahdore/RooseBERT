@@ -108,6 +108,7 @@ def run(args):
     pipe = load_model(args.model)
 
     predictions = []
+    predictions_text = []
     gold_labels = df[args.label_col].tolist()
     sentences = df[args.text_col].tolist()
 
@@ -116,8 +117,10 @@ def run(args):
         output = pipe(prompt)[0]["generated_text"]
         label = extract_label(output)
         predictions.append(label)
+        predictions_text.append(output)
 
     df["prediction"] = predictions
+    df['predictions_text'] = predictions_text
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
     out_file = f"logs/{args.model}/{args.dataset}/zero_shot_binary_classification.csv"
 

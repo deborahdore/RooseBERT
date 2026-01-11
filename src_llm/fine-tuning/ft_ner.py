@@ -41,51 +41,10 @@ def integrate_ner_tags(tokens, tags):
     open_tag = None
 
     for token, tag in zip(tokens, tags):
-        # Handle Outside tag (O)
-        if tag == "O":
-            if open_tag:
-                result.append(f" </{open_tag}> ")
-                open_tag = None
-            result.append(token)
-            continue
-
-        # Extract label type (e.g., Claim, Premise)
-        prefix, label = tag.split("-", 1)
-
-        if prefix == "B":
-            # If a tag is already open, close it before opening a new one
-            if open_tag:
-                result.append(f" </{open_tag}> ")
-            result.append(f" <{label}> {token} ")
-            open_tag = label
-
-        elif prefix == "I":
-            # Continue the current span
-            if open_tag == label:
-                result.append(f" {token} ")
-            else:
-                # Handle misaligned tags (shouldn't happen in clean BIO data)
-                if open_tag:
-                    result.append(f" </{open_tag}> ")
-                result.append(f" <{label}> {token} ")
-                open_tag = label
-
-    # Close any unclosed tag at the end
-    if open_tag:
-        result.append(f" </{open_tag}> ")
+        result.append(f"<{tag}>{token}</{tag}>")
 
     # Merge into final string
-    final_text = " ".join(result)
-
-    # Fix spacing before punctuation (optional cleanup)
-    final_text = (
-        final_text.replace(" ,", ",")
-        .replace(" .", ".")
-        .replace(" !", "!")
-        .replace(" ?", "?")
-        .replace(" ;", ";")
-        .replace(" :", ":")
-    )
+    final_text = "".join(result)
     return re.sub(r' +', ' ', final_text).strip()
 
 
@@ -99,11 +58,11 @@ def run(args):
     print("Chosen Model:", args.model)
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
     output_dir = f"logs/{args.model}/{args.dataset}"
-    output_file = f"{output_dir}/fine_tuning_sequence_labelling.csv"
+    output_file = f"{output_dir}/fine_tuning_ner.csv"
 
-    train_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/train.json"))
-    dev_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/dev.json"))
-    test_df = convert(pd.read_json(f"data/sequence_labelling/{args.dataset}/test.json"))
+    train_df = convert(pd.read_json(f"data/ner/{args.dataset}/train.json"))
+    dev_df = convert(pd.read_json(f"data/ner/{args.dataset}/dev.json"))
+    test_df = convert(pd.read_json(f"data/ner/{args.dataset}/test.json"))
 
     train_dataset = Dataset.from_pandas(train_df)
     dev_dataset = Dataset.from_pandas(dev_df)
@@ -115,18 +74,10 @@ def run(args):
     model = create_model(args)
     model.config.pad_token_id = tokenizer.pad_token_id
 
-    # def formatting_func(example):
-    #     return (
-    #         "Task: Identify argumentative components in the sentence.\n"
-    #         "Tag each span using <claim>...</claim> and <premise>...</premise>.\n"
-    #         "Do not add or remove text.\n\n"
-    #         f"Sentence:\n{example['text']}\n\n"
-    #         f"Output:\n{example['label']}"
-    #     )
     def preprocess(example):
         prompt = (
-            "Task: Identify argumentative components in the sentence.\n"
-            "Tag each span using <claim>...</claim> and <premise>...</premise>.\n"
+            "Task: Identify the named entities in the sentence.\n"
+            "Tag each span using <named entity>...</named entity>.\n"
             "Do not add or remove text.\n\n"
             f"Sentence:\n{example['text']}\n\n"
             f"Output:\n"
@@ -223,8 +174,8 @@ def run(args):
 
     for idx, row in tqdm(test_df.iterrows(), total=len(test_df)):
         prompt = (
-            "Task: Identify argumentative components in the sentence.\n"
-            "Tag each span using <claim>...</claim> and <premise>...</premise>.\n"
+            "Task: Identify the named entities in the sentence.\n"
+            "Tag each span using <entity>...</entity>.\n"
             "Do not add or remove text.\n\n"
             f"Sentence:\n{row['text']}\n\n"
             f"Output:\n"
@@ -263,7 +214,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
-    parser.add_argument("--dataset", type=str, choices=['ElecDeb60to20', 'ArgUNSC'], default="ArgUNSC")
+    parser.add_argument("--dataset", type=str, choices=['nerex'], default="nerex")
 
     args = parser.parse_args()
     run(args)

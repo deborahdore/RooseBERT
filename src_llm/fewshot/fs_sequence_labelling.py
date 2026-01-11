@@ -38,7 +38,7 @@ PROMPT_TEMPLATES = {
         "Sentence: {sentence}\n"
         "Output:"
     ),
-    "ElecDeb60to20-components": (
+    "ElecDeb60to20": (
         "Sentence: Yes, I voted for it, supported it.\n"
         "Output: <premise>Yes, I voted for it</premise>, <claim>supported it.</claim>\n\n"
 
@@ -182,8 +182,8 @@ def evaluate(results_df):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, default="ElecDeb60to20-components",
-                        choices=["ArgUNSC", "ElecDeb60to20-components"])
+    parser.add_argument("--dataset", type=str, default="ElecDeb60to20",
+                        choices=["ArgUNSC", "ElecDeb60to20"])
     parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
     args = parser.parse_args()
 

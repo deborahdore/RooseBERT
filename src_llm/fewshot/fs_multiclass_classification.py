@@ -22,7 +22,7 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
 EXAMPLES = {
-    "ElecDeb60to20-relations": [
+    "ElecDeb60to20": [
         "Sentence: we have avoided surrender of principle or territory at the conference table [SEP] In the past seven years, in President Eisenhower's Administration, this situation has been reversed\n"
         "Output: support\n",
 
@@ -67,7 +67,7 @@ EXAMPLES = {
 }
 
 INSTRUCTION_PROMPT = {
-    "ElecDeb60to20-relations": (
+    "ElecDeb60to20": (
         "You are a relation classification assistant. Classify the sentences separated by [SEP] using the labels: support, attack, no_relation\n\n"
         "{examples}"
         "Sentence: {sentence}\n"
@@ -195,11 +195,12 @@ def run(args):
     pipe = load_model(args.model)
 
     predictions = []
+    predictions_text = []
     gold_labels = df[args.label_col].tolist()
     sentences = df[args.text_col].tolist()
 
     extract_label = {
-        'ElecDeb60to20-relations': extract_label_relations,
+        'ElecDeb60to20': extract_label_relations,
         'MotionPolicyPreference': extract_label_MotionPolicyPreference,
         'ParlVote+': extract_label_ParlVotePlus,
         'ArgUNSC': extract_label_relations
@@ -210,8 +211,10 @@ def run(args):
         output = pipe(prompt)[0]["generated_text"]
         label = extract_label.get(args.dataset)(output)
         predictions.append(label)
+        predictions_text.append(output)
 
     df["prediction"] = predictions
+    df['predictions_text'] = predictions_text
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
     out_file = f"logs/{args.model}/{args.dataset}/few_shot_multi_class_classification.csv"
 

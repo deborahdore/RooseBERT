@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import re
 import warnings
 
 import pandas as pd
@@ -18,8 +17,6 @@ from transformers import (
 
 from utils import flatten, load_data
 
-rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
-
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -27,34 +24,85 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 PROMPT_TEMPLATES = {
     "instructions": (
-        "Task: identify argumentative spans in the sentence.\n\n"
-        "Span types:\n"
-        "- <claim>: expresses a stance, opinion, or proposed policy\n"
-        "- <premise>: provides justification or support for a claim\n\n"
+        "Task: identify the entities in the sentence.\n\n"
+        "Possible categories are:\n"
+        "CC (coordinating conjunction, e.g. 'and', 'but'), "
+        "CD (cardinal number, e.g. 'three'), "
+        "DT (determiner, e.g. 'the'), "
+        "EX (existential 'there'), "
+        "FW (foreign word, e.g. 'ad hoc'), "
+        "IN (preposition or subordinating conjunction, e.g. 'because'), "
+        "JJ (adjective, e.g. 'strong'), "
+        "JJR (comparative adjective, e.g. 'stronger'), "
+        "JJS (superlative adjective, e.g. 'strongest'), "
+        "LS (list marker, e.g. '1.'), "
+        "MD (modal verb, e.g. 'must'), "
+        "NN (singular noun, e.g. 'argument'), "
+        "NNP (proper noun, e.g. 'Jennifer'), "
+        "NNPS (plural proper noun, e.g. 'Americans'), "
+        "NNS (plural noun, e.g. 'arguments'), "
+        "PDT (predeterminer, e.g. 'all'), "
+        "POS (possessive ending, e.g. \"'s\"), "
+        "PRP (personal pronoun, e.g. 'she'), "
+        "RB (adverb, e.g. 'clearly'), "
+        "RBR (comparative adverb, e.g. 'more'), "
+        "RBS (superlative adverb, e.g. 'most'), "
+        "RP (particle, e.g. 'up' in 'give up'), "
+        "SYM (symbol, e.g. '$'), "
+        "TO (infinitive marker 'to'), "
+        "UH (interjection, e.g. 'oh'), "
+        "VB (base verb, e.g. 'argue'), "
+        "VBD (past verb, e.g. 'argued'), "
+        "VBG (gerund, e.g. 'arguing'), "
+        "VBN (past participle, e.g. 'supported'), "
+        "VBP (present verb, e.g. 'believe'), "
+        "VBZ (3rd person present verb, e.g. 'believes'), "
+        "WDT (wh-determiner, e.g. 'which'), "
+        "WP (wh-pronoun, e.g. 'who'), "
+        ", (comma), "
+        ": (colon), "
+        ". (dot), "
+        "WRB (wh-adverb, e.g. 'why').\n\n"
         "Rewrite the entire sentence exactly as given.\n"
-        "Surround each identified span with <claim>...</claim> or <premise>...</premise>.\n"
-        "Only tag spans that clearly match one of the types.\n"
+        "Surround each identified entity span with <tag>...</tag>.\n"
         "Do not add, remove, or change any words.\n\n"
         "Output the fully tagged sentence only.\n\n"
+        "{examples}"
         "Sentence: {sentence}\n"
         "Output:"
+    ),
+    "nerex": (
+        "Sentence: He was trying to get rid of sanctions for a reason : He wanted to restart weapons programs .\n"
+        "Output: <PRP>He</PRP> <VBD>was</VBD> <VBG>trying</VBG> <TO>to</TO> <VB>get</VB> <JJ>rid</JJ> <IN>of</IN> <NNS>sanctions</NNS> <IN>for</IN> <DT>a</DT> <NN>reason</NN> <:>:</:> <PRP>He</PRP> <VBD>wanted</VBD> <TO>to</TO> <VB>restart</VB> <NNS>weapons</NNS> <NNS>programs</NNS><.>.</.> \n\n"
+
+        "Sentence: He 'll have two minutes to answer .\n"
+        "Output: <PRP>He</PRP> <MD>'ll</MD> <VB>have</VB> <CD>two</CD> <NNS>minutes</NNS> <TO>to</TO> <VB>answer</VB><.>.</.>\n\n"
+
+        "Sentence: You remember the last debate ?\n"
+        "Output: <PRP>You</PRP> <VBP>remember</VBP> <DT>the</DT> <JJ>last</JJ> <NN>debate</NN><.>.</.>\n\n"
     )
 }
+
+import re
 
 
 def transform_into_tags(original_sentence: str, predicted_text: str, length: int):
     """
-    Convert text with <claim>...</claim> and <premise>...</premise> into BIO tags aligned
-    to the original sentence tokens.
+    Convert text with <TAG>...</TAG> into flat token-level tags
+    aligned to the original sentence tokens (no BIO scheme).
     """
     tokens = original_sentence.strip().split()
-    bio = ["O"] * len(tokens)
+    tags = ["O"] * len(tokens)
 
-    pattern = re.compile(r"<(claim|premise)>(.*?)</\1>", re.DOTALL | re.IGNORECASE)
+    pattern = re.compile(
+        r"<(,|\.|:|CC|CD|DT|EX|FW|IN|JJ|JJR|JJS|LS|MD|NN|NNP|NNPS|NNS|PDT|POS|PRP|RB|RBR|RBS|RP|SYM|TO|UH|VB|VBD|VBG|VBN|VBP|VBZ|WDT|WP|WRB)>(.*?)</\1>",
+        re.DOTALL | re.IGNORECASE
+    )
+
     spans = pattern.findall(predicted_text)
 
     for tag, span_text in spans:
-        tag = tag.lower()
+        tag = tag.upper()
         span_tokens = span_text.strip().split()
         matched_indices = []
 
@@ -67,11 +115,10 @@ def transform_into_tags(original_sentence: str, predicted_text: str, length: int
                     matched_indices.append(i)
                     break
 
-        matched_indices.sort()
-        for idx, pos in enumerate(matched_indices):
-            bio[pos] = ("B-" if idx == 0 else "I-") + tag
+        for pos in matched_indices:
+            tags[pos] = tag
 
-    return bio[:length]
+    return tags[:length]
 
 
 def load_model_and_pipeline(model_id: str):
@@ -163,23 +210,22 @@ def evaluate(results_df):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset", type=str, default="ElecDeb60to20",
-                        choices=["ArgUNSC", "ElecDeb60to20"])
+    parser.add_argument("--dataset", type=str, default="nerex", choices=["nerex"])
     parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
     args = parser.parse_args()
 
     # Load dataset
-    dataset = load_data(f"./data/sequence_labelling/{args.dataset}/test.json")
+    dataset = load_data(f"./data/ner/{args.dataset}/test.json")
 
     # Build prompt
+    examples = PROMPT_TEMPLATES[args.dataset].strip()
     dataset["prompt"] = dataset["text"].apply(
-        lambda x: PROMPT_TEMPLATES["instructions"].format(sentence=x))
+        lambda x: PROMPT_TEMPLATES["instructions"].format(examples=examples, sentence=x))
 
     # Prepare output directory
     model_name = args.model.split("/")[-1]
-    out_dir = os.path.join("logs", model_name)
     os.makedirs(f"logs/{args.model}/{args.dataset}", exist_ok=True)
-    out_file = f"logs/{args.model}/{args.dataset}/zero_shot_sequence_labelling.csv"
+    out_file = f"logs/{args.model}/{args.dataset}/few_shot_ner.csv"
 
     # Run model
     generator = load_model_and_pipeline(args.model)
