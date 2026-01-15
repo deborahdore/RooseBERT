@@ -190,7 +190,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--model", type=str, default="google/gemma-3-1b-it")
     parser.add_argument("--dataset", type=str,
-                        choices=['ArgUNSC', 'ElecDeb60to20-relations', 'MotionPolicyPreference', 'ParlVote+'],
+                        choices=['ArgUNSC', 'ElecDeb60to20', 'MotionPolicyPreference', 'ParlVote+'],
                         default="ParlVote")
 
     parser.add_argument("--text-col", type=str, default="text")
