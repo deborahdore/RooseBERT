@@ -77,7 +77,7 @@ def main(index_url: str, output_file: str):
     all_rows = []
 
     # Single tqdm bar for the year loop
-    for year in tqdm(range(FROM, TO + 1), desc="Scraping years", unit="year"):
+    for year in range(FROM, TO + 1):
 
         year_url = urljoin(index_url, f"{year}/")
         year_soup = fetch_soup(year_url)
@@ -90,42 +90,46 @@ def main(index_url: str, output_file: str):
             href=re.compile(rf"^/debates/{year}/")
         )
 
-        for a in debate_links:
+        for a in tqdm(debate_links, desc=f"Scraping {year}", unit="debate"):
+            try:
 
-            # Parse the date
-            raw_date = a.get_text(strip=True)
-            clean_date = re.sub(r"(st|nd|rd|th)", "", raw_date)
-            date = convert_to_dmy_format(clean_date, "%B %d")
+                # Parse the date
+                raw_date = a.get_text(strip=True)
+                clean_date = re.sub(r"(st|nd|rd|th)", "", raw_date)
 
-            # Load debate page
-            debate_url = urljoin(BASE_URL, a["href"]) + "?singlepage=1"
-            debate_soup = fetch_soup(debate_url)
-            if not debate_soup:
-                continue
+                date = convert_to_dmy_format(clean_date, "%B %d")
 
-            # Extract statement blocks
-            blocks = find_statement_blocks(debate_soup)
-            if not blocks:
-                continue
-
-            # Extract text from each block
-            for block in blocks:
-                speaker_tag = block.find("span", class_="pol_name")
-                speaker = speaker_tag.get_text(strip=True) if speaker_tag else "Procedural"
-
-                text_div = block.find("div", class_="text")
-                if not text_div:
+                # Load debate page
+                debate_url = urljoin(BASE_URL, a["href"]) + "?singlepage=1"
+                debate_soup = fetch_soup(debate_url)
+                if not debate_soup:
                     continue
 
-                text = extract_text_block(text_div)
+                # Extract statement blocks
+                blocks = find_statement_blocks(debate_soup)
+                if not blocks:
+                    continue
 
-                all_rows.append({
-                    "ID": f"CanadaParliament_{date}",
-                    "date": date,
-                    "speaker": speaker,
-                    "text": text,
-                })
-            time.sleep(5)
+                # Extract text from each block
+                for block in blocks:
+                    speaker_tag = block.find("span", class_="pol_name")
+                    speaker = speaker_tag.get_text(strip=True) if speaker_tag else "Procedural"
+
+                    text_div = block.find("div", class_="text")
+                    if not text_div:
+                        continue
+
+                    text = extract_text_block(text_div)
+
+                    all_rows.append({
+                        "ID": f"CanadaParliament_{date}",
+                        "date": date,
+                        "speaker": speaker,
+                        "text": text,
+                    })
+            except Exception as e:
+                time.sleep(5)
+                continue
 
     print("\n Cleaning dataset...")
     df = pd.DataFrame(all_rows)

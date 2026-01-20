@@ -42,7 +42,9 @@ from transformers import (
     CONFIG_MAPPING,
     MODEL_FOR_MASKED_LM_MAPPING,
     AutoConfig,
+    AutoModelForMaskedLM,
     AutoTokenizer,
+    DataCollatorForLanguageModeling,
     HfArgumentParser,
     Trainer,
     TrainingArguments,
@@ -53,10 +55,6 @@ from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
-
-from src.data.collator_multitask import DataCollatorForMultiTaskPretraining
-from src.models.bert_multitask import BertForMultiTaskPretraining
-from src.callbacks.MultiTaskLoggingCallback import MultiTaskLoggingCallback
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.49.0.dev0")
@@ -418,7 +416,7 @@ def main():
             if model_args.torch_dtype in ["auto", None]
             else getattr(torch, model_args.torch_dtype)
         )
-        model = BertForMultiTaskPretraining.from_pretrained(
+        model = AutoModelForMaskedLM.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -431,7 +429,7 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = BertForMultiTaskPretraining(config)
+        model = AutoModelForMaskedLM.from_config(config, trust_remote_code=model_args.trust_remote_code)
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -471,11 +469,6 @@ def main():
             max_length=max_seq_length,
             return_special_tokens_mask=True,
         )
-        # Preserve extra columns
-        if "same_speaker" in examples:
-            tokenized["scp_labels"] = [int(l) for l in examples["same_speaker"]]
-        if "same_debate" in examples:
-            tokenized["acm_labels"] = [int(l) for l in examples["same_debate"]]
         return tokenized
 
     with training_args.main_process_first(desc="dataset map tokenization"):
@@ -512,94 +505,26 @@ def main():
             eval_dataset = eval_dataset.select(range(max_eval_samples))
 
         def preprocess_logits_for_metrics(logits, labels):
-            """
-            Preprocess logits from multi-task model
-            """
             if isinstance(logits, tuple):
-                # Multi-task: (mlm_logits, scp_logits, acm_logits)
-                mlm_logits, scp_logits, acm_logits = logits[3], logits[4], logits[5]
+                # Depending on the model and config, logits may contain extra tensors,
+                # like past_key_values, but logits always come first
+                logits = logits[0]
+            return F.softmax(logits, dim=-1).argmax(dim=-1)
 
-                # Convert to predictions
-                mlm_preds = F.softmax(mlm_logits, dim=-1).argmax(dim=-1)
-                scp_preds = F.softmax(scp_logits, dim=-1).argmax(dim=-1)
-                acm_preds = F.softmax(acm_logits, dim=-1).argmax(dim=-1)
-
-                return (mlm_preds, scp_preds, acm_preds)
-            else:
-                # Single task fallback
-                return F.softmax(logits, dim=-1).argmax(dim=-1)
-
-        # Load metrics for each task
-        metric_mlm = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
-        metric_scp = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
-        metric_acm = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
+        metric = evaluate.load("accuracy", cache_dir=model_args.cache_dir)
 
         def compute_metrics(eval_preds):
-            """
-            Compute metrics for all three tasks
-            """
             preds, labels = eval_preds
-
-            # Multi-task predictions
-            if isinstance(preds, tuple) and len(preds) == 3:
-                mlm_preds, scp_preds, acm_preds = preds
-                mlm_labels, scp_labels, acm_labels = labels
-
-                # MLM Accuracy (masked tokens only)
-                mlm_labels_flat = mlm_labels.reshape(-1)
-                mlm_preds_flat = mlm_preds.reshape(-1)
-                mlm_mask = mlm_labels_flat != -100
-                mlm_labels_filtered = mlm_labels_flat[mlm_mask]
-                mlm_preds_filtered = mlm_preds_flat[mlm_mask]
-
-                mlm_accuracy = metric_mlm.compute(
-                    predictions=mlm_preds_filtered,
-                    references=mlm_labels_filtered
-                )['accuracy']
-
-                # SCP Accuracy
-                scp_labels_flat = scp_labels.reshape(-1)
-                scp_preds_flat = scp_preds.reshape(-1)
-                scp_mask = scp_labels_flat != -100
-                scp_labels_filtered = scp_labels_flat[scp_mask]
-                scp_preds_filtered = scp_preds_flat[scp_mask]
-
-                scp_accuracy = metric_scp.compute(
-                    predictions=scp_preds_filtered,
-                    references=scp_labels_filtered
-                )['accuracy']
-
-                # ACM Accuracy
-                acm_labels_flat = acm_labels.reshape(-1)
-                acm_preds_flat = acm_preds.reshape(-1)
-                acm_mask = acm_labels_flat != -100
-                acm_labels_filtered = acm_labels_flat[acm_mask]
-                acm_preds_filtered = acm_preds_flat[acm_mask]
-
-                acm_accuracy = metric_acm.compute(
-                    predictions=acm_preds_filtered,
-                    references=acm_labels_filtered
-                )['accuracy']
-
-                return {
-                    'mlm_accuracy': mlm_accuracy,
-                    'scp_accuracy': scp_accuracy,
-                    'acm_accuracy': acm_accuracy,
-                    'avg_accuracy': (mlm_accuracy + scp_accuracy + acm_accuracy) / 3,
-                }
-
-            else:
-                # Single-task fallback
-                labels = labels.reshape(-1)
-                preds = preds.reshape(-1)
-                mask = labels != -100
-                labels = labels[mask]
-                preds = preds[mask]
-                return metric_mlm.compute(predictions=preds, references=labels)
+            labels = labels.reshape(-1)
+            preds = preds.reshape(-1)
+            mask = labels != -100
+            labels = labels[mask]
+            preds = preds[mask]
+            return metric.compute(predictions=preds, references=labels)
 
     # Data collator
     pad_to_multiple_of_8 = data_args.line_by_line and training_args.fp16 and not data_args.pad_to_max_length
-    data_collator = DataCollatorForMultiTaskPretraining(
+    data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm_probability=data_args.mlm_probability,
         pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
@@ -617,7 +542,6 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_xla_available()
         else None,
-        callbacks=[MultiTaskLoggingCallback()]
     )
 
     # Training

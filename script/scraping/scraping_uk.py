@@ -42,17 +42,17 @@ def main(input_folder: str, output_file: str):
         try:
             df = pd.read_csv(file_path, usecols=["body", "name"], low_memory=False)
             df["date"] = convert_to_dmy_format(date, "%Y")
+            df.rename(columns={"body": "text", "name": 'speaker'}, inplace=True)
+            df["text"] = df["text"].apply(clean_text)
+            df['ID'] = "UKParliament_" + df['date']
+            df = df[['ID', 'date', 'speaker', 'text']]
+            df = df.dropna().drop_duplicates().reset_index(drop=True)
             all_records.append(df)
         except Exception as e:
             print(f"⚠️ Skipping {filename} due to error: {e}")
 
     if all_records:
         df_combined = pd.concat(all_records, ignore_index=True)
-        df_combined.rename(columns={"body": "text", "name": 'speaker'}, inplace=True)
-        df_combined["text"] = df_combined["text"].apply(clean_text)
-        df_combined['ID'] = "UKParliament_" + df_combined['date']
-        df_combined = df_combined[['ID', 'date', 'speaker', 'text']]
-        df_combined = df_combined.dropna().drop_duplicates().reset_index(drop=True)
         df_combined.to_csv(output_file, index=False)
         print("Dataset Length: {}".format(len(df_combined)))
         print(f"✅ Processed dataset saved to: {output_file}")

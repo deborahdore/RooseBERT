@@ -47,12 +47,16 @@ from transformers import (
     Trainer,
     TrainingArguments,
     is_torch_xla_available,
-    set_seed, BertModel, DataCollatorForLanguageModeling, )
+    set_seed, )
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
+
+from src.experiments_with_loss.data.collator_multitask import DataCollatorForMultiTaskPretraining
+from src.experiments_with_loss.models.bert_multitask import BertForMultiTaskPretraining
+from src.experiments_with_loss.callbacks.MultiTaskLoggingCallback import MultiTaskLoggingCallback
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.49.0.dev0")
@@ -414,7 +418,7 @@ def main():
             if model_args.torch_dtype in ["auto", None]
             else getattr(torch, model_args.torch_dtype)
         )
-        model = BertModel.from_pretrained(
+        model = BertForMultiTaskPretraining.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -427,7 +431,7 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = BertModel(config)
+        model = BertForMultiTaskPretraining(config)
 
     # We resize the embeddings only when necessary to avoid index errors. If you are creating a model from scratch
     # on a small vocab and want a smaller embedding size, remove this test.
@@ -595,7 +599,7 @@ def main():
 
     # Data collator
     pad_to_multiple_of_8 = data_args.line_by_line and training_args.fp16 and not data_args.pad_to_max_length
-    data_collator = DataCollatorForLanguageModeling(
+    data_collator = DataCollatorForMultiTaskPretraining(
         tokenizer=tokenizer,
         mlm_probability=data_args.mlm_probability,
         pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
@@ -613,6 +617,7 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_xla_available()
         else None,
+        callbacks=[MultiTaskLoggingCallback()]
     )
 
     # Training
