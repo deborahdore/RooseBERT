@@ -7,7 +7,7 @@ import os
 import random
 from collections import Counter
 from itertools import combinations
-from typing import List, Tuple
+from typing import Tuple
 
 import nltk
 import pandas as pd
@@ -149,7 +149,7 @@ def clean_df(df: pd.DataFrame, text_column_name: str) -> pd.DataFrame:
 
 # ------------------- Main Workflow -------------------
 
-def load_and_process_data(data_dir, max_sequences: List[int] = [64, 128, 256, 512]) -> Tuple:
+def load_and_process_data(data_dir, max_sequence: int) -> Tuple:
     """Load CSVs, split sentences, create chunks, split into train/dev."""
     all_train, all_dev = [], []
 
@@ -168,6 +168,7 @@ def load_and_process_data(data_dir, max_sequences: List[int] = [64, 128, 256, 51
             continue
 
         df = split_sentences(df)
+        df = concatenate_in_chunks(df, max_sequence)
 
         train, dev = train_test_split(df, test_size=0.1, random_state=42, shuffle=False)
         all_train.append(train)
@@ -176,63 +177,25 @@ def load_and_process_data(data_dir, max_sequences: List[int] = [64, 128, 256, 51
     if not all_train or not all_dev:
         raise ValueError("No data processed.")
 
-    train_df = pd.concat(all_train).reset_index(drop=True)
-    dev_df = pd.concat(all_dev).reset_index(drop=True)
-
-    train_chunks = {k: concatenate_in_chunks(train_df, k) for k in max_sequences}
-    dev_chunks = {k: concatenate_in_chunks(dev_df, k) for k in max_sequences}
-
-    # Shuffle datasets
-    train_chunks = {k: shuffle_df(v) for k, v in train_chunks.items()}
-    dev_chunks = {k: shuffle_df(v) for k, v in dev_chunks.items()}
-
-    return train_chunks, dev_chunks
+    return pd.concat(all_train).reset_index(drop=True), pd.concat(all_dev).reset_index(drop=True)
 
 
 def main(data_dir: str):
     for size in [128, 512]:
-        train_chunks, dev_chunks = load_and_process_data(data_dir, max_sequences=[size // 2, size])
+        train, dev = load_and_process_data(data_dir, max_sequence=size)
         os.makedirs(os.path.join(data_dir, f"max_{size}"), exist_ok=True)
-        train = train_chunks[size]
-        dev = dev_chunks[size]
 
-        # Same speaker / same debate
-        train['same_speaker'] = True
-        dev['same_speaker'] = True
-        train['same_debate'] = True
-        dev['same_debate'] = True
-
-        # Different speaker same debate
-        train_diff_speaker = create_speaker_change_prediction_dataset(train_chunks[size // 2], len(train) // 2)
-        dev_diff_speaker = create_speaker_change_prediction_dataset(dev_chunks[size // 2], len(dev) // 2)
-        train_diff_speaker['same_speaker'] = False
-        dev_diff_speaker['same_speaker'] = False
-        train_diff_speaker['same_debate'] = True
-        dev_diff_speaker['same_debate'] = True
-
-        # Different debate
-        train_diff_debate = create_argument_continuity_dataset(train_chunks[size // 2], len(train) // 2)
-        dev_diff_debate = create_argument_continuity_dataset(dev_chunks[size // 2], len(dev) // 2)
-        train_diff_debate['same_speaker'] = False
-        dev_diff_debate['same_speaker'] = False
-        train_diff_debate['same_debate'] = False
-        dev_diff_debate['same_debate'] = False
-
-        # Concatenate and save
         if size == 512:
             dev.to_csv(os.path.join(data_dir, "perplexity_test.csv"), index=False)
 
-        train_full = pd.concat([train, train_diff_speaker, train_diff_debate], axis=0)
-        train_full = clean_df(train_full, 'text')
+        train = clean_df(train, 'text')
+        dev = clean_df(dev, 'text')
 
-        dev_full = pd.concat([dev, dev_diff_speaker, dev_diff_debate], axis=0)
-        dev_full = clean_df(dev_full, 'text')
-
-        train_full.to_csv(os.path.join(data_dir, f'max_{size}/train.csv'), index=False)
-        dev_full.to_csv(os.path.join(data_dir, f'max_{size}/dev.csv'), index=False)
+        train.to_csv(os.path.join(data_dir, f'max_{size}/train.csv'), index=False)
+        dev.to_csv(os.path.join(data_dir, f'max_{size}/dev.csv'), index=False)
 
         logger.info("Saved datasets for max_sequence=%d", size)
-        logger.info("Train size: %d | Dev size: %d", len(train_full), len(dev_full))
+        logger.info("Train size: %d | Dev size: %d", len(train), len(dev))
 
 
 if __name__ == '__main__':

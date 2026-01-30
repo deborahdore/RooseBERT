@@ -92,12 +92,11 @@ def main(index_url: str, output_file: str):
 
         for a in tqdm(debate_links, desc=f"Scraping {year}", unit="debate"):
             try:
-
                 # Parse the date
-                raw_date = a.get_text(strip=True)
+                raw_date = a.get_text(strip=True) + f" {year}"
                 clean_date = re.sub(r"(st|nd|rd|th)", "", raw_date)
 
-                date = convert_to_dmy_format(clean_date, "%B %d")
+                date = convert_to_dmy_format(clean_date, "%B %d %Y")
 
                 # Load debate page
                 debate_url = urljoin(BASE_URL, a["href"]) + "?singlepage=1"
@@ -129,7 +128,6 @@ def main(index_url: str, output_file: str):
                     })
             except Exception as e:
                 time.sleep(5)
-                continue
 
     print("\n Cleaning dataset...")
     df = pd.DataFrame(all_rows)

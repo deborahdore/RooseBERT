@@ -66,4 +66,4 @@ def convert_to_dmy_format(date_str, current_format="%Y-%m-%d"):
         date_obj = datetime.strptime(str(date_str), current_format)
         return date_obj.strftime("%d-%m-%Y")
     except ValueError as e:
-        return f"Error: {e}"
+        return date_str

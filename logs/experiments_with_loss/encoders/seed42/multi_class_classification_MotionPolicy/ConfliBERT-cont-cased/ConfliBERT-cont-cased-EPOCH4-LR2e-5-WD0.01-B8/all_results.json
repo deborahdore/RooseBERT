@@ -1,0 +1,19 @@
+{
+  "epoch": 4.0,
+  "num_input_tokens_seen": 0,
+  "test_accuracy": 0.5119047619047619,
+  "test_epoch": 4.0,
+  "test_f1": 0.2611379287071808,
+  "test_loss": 2.77074933052063,
+  "test_precision": 0.259278335095032,
+  "test_recall": 0.3358813700918964,
+  "test_runtime": 0.2657,
+  "test_samples_per_second": 632.244,
+  "test_step": 672,
+  "test_steps_per_second": 79.031,
+  "total_flos": 190746908009280.0,
+  "train_loss": 3.149726141066778,
+  "train_runtime": 42.3221,
+  "train_samples_per_second": 127.026,
+  "train_steps_per_second": 15.878
+}

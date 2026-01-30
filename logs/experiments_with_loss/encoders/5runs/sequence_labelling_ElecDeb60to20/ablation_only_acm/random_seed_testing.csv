@@ -1,0 +1,6 @@
+model,seed,f1_score,accuracy
+/home/ddore/workspace/Ablation/models/only-acm,42,0.6327861858841834,0.6844660849833869
+/home/ddore/workspace/Ablation/models/only-acm,12,0.6268269410554802,0.6793470920338205
+/home/ddore/workspace/Ablation/models/only-acm,16,0.6327901062151065,0.6886936438045328
+/home/ddore/workspace/Ablation/models/only-acm,48,0.628801592092749,0.6797320294983658
+/home/ddore/workspace/Ablation/models/only-acm,33,0.628316215928942,0.6799751478970258
