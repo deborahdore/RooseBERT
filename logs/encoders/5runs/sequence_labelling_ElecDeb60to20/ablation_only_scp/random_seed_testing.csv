@@ -1,6 +1,0 @@
-model,seed,f1_score,accuracy
-/home/ddore/workspace/Ablation/models/only-scp,42,0.6203896417526009,0.6730462735352116
-/home/ddore/workspace/Ablation/models/only-scp,12,0.6317659780257616,0.6861949269294146
-/home/ddore/workspace/Ablation/models/only-scp,16,0.6310862753179304,0.6841284205408034
-/home/ddore/workspace/Ablation/models/only-scp,48,0.6250906751233092,0.6778478619087496
-/home/ddore/workspace/Ablation/models/only-scp,33,0.6250800928861677,0.6785434506604716

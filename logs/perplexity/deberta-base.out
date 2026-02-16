@@ -1,707 +1,0 @@
-W&B disabled.
-12/26/2025 20:47:30 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1, distributed training: False, 16-bits training: True
-12/26/2025 20:47:30 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
-_n_gpu=1,
-accelerator_config={'split_batches': False, 'dispatch_batches': None, 'even_batches': True, 'use_seedable_sampler': True, 'non_blocking': False, 'gradient_accumulation_kwargs': None, 'use_configured_state': False},
-adafactor=False,
-adam_beta1=0.9,
-adam_beta2=0.98,
-adam_epsilon=1e-06,
-auto_find_batch_size=False,
-average_tokens_across_devices=True,
-batch_eval_metrics=False,
-bf16=False,
-bf16_full_eval=False,
-data_seed=42,
-dataloader_drop_last=False,
-dataloader_num_workers=8,
-dataloader_persistent_workers=False,
-dataloader_pin_memory=True,
-dataloader_prefetch_factor=None,
-ddp_backend=None,
-ddp_broadcast_buffers=None,
-ddp_bucket_cap_mb=None,
-ddp_find_unused_parameters=None,
-ddp_timeout=1800,
-debug=[],
-deepspeed=None,
-disable_tqdm=False,
-do_eval=True,
-do_predict=False,
-do_train=False,
-eval_accumulation_steps=None,
-eval_delay=0,
-eval_do_concat_batches=True,
-eval_on_start=True,
-eval_steps=2000,
-eval_strategy=steps,
-eval_use_gather_object=False,
-fp16=True,
-fp16_backend=auto,
-fp16_full_eval=False,
-fp16_opt_level=O1,
-fsdp=[],
-fsdp_config={'min_num_params': 0, 'xla': False, 'xla_fsdp_v2': False, 'xla_fsdp_grad_ckpt': False},
-fsdp_min_num_params=0,
-fsdp_transformer_layer_cls_to_wrap=None,
-full_determinism=False,
-gradient_accumulation_steps=4,
-gradient_checkpointing=False,
-gradient_checkpointing_kwargs=None,
-greater_is_better=None,
-group_by_length=False,
-half_precision_backend=auto,
-hub_always_push=False,
-hub_model_id=None,
-hub_private_repo=None,
-hub_revision=None,
-hub_strategy=every_save,
-hub_token=<HUB_TOKEN>,
-ignore_data_skip=False,
-include_for_metrics=[],
-include_inputs_for_metrics=False,
-include_num_input_tokens_seen=no,
-include_tokens_per_second=False,
-jit_mode_eval=False,
-label_names=None,
-label_smoothing_factor=0.0,
-learning_rate=0.0003,
-length_column_name=length,
-liger_kernel_config=None,
-load_best_model_at_end=False,
-local_rank=0,
-log_level=detail,
-log_level_replica=warning,
-log_on_each_node=True,
-logging_dir=logs/,
-logging_first_step=False,
-logging_nan_inf_filter=True,
-logging_steps=1000,
-logging_strategy=steps,
-lr_scheduler_kwargs={},
-lr_scheduler_type=linear,
-max_grad_norm=1.0,
-max_steps=512,
-metric_for_best_model=None,
-mp_parameters=,
-neftune_noise_alpha=None,
-no_cuda=False,
-num_train_epochs=3.0,
-optim=adamw_torch_fused,
-optim_args=None,
-optim_target_modules=None,
-output_dir=logs/,
-overwrite_output_dir=True,
-parallelism_config=None,
-past_index=-1,
-per_device_eval_batch_size=64,
-per_device_train_batch_size=64,
-prediction_loss_only=False,
-project=huggingface,
-push_to_hub=False,
-push_to_hub_model_id=None,
-push_to_hub_organization=None,
-push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
-ray_scope=last,
-remove_unused_columns=True,
-report_to=['wandb'],
-restore_callback_states_from_checkpoint=False,
-resume_from_checkpoint=None,
-run_name=deberta-base,
-save_on_each_node=False,
-save_only_model=False,
-save_safetensors=True,
-save_steps=10000,
-save_strategy=steps,
-save_total_limit=1,
-seed=42,
-skip_memory_metrics=True,
-tf32=None,
-torch_compile=False,
-torch_compile_backend=None,
-torch_compile_mode=None,
-torch_empty_cache_steps=None,
-torchdynamo=None,
-tpu_metrics_debug=False,
-tpu_num_cores=None,
-trackio_space_id=trackio,
-use_cpu=False,
-use_legacy_prediction_loop=False,
-use_liger_kernel=False,
-use_mps_device=False,
-warmup_ratio=0.0,
-warmup_steps=10000,
-weight_decay=0.01,
-)
-Using custom data configuration default-dc0da6634afd4efd
-12/26/2025 20:47:31 - INFO - datasets.builder - Using custom data configuration default-dc0da6634afd4efd
-Overwrite dataset info from restored data version if exists.
-12/26/2025 20:47:31 - DEBUG - datasets.builder - Overwrite dataset info from restored data version if exists.
-Loading Dataset info from cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-12/26/2025 20:47:31 - DEBUG - datasets.info - Loading Dataset info from cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-Found cached dataset csv (/workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420)
-12/26/2025 20:47:31 - INFO - datasets.builder - Found cached dataset csv (/workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420)
-Loading Dataset info from /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-12/26/2025 20:47:31 - DEBUG - datasets.info - Loading Dataset info from /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-Constructing Dataset for split train, validation, from /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-12/26/2025 20:47:31 - DEBUG - datasets.builder - Constructing Dataset for split train, validation, from /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420
-[INFO|configuration_utils.py:765] 2025-12-26 20:47:34,561 >> loading configuration file config.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/config.json
-[INFO|configuration_utils.py:839] 2025-12-26 20:47:34,562 >> Model config DebertaConfig {
-  "attention_probs_dropout_prob": 0.1,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-07,
-  "legacy": true,
-  "max_position_embeddings": 512,
-  "max_relative_positions": -1,
-  "model_type": "deberta",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "pooler_dropout": 0,
-  "pooler_hidden_act": "gelu",
-  "pooler_hidden_size": 768,
-  "pos_att_type": [
-    "c2p",
-    "p2c"
-  ],
-  "position_biased_input": false,
-  "relative_attention": true,
-  "transformers_version": "4.57.3",
-  "type_vocab_size": 0,
-  "vocab_size": 50265
-}
-
-[INFO|configuration_utils.py:765] 2025-12-26 20:47:35,078 >> loading configuration file config.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/config.json
-[INFO|configuration_utils.py:839] 2025-12-26 20:47:35,079 >> Model config DebertaConfig {
-  "attention_probs_dropout_prob": 0.1,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-07,
-  "legacy": true,
-  "max_position_embeddings": 512,
-  "max_relative_positions": -1,
-  "model_type": "deberta",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "pooler_dropout": 0,
-  "pooler_hidden_act": "gelu",
-  "pooler_hidden_size": 768,
-  "pos_att_type": [
-    "c2p",
-    "p2c"
-  ],
-  "position_biased_input": false,
-  "relative_attention": true,
-  "transformers_version": "4.57.3",
-  "type_vocab_size": 0,
-  "vocab_size": 50265
-}
-
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,730 >> loading file vocab.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/vocab.json
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,731 >> loading file merges.txt from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/merges.txt
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,731 >> loading file tokenizer.json from cache at None
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,732 >> loading file added_tokens.json from cache at None
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,732 >> loading file special_tokens_map.json from cache at None
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,733 >> loading file tokenizer_config.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/tokenizer_config.json
-[INFO|tokenization_utils_base.py:2111] 2025-12-26 20:47:37,733 >> loading file chat_template.jinja from cache at None
-[INFO|configuration_utils.py:765] 2025-12-26 20:47:37,737 >> loading configuration file config.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/config.json
-[INFO|configuration_utils.py:839] 2025-12-26 20:47:37,738 >> Model config DebertaConfig {
-  "attention_probs_dropout_prob": 0.1,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-07,
-  "legacy": true,
-  "max_position_embeddings": 512,
-  "max_relative_positions": -1,
-  "model_type": "deberta",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "pooler_dropout": 0,
-  "pooler_hidden_act": "gelu",
-  "pooler_hidden_size": 768,
-  "pos_att_type": [
-    "c2p",
-    "p2c"
-  ],
-  "position_biased_input": false,
-  "relative_attention": true,
-  "transformers_version": "4.57.3",
-  "type_vocab_size": 0,
-  "vocab_size": 50265
-}
-
-[INFO|configuration_utils.py:765] 2025-12-26 20:47:37,804 >> loading configuration file config.json from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/config.json
-[INFO|configuration_utils.py:839] 2025-12-26 20:47:37,805 >> Model config DebertaConfig {
-  "attention_probs_dropout_prob": 0.1,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-07,
-  "legacy": true,
-  "max_position_embeddings": 512,
-  "max_relative_positions": -1,
-  "model_type": "deberta",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "pooler_dropout": 0,
-  "pooler_hidden_act": "gelu",
-  "pooler_hidden_size": 768,
-  "pos_att_type": [
-    "c2p",
-    "p2c"
-  ],
-  "position_biased_input": false,
-  "relative_attention": true,
-  "transformers_version": "4.57.3",
-  "type_vocab_size": 0,
-  "vocab_size": 50265
-}
-
-[INFO|modeling_utils.py:1172] 2025-12-26 20:47:48,160 >> loading weights file pytorch_model.bin from cache at cache/models--microsoft--deberta-base/snapshots/0d1b43ccf21b5acd9f4e5f7b077fa698f05cf195/pytorch_model.bin
-[DEBUG|import_utils.py:92] 2025-12-26 20:47:48,204 >> Detected torch version: 2.9.1
-[INFO|safetensors_conversion.py:61] 2025-12-26 20:47:48,296 >> Attempting to create safetensors variant
-[INFO|modeling_utils.py:5525] 2025-12-26 20:47:48,478 >> Some weights of the model checkpoint at microsoft/deberta-base were not used when initializing DebertaForMaskedLM: ['lm_predictions.lm_head.LayerNorm.bias', 'lm_predictions.lm_head.LayerNorm.weight', 'lm_predictions.lm_head.bias', 'lm_predictions.lm_head.dense.bias', 'lm_predictions.lm_head.dense.weight']
-- This IS expected if you are initializing DebertaForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
-- This IS NOT expected if you are initializing DebertaForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
-[WARNING|modeling_utils.py:5535] 2025-12-26 20:47:48,479 >> Some weights of DebertaForMaskedLM were not initialized from the model checkpoint at microsoft/deberta-base and are newly initialized: ['cls.predictions.bias', 'cls.predictions.decoder.bias', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.dense.weight']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00000_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00000_of_00008.arrow
-Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00001_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00001_of_00008.arrow
-Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00002_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00002_of_00008.arrow
-Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00003_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00003_of_00008.arrow
-Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00004_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00004_of_00008.arrow
-Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00005_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00005_of_00008.arrow
-Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00006_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00006_of_00008.arrow
-Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00007_of_00008.arrow
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00007_of_00008.arrow
-Running tokenizer on every text in dataset (num_proc=8):   0%|          | 0/91676 [00:00<?, ? examples/s]Spawning 8 processes
-12/26/2025 20:47:48 - INFO - datasets.arrow_dataset - Spawning 8 processes
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-[INFO|safetensors_conversion.py:74] 2025-12-26 20:47:49,253 >> Safetensors PR exists
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:50 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:50 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:47:50 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00000_of_00008.arrow
-12/26/2025 20:47:59 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00000_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00001_of_00008.arrow
-12/26/2025 20:47:59 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00001_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00002_of_00008.arrow
-12/26/2025 20:48:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00002_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00003_of_00008.arrow
-12/26/2025 20:48:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00003_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00004_of_00008.arrow
-12/26/2025 20:48:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00004_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00005_of_00008.arrow
-12/26/2025 20:48:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00005_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00006_of_00008.arrow
-12/26/2025 20:48:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00006_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00007_of_00008.arrow
-12/26/2025 20:48:01 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-48e0990d213de7e3_00007_of_00008.arrow
-Running tokenizer on every text in dataset (num_proc=8):   1%|          | 1000/91676 [00:13<19:40, 76.84 examples/s]Running tokenizer on every text in dataset (num_proc=8):   3%|▎         | 3000/91676 [00:13<05:07, 288.28 examples/s]Running tokenizer on every text in dataset (num_proc=8):   4%|▍         | 4000/91676 [00:13<03:23, 430.88 examples/s]Running tokenizer on every text in dataset (num_proc=8):   5%|▌         | 5000/91676 [00:13<02:18, 625.48 examples/s]Running tokenizer on every text in dataset (num_proc=8):   7%|▋         | 6000/91676 [00:13<01:37, 875.29 examples/s]Running tokenizer on every text in dataset (num_proc=8):   8%|▊         | 7000/91676 [00:13<01:09, 1222.56 examples/s]Running tokenizer on every text in dataset (num_proc=8):   9%|▊         | 8000/91676 [00:14<00:53, 1560.68 examples/s]Running tokenizer on every text in dataset (num_proc=8):  10%|▉         | 9000/91676 [00:23<04:36, 298.80 examples/s] Running tokenizer on every text in dataset (num_proc=8):  12%|█▏        | 11000/91676 [00:23<02:27, 548.41 examples/s]Running tokenizer on every text in dataset (num_proc=8):  13%|█▎        | 12000/91676 [00:23<01:53, 701.74 examples/s]Running tokenizer on every text in dataset (num_proc=8):  15%|█▌        | 14000/91676 [00:24<01:08, 1129.56 examples/s]Running tokenizer on every text in dataset (num_proc=8):  17%|█▋        | 16000/91676 [00:24<00:47, 1594.85 examples/s]Running tokenizer on every text in dataset (num_proc=8):  19%|█▊        | 17000/91676 [00:34<03:04, 403.89 examples/s] Running tokenizer on every text in dataset (num_proc=8):  21%|██        | 19000/91676 [00:34<01:55, 631.61 examples/s]Running tokenizer on every text in dataset (num_proc=8):  22%|██▏       | 20000/91676 [00:34<01:31, 780.35 examples/s]Running tokenizer on every text in dataset (num_proc=8):  24%|██▍       | 22000/91676 [00:34<00:59, 1164.10 examples/s]Running tokenizer on every text in dataset (num_proc=8):  26%|██▌       | 24000/91676 [00:35<00:43, 1547.51 examples/s]Running tokenizer on every text in dataset (num_proc=8):  27%|██▋       | 25000/91676 [00:44<02:37, 422.08 examples/s] Running tokenizer on every text in dataset (num_proc=8):  29%|██▉       | 27000/91676 [00:44<01:39, 651.66 examples/s]Running tokenizer on every text in dataset (num_proc=8):  31%|███       | 28000/91676 [00:44<01:19, 800.15 examples/s]Running tokenizer on every text in dataset (num_proc=8):  32%|███▏      | 29000/91676 [00:44<01:02, 1005.86 examples/s]Running tokenizer on every text in dataset (num_proc=8):  33%|███▎      | 30000/91676 [00:45<00:48, 1261.74 examples/s]Running tokenizer on every text in dataset (num_proc=8):  34%|███▍      | 31000/91676 [00:45<00:37, 1613.92 examples/s]Running tokenizer on every text in dataset (num_proc=8):  35%|███▍      | 32000/91676 [00:45<00:32, 1828.62 examples/s]Running tokenizer on every text in dataset (num_proc=8):  36%|███▌      | 33000/91676 [00:54<02:50, 343.94 examples/s] Running tokenizer on every text in dataset (num_proc=8):  37%|███▋      | 34000/91676 [00:54<02:03, 468.81 examples/s]Running tokenizer on every text in dataset (num_proc=8):  40%|████      | 37000/91676 [00:55<00:55, 989.52 examples/s]Running tokenizer on every text in dataset (num_proc=8):  41%|████▏     | 38000/91676 [00:55<00:44, 1206.88 examples/s]Running tokenizer on every text in dataset (num_proc=8):  43%|████▎     | 39000/91676 [00:55<00:35, 1479.47 examples/s]Running tokenizer on every text in dataset (num_proc=8):  44%|████▎     | 40000/91676 [00:55<00:29, 1737.01 examples/s]Running tokenizer on every text in dataset (num_proc=8):  45%|████▍     | 41000/91676 [01:04<02:23, 354.25 examples/s] Running tokenizer on every text in dataset (num_proc=8):  46%|████▌     | 42000/91676 [01:05<01:45, 470.23 examples/s]Running tokenizer on every text in dataset (num_proc=8):  49%|████▉     | 45000/91676 [01:05<00:48, 958.45 examples/s]Running tokenizer on every text in dataset (num_proc=8):  51%|█████▏    | 47000/91676 [01:05<00:33, 1344.01 examples/s]Running tokenizer on every text in dataset (num_proc=8):  52%|█████▏    | 48000/91676 [01:05<00:27, 1565.27 examples/s]Running tokenizer on every text in dataset (num_proc=8):  53%|█████▎    | 49000/91676 [01:15<01:47, 396.02 examples/s] Running tokenizer on every text in dataset (num_proc=8):  55%|█████▍    | 50000/91676 [01:15<01:22, 502.51 examples/s]Running tokenizer on every text in dataset (num_proc=8):  58%|█████▊    | 53000/91676 [01:15<00:40, 966.22 examples/s]Running tokenizer on every text in dataset (num_proc=8):  59%|█████▉    | 54000/91676 [01:15<00:32, 1152.27 examples/s]Running tokenizer on every text in dataset (num_proc=8):  60%|█████▉    | 55000/91676 [01:16<00:26, 1381.24 examples/s]Running tokenizer on every text in dataset (num_proc=8):  61%|██████    | 56000/91676 [01:16<00:21, 1645.00 examples/s]Running tokenizer on every text in dataset (num_proc=8):  62%|██████▏   | 57000/91676 [01:27<01:49, 317.56 examples/s] Running tokenizer on every text in dataset (num_proc=8):  63%|██████▎   | 58000/91676 [01:27<01:20, 418.14 examples/s]Running tokenizer on every text in dataset (num_proc=8):  65%|██████▌   | 60000/91676 [01:27<00:44, 712.66 examples/s]Running tokenizer on every text in dataset (num_proc=8):  68%|██████▊   | 62000/91676 [01:27<00:26, 1103.80 examples/s]Running tokenizer on every text in dataset (num_proc=8):  69%|██████▊   | 63000/91676 [01:27<00:21, 1328.81 examples/s]Running tokenizer on every text in dataset (num_proc=8):  70%|██████▉   | 64000/91676 [01:28<00:17, 1602.60 examples/s]Running tokenizer on every text in dataset (num_proc=8):  71%|███████   | 65000/91676 [01:36<01:11, 372.18 examples/s] Running tokenizer on every text in dataset (num_proc=8):  72%|███████▏  | 66000/91676 [01:37<00:52, 488.84 examples/s]Running tokenizer on every text in dataset (num_proc=8):  74%|███████▍  | 68000/91676 [01:37<00:29, 814.28 examples/s]Running tokenizer on every text in dataset (num_proc=8):  76%|███████▋  | 70000/91676 [01:37<00:17, 1257.09 examples/s]Running tokenizer on every text in dataset (num_proc=8):  77%|███████▋  | 71000/91676 [01:37<00:13, 1505.43 examples/s]Running tokenizer on every text in dataset (num_proc=8):  79%|███████▊  | 72000/91676 [01:38<00:10, 1811.38 examples/s]Running tokenizer on every text in dataset (num_proc=8):  80%|███████▉  | 73000/91676 [01:46<00:49, 378.20 examples/s] Running tokenizer on every text in dataset (num_proc=8):  81%|████████  | 74000/91676 [01:47<00:35, 499.82 examples/s]Running tokenizer on every text in dataset (num_proc=8):  83%|████████▎ | 76000/91676 [01:47<00:18, 828.52 examples/s]Running tokenizer on every text in dataset (num_proc=8):  84%|████████▍ | 77000/91676 [01:47<00:13, 1055.08 examples/s]Running tokenizer on every text in dataset (num_proc=8):  85%|████████▌ | 78000/91676 [01:47<00:10, 1359.47 examples/s]Running tokenizer on every text in dataset (num_proc=8):  86%|████████▌ | 79000/91676 [01:47<00:07, 1687.48 examples/s]Running tokenizer on every text in dataset (num_proc=8):  87%|████████▋ | 80000/91676 [01:48<00:05, 2075.46 examples/s]Running tokenizer on every text in dataset (num_proc=8):  88%|████████▊ | 81000/91676 [01:57<00:30, 347.36 examples/s] Running tokenizer on every text in dataset (num_proc=8):  89%|████████▉ | 82000/91676 [01:57<00:20, 480.18 examples/s]Running tokenizer on every text in dataset (num_proc=8):  92%|█████████▏| 84000/91676 [01:57<00:09, 832.07 examples/s]Running tokenizer on every text in dataset (num_proc=8):  93%|█████████▎| 85000/91676 [01:57<00:06, 1048.95 examples/s]Running tokenizer on every text in dataset (num_proc=8):  95%|█████████▍| 87000/91676 [01:57<00:02, 1594.09 examples/s]Running tokenizer on every text in dataset (num_proc=8):  96%|█████████▌| 88000/91676 [01:58<00:01, 1966.24 examples/s]Done writing 11460 examples in 46591428 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpeizx57dn.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46591428 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpeizx57dn.
-Finished processing shard number 1 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 8.
-Running tokenizer on every text in dataset (num_proc=8):  97%|█████████▋| 88920/91676 [02:01<00:03, 733.09 examples/s] Done writing 11460 examples in 46662842 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp5vgmq_y8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46662842 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp5vgmq_y8.
-Done writing 11460 examples in 46633491 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpu9i1wu0q.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46633491 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpu9i1wu0q.
-Finished processing shard number 2 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 8.
-Finished processing shard number 3 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 8.
-Running tokenizer on every text in dataset (num_proc=8):  98%|█████████▊| 89840/91676 [02:02<00:01, 919.34 examples/s]Done writing 11460 examples in 46789199 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpyhvw306l.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46789199 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpyhvw306l.
-Finished processing shard number 0 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 8.
-Done writing 11459 examples in 46662168 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpmutgd3hk.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46662168 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpmutgd3hk.
-Running tokenizer on every text in dataset (num_proc=8):  99%|█████████▉| 90758/91676 [02:02<00:00, 1199.26 examples/s]Done writing 11459 examples in 46621470 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpzuddnd7r.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46621470 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpzuddnd7r.
-Finished processing shard number 4 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 4 of 8.
-Finished processing shard number 6 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 6 of 8.
-Done writing 11459 examples in 46733316 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp8z8sr445.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46733316 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp8z8sr445.
-Finished processing shard number 5 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 5 of 8.
-Running tokenizer on every text in dataset (num_proc=8): 100%|██████████| 91676/91676 [02:02<00:00, 1524.31 examples/s]Done writing 11459 examples in 46633251 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9huydjt3.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46633251 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9huydjt3.
-Finished processing shard number 7 of 8.
-12/26/2025 20:49:50 - DEBUG - datasets.arrow_dataset - Finished processing shard number 7 of 8.
-Running tokenizer on every text in dataset (num_proc=8): 100%|██████████| 91676/91676 [02:02<00:00, 747.69 examples/s] 
-Concatenating 8 shards
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Concatenating 8 shards
-Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:51 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:51 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00000_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00000_of_00008.arrow
-Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00001_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00001_of_00008.arrow
-Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00002_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00002_of_00008.arrow
-Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00003_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00003_of_00008.arrow
-Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00004_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00004_of_00008.arrow
-Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00005_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00005_of_00008.arrow
-Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00006_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00006_of_00008.arrow
-Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00007_of_00008.arrow
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00007_of_00008.arrow
-Running tokenizer on every text in dataset (num_proc=8):   0%|          | 0/91676 [00:00<?, ? examples/s]Spawning 8 processes
-12/26/2025 20:49:51 - INFO - datasets.arrow_dataset - Spawning 8 processes
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:51 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:51 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:49:52 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00000_of_00008.arrow
-12/26/2025 20:50:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00000_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00001_of_00008.arrow
-12/26/2025 20:50:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00001_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00002_of_00008.arrow
-12/26/2025 20:50:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00002_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00003_of_00008.arrow
-12/26/2025 20:50:00 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00003_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00004_of_00008.arrow
-12/26/2025 20:50:01 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00004_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00005_of_00008.arrow
-12/26/2025 20:50:01 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00005_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00006_of_00008.arrow
-12/26/2025 20:50:01 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00006_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00007_of_00008.arrow
-12/26/2025 20:50:01 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-5987794abec9ae67_00007_of_00008.arrow
-Running tokenizer on every text in dataset (num_proc=8):   1%|          | 1000/91676 [00:10<16:36, 90.98 examples/s]Running tokenizer on every text in dataset (num_proc=8):   3%|▎         | 3000/91676 [00:11<04:18, 342.40 examples/s]Running tokenizer on every text in dataset (num_proc=8):   5%|▌         | 5000/91676 [00:11<02:07, 678.07 examples/s]Running tokenizer on every text in dataset (num_proc=8):   7%|▋         | 6000/91676 [00:11<01:36, 891.55 examples/s]Running tokenizer on every text in dataset (num_proc=8):   9%|▊         | 8000/91676 [00:11<00:58, 1434.65 examples/s]Running tokenizer on every text in dataset (num_proc=8):  10%|▉         | 9000/91676 [00:21<03:44, 367.50 examples/s] Running tokenizer on every text in dataset (num_proc=8):  13%|█▎        | 12000/91676 [00:21<01:52, 709.96 examples/s]Running tokenizer on every text in dataset (num_proc=8):  15%|█▌        | 14000/91676 [00:21<01:15, 1028.48 examples/s]Running tokenizer on every text in dataset (num_proc=8):  17%|█▋        | 16000/91676 [00:21<00:54, 1388.62 examples/s]Running tokenizer on every text in dataset (num_proc=8):  19%|█▊        | 17000/91676 [00:31<02:49, 439.91 examples/s] Running tokenizer on every text in dataset (num_proc=8):  21%|██        | 19000/91676 [00:31<01:49, 661.61 examples/s]Running tokenizer on every text in dataset (num_proc=8):  22%|██▏       | 20000/91676 [00:31<01:29, 800.54 examples/s]Running tokenizer on every text in dataset (num_proc=8):  24%|██▍       | 22000/91676 [00:31<00:57, 1216.20 examples/s]Running tokenizer on every text in dataset (num_proc=8):  26%|██▌       | 24000/91676 [00:31<00:41, 1616.83 examples/s]Running tokenizer on every text in dataset (num_proc=8):  27%|██▋       | 25000/91676 [00:41<02:31, 440.88 examples/s] Running tokenizer on every text in dataset (num_proc=8):  29%|██▉       | 27000/91676 [00:41<01:35, 678.20 examples/s]Running tokenizer on every text in dataset (num_proc=8):  31%|███       | 28000/91676 [00:41<01:17, 824.23 examples/s]Running tokenizer on every text in dataset (num_proc=8):  33%|███▎      | 30000/91676 [00:41<00:48, 1262.48 examples/s]Running tokenizer on every text in dataset (num_proc=8):  35%|███▍      | 32000/91676 [00:41<00:34, 1711.05 examples/s]Running tokenizer on every text in dataset (num_proc=8):  36%|███▌      | 33000/91676 [00:50<02:13, 438.51 examples/s] Running tokenizer on every text in dataset (num_proc=8):  37%|███▋      | 34000/91676 [00:51<01:44, 550.24 examples/s]Running tokenizer on every text in dataset (num_proc=8):  40%|████      | 37000/91676 [00:51<00:53, 1031.52 examples/s]Running tokenizer on every text in dataset (num_proc=8):  43%|████▎     | 39000/91676 [00:51<00:35, 1471.72 examples/s]Running tokenizer on every text in dataset (num_proc=8):  45%|████▍     | 41000/91676 [01:00<01:38, 516.84 examples/s] Running tokenizer on every text in dataset (num_proc=8):  46%|████▌     | 42000/91676 [01:01<01:20, 613.86 examples/s]Running tokenizer on every text in dataset (num_proc=8):  49%|████▉     | 45000/91676 [01:01<00:44, 1053.55 examples/s]Running tokenizer on every text in dataset (num_proc=8):  51%|█████▏    | 47000/91676 [01:01<00:30, 1457.10 examples/s]Running tokenizer on every text in dataset (num_proc=8):  53%|█████▎    | 49000/91676 [01:10<01:19, 535.14 examples/s] Running tokenizer on every text in dataset (num_proc=8):  55%|█████▍    | 50000/91676 [01:11<01:06, 629.44 examples/s]Running tokenizer on every text in dataset (num_proc=8):  57%|█████▋    | 52000/91676 [01:11<00:42, 924.89 examples/s]Running tokenizer on every text in dataset (num_proc=8):  59%|█████▉    | 54000/91676 [01:11<00:28, 1322.38 examples/s]Running tokenizer on every text in dataset (num_proc=8):  61%|██████    | 56000/91676 [01:11<00:20, 1753.45 examples/s]Running tokenizer on every text in dataset (num_proc=8):  62%|██████▏   | 57000/91676 [01:20<01:14, 465.45 examples/s] Running tokenizer on every text in dataset (num_proc=8):  63%|██████▎   | 58000/91676 [01:21<00:59, 563.39 examples/s]Running tokenizer on every text in dataset (num_proc=8):  65%|██████▌   | 60000/91676 [01:21<00:36, 878.64 examples/s]Running tokenizer on every text in dataset (num_proc=8):  70%|██████▉   | 64000/91676 [01:21<00:16, 1675.53 examples/s]Running tokenizer on every text in dataset (num_proc=8):  71%|███████   | 65000/91676 [01:32<00:58, 454.98 examples/s] Running tokenizer on every text in dataset (num_proc=8):  72%|███████▏  | 66000/91676 [01:32<00:47, 539.43 examples/s]Running tokenizer on every text in dataset (num_proc=8):  74%|███████▍  | 68000/91676 [01:33<00:29, 803.83 examples/s]Running tokenizer on every text in dataset (num_proc=8):  79%|███████▊  | 72000/91676 [01:33<00:13, 1487.29 examples/s]Running tokenizer on every text in dataset (num_proc=8):  81%|████████  | 74000/91676 [01:42<00:30, 576.19 examples/s] Running tokenizer on every text in dataset (num_proc=8):  83%|████████▎ | 76000/91676 [01:43<00:20, 780.56 examples/s]Running tokenizer on every text in dataset (num_proc=8):  87%|████████▋ | 80000/91676 [01:43<00:08, 1313.49 examples/s]Running tokenizer on every text in dataset (num_proc=8):  89%|████████▉ | 82000/91676 [01:52<00:16, 584.49 examples/s] Running tokenizer on every text in dataset (num_proc=8):  93%|█████████▎| 85000/91676 [01:53<00:07, 871.08 examples/s]Running tokenizer on every text in dataset (num_proc=8):  96%|█████████▌| 88000/91676 [01:53<00:02, 1235.87 examples/s]Done writing 11460 examples in 46591428 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp_nzc80nv.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46591428 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp_nzc80nv.
-Finished processing shard number 1 of 8.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 8.
-Done writing 11460 examples in 46662842 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpot7h42be.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46662842 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpot7h42be.
-Finished processing shard number 2 of 8.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 8.
-Running tokenizer on every text in dataset (num_proc=8):  97%|█████████▋| 89380/91676 [01:57<00:02, 818.81 examples/s] Done writing 11460 examples in 46633491 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpmnbj0h97.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46633491 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpmnbj0h97.
-Done writing 11460 examples in 46789199 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp3uzmy1j4.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_writer - Done writing 11460 examples in 46789199 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp3uzmy1j4.
-Done writing 11459 examples in 46621470 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp2n_5ukwo.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46621470 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp2n_5ukwo.
-Finished processing shard number 3 of 8.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 8.
-Finished processing shard number 0 of 8.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 8.
-Finished processing shard number 6 of 8.
-12/26/2025 20:51:48 - DEBUG - datasets.arrow_dataset - Finished processing shard number 6 of 8.
-Done writing 11459 examples in 46733316 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9bumwu4o.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46733316 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9bumwu4o.
-Running tokenizer on every text in dataset (num_proc=8):  99%|█████████▉| 90758/91676 [01:57<00:00, 1007.49 examples/s]Finished processing shard number 5 of 8.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Finished processing shard number 5 of 8.
-Done writing 11459 examples in 46662168 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmplckmu84a.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46662168 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmplckmu84a.
-Finished processing shard number 4 of 8.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Finished processing shard number 4 of 8.
-Done writing 11459 examples in 46633251 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpxj6cgrpw.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_writer - Done writing 11459 examples in 46633251 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpxj6cgrpw.
-Finished processing shard number 7 of 8.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Finished processing shard number 7 of 8.
-Running tokenizer on every text in dataset (num_proc=8): 100%|██████████| 91676/91676 [01:58<00:00, 775.98 examples/s] 
-Concatenating 8 shards
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Concatenating 8 shards
-Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00000_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00000_of_00008.arrow
-Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00001_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00001_of_00008.arrow
-Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00002_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00002_of_00008.arrow
-Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00003_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00003_of_00008.arrow
-Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00004_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00004_of_00008.arrow
-Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00005_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00005_of_00008.arrow
-Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00006_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00006_of_00008.arrow
-Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00007_of_00008.arrow
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00007_of_00008.arrow
-Grouping texts in chunks of 512 (num_proc=8):   0%|          | 0/91676 [00:00<?, ? examples/s]Spawning 8 processes
-12/26/2025 20:51:49 - INFO - datasets.arrow_dataset - Spawning 8 processes
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:51:49 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00001_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00001_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00000_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00000_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00002_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00002_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00003_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00003_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00004_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00004_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00006_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00006_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00007_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00007_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00005_of_00008.arrow
-12/26/2025 20:51:55 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-64f188c81276fa86_00005_of_00008.arrow
-Grouping texts in chunks of 512 (num_proc=8):   1%|          | 1000/91676 [00:07<11:32, 130.85 examples/s]Grouping texts in chunks of 512 (num_proc=8):   3%|▎         | 3000/91676 [00:07<03:00, 491.77 examples/s]Grouping texts in chunks of 512 (num_proc=8):   8%|▊         | 7000/91676 [00:07<00:58, 1453.27 examples/s]Grouping texts in chunks of 512 (num_proc=8):  10%|▉         | 9000/91676 [00:15<02:16, 606.27 examples/s] Grouping texts in chunks of 512 (num_proc=8):  12%|█▏        | 11000/91676 [00:15<01:32, 872.85 examples/s]Grouping texts in chunks of 512 (num_proc=8):  16%|█▋        | 15000/91676 [00:15<00:48, 1596.98 examples/s]Grouping texts in chunks of 512 (num_proc=8):  19%|█▊        | 17000/91676 [00:22<01:43, 722.38 examples/s] Grouping texts in chunks of 512 (num_proc=8):  22%|██▏       | 20000/91676 [00:22<01:05, 1092.99 examples/s]Grouping texts in chunks of 512 (num_proc=8):  25%|██▌       | 23000/91676 [00:23<00:43, 1584.18 examples/s]Grouping texts in chunks of 512 (num_proc=8):  27%|██▋       | 25000/91676 [00:30<01:30, 739.78 examples/s] Grouping texts in chunks of 512 (num_proc=8):  31%|███       | 28000/91676 [00:30<00:57, 1104.40 examples/s]Grouping texts in chunks of 512 (num_proc=8):  33%|███▎      | 30000/91676 [00:30<00:43, 1431.12 examples/s]Grouping texts in chunks of 512 (num_proc=8):  35%|███▍      | 32000/91676 [00:30<00:32, 1819.83 examples/s]Grouping texts in chunks of 512 (num_proc=8):  37%|███▋      | 34000/91676 [00:38<01:19, 726.01 examples/s] Grouping texts in chunks of 512 (num_proc=8):  41%|████▏     | 38000/91676 [00:38<00:42, 1264.63 examples/s]Grouping texts in chunks of 512 (num_proc=8):  44%|████▎     | 40000/91676 [00:38<00:32, 1589.57 examples/s]Grouping texts in chunks of 512 (num_proc=8):  46%|████▌     | 42000/91676 [00:45<01:09, 718.54 examples/s] Grouping texts in chunks of 512 (num_proc=8):  51%|█████▏    | 47000/91676 [00:46<00:33, 1316.52 examples/s]Grouping texts in chunks of 512 (num_proc=8):  53%|█████▎    | 49000/91676 [00:52<00:56, 748.85 examples/s] Grouping texts in chunks of 512 (num_proc=8):  55%|█████▍    | 50000/91676 [00:53<00:50, 828.70 examples/s]Grouping texts in chunks of 512 (num_proc=8):  58%|█████▊    | 53000/91676 [00:53<00:30, 1278.33 examples/s]Grouping texts in chunks of 512 (num_proc=8):  60%|█████▉    | 55000/91676 [00:53<00:22, 1650.16 examples/s]Grouping texts in chunks of 512 (num_proc=8):  62%|██████▏   | 57000/91676 [01:00<00:47, 732.24 examples/s] Grouping texts in chunks of 512 (num_proc=8):  63%|██████▎   | 58000/91676 [01:00<00:41, 819.04 examples/s]Grouping texts in chunks of 512 (num_proc=8):  68%|██████▊   | 62000/91676 [01:01<00:19, 1541.19 examples/s]Grouping texts in chunks of 512 (num_proc=8):  70%|██████▉   | 64000/91676 [01:01<00:15, 1742.23 examples/s]Grouping texts in chunks of 512 (num_proc=8):  72%|███████▏  | 66000/91676 [01:10<00:40, 635.53 examples/s] Grouping texts in chunks of 512 (num_proc=8):  77%|███████▋  | 71000/91676 [01:10<00:16, 1219.50 examples/s]Grouping texts in chunks of 512 (num_proc=8):  80%|███████▉  | 73000/91676 [01:17<00:26, 716.00 examples/s] Grouping texts in chunks of 512 (num_proc=8):  82%|████████▏ | 75000/91676 [01:18<00:18, 886.61 examples/s]Grouping texts in chunks of 512 (num_proc=8):  86%|████████▌ | 79000/91676 [01:18<00:08, 1455.54 examples/s]Grouping texts in chunks of 512 (num_proc=8):  88%|████████▊ | 81000/91676 [01:25<00:14, 757.31 examples/s] Grouping texts in chunks of 512 (num_proc=8):  91%|█████████ | 83000/91676 [01:25<00:09, 954.71 examples/s]Grouping texts in chunks of 512 (num_proc=8):  95%|█████████▍| 87000/91676 [01:25<00:02, 1560.39 examples/s]Grouping texts in chunks of 512 (num_proc=8):  96%|█████████▋| 88460/91676 [01:28<00:02, 1140.25 examples/s]Done writing 12942 examples in 46591200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpemhdpgv6.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12942 examples in 46591200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpemhdpgv6.
-Finished processing shard number 1 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 8.
-Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpf1c3cwsa.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpf1c3cwsa.
-Grouping texts in chunks of 512 (num_proc=8):  97%|█████████▋| 89380/91676 [01:29<00:01, 1242.04 examples/s]Done writing 12997 examples in 46789200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp3qigx3lv.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12997 examples in 46789200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp3qigx3lv.
-Done writing 12951 examples in 46623600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp_6x_fwrk.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12951 examples in 46623600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp_6x_fwrk.
-Finished processing shard number 2 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 8.
-Finished processing shard number 0 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 8.
-Finished processing shard number 6 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 6 of 8.
-Done writing 12956 examples in 46641600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpqdja4_6w.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12956 examples in 46641600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpqdja4_6w.
-Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmprh2cf6bx.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmprh2cf6bx.
-Finished processing shard number 3 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 8.
-Finished processing shard number 4 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 4 of 8.
-Grouping texts in chunks of 512 (num_proc=8):  99%|█████████▉| 91217/91676 [01:29<00:00, 1666.47 examples/s]Done writing 12981 examples in 46731600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpezhefnoz.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12981 examples in 46731600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpezhefnoz.
-Finished processing shard number 5 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 5 of 8.
-Done writing 12954 examples in 46634400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp0f2epyh_.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_writer - Done writing 12954 examples in 46634400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp0f2epyh_.
-Finished processing shard number 7 of 8.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Finished processing shard number 7 of 8.
-Grouping texts in chunks of 512 (num_proc=8): 100%|██████████| 91676/91676 [01:29<00:00, 1024.04 examples/s]
-Concatenating 8 shards
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Concatenating 8 shards
-Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:18 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00000_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #1 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00000_of_00008.arrow
-Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00001_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #2 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00001_of_00008.arrow
-Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00002_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #3 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00002_of_00008.arrow
-Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00003_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #4 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00003_of_00008.arrow
-Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00004_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #5 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00004_of_00008.arrow
-Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00005_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #6 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00005_of_00008.arrow
-Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00006_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #7 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00006_of_00008.arrow
-Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00007_of_00008.arrow
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Process #8 will write at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00007_of_00008.arrow
-Grouping texts in chunks of 512 (num_proc=8):   0%|          | 0/91676 [00:00<?, ? examples/s]Spawning 8 processes
-12/26/2025 20:53:18 - INFO - datasets.arrow_dataset - Spawning 8 processes
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:53:19 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to arrow for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00001_of_00008.arrow
-12/26/2025 20:53:24 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00001_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00000_of_00008.arrow
-12/26/2025 20:53:24 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00000_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00003_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00003_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00002_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00002_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00004_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00004_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00006_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00006_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00005_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00005_of_00008.arrow
-Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00007_of_00008.arrow
-12/26/2025 20:53:25 - INFO - datasets.arrow_dataset - Caching processed dataset at /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/cache-4cd9c63e9150b0ec_00007_of_00008.arrow
-Grouping texts in chunks of 512 (num_proc=8):   1%|          | 1000/91676 [00:07<11:25, 132.33 examples/s]Grouping texts in chunks of 512 (num_proc=8):   3%|▎         | 3000/91676 [00:07<02:58, 497.96 examples/s]Grouping texts in chunks of 512 (num_proc=8):   8%|▊         | 7000/91676 [00:07<00:56, 1506.00 examples/s]Grouping texts in chunks of 512 (num_proc=8):  11%|█         | 10000/91676 [00:15<01:54, 710.27 examples/s]Grouping texts in chunks of 512 (num_proc=8):  14%|█▍        | 13000/91676 [00:15<01:10, 1118.15 examples/s]Grouping texts in chunks of 512 (num_proc=8):  19%|█▊        | 17000/91676 [00:22<01:35, 783.88 examples/s] Grouping texts in chunks of 512 (num_proc=8):  21%|██        | 19000/91676 [00:22<01:13, 992.59 examples/s]Grouping texts in chunks of 512 (num_proc=8):  27%|██▋       | 25000/91676 [00:29<01:13, 906.95 examples/s]Grouping texts in chunks of 512 (num_proc=8):  28%|██▊       | 26000/91676 [00:30<01:05, 995.33 examples/s]Grouping texts in chunks of 512 (num_proc=8):  31%|███       | 28000/91676 [00:30<00:50, 1271.67 examples/s]Grouping texts in chunks of 512 (num_proc=8):  35%|███▍      | 32000/91676 [00:30<00:28, 2069.59 examples/s]Grouping texts in chunks of 512 (num_proc=8):  37%|███▋      | 34000/91676 [00:37<01:08, 841.83 examples/s] Grouping texts in chunks of 512 (num_proc=8):  41%|████▏     | 38000/91676 [00:37<00:39, 1355.01 examples/s]Grouping texts in chunks of 512 (num_proc=8):  45%|████▍     | 41000/91676 [00:44<01:01, 827.41 examples/s] Grouping texts in chunks of 512 (num_proc=8):  47%|████▋     | 43000/91676 [00:45<00:47, 1015.56 examples/s]Grouping texts in chunks of 512 (num_proc=8):  50%|█████     | 46000/91676 [00:45<00:31, 1453.11 examples/s]Grouping texts in chunks of 512 (num_proc=8):  52%|█████▏    | 48000/91676 [00:45<00:23, 1849.01 examples/s]Grouping texts in chunks of 512 (num_proc=8):  55%|█████▍    | 50000/91676 [00:52<00:54, 766.25 examples/s] Grouping texts in chunks of 512 (num_proc=8):  59%|█████▉    | 54000/91676 [00:52<00:29, 1268.46 examples/s]Grouping texts in chunks of 512 (num_proc=8):  62%|██████▏   | 57000/91676 [00:59<00:42, 807.27 examples/s] Grouping texts in chunks of 512 (num_proc=8):  63%|██████▎   | 58000/91676 [01:00<00:38, 879.27 examples/s]Grouping texts in chunks of 512 (num_proc=8):  64%|██████▍   | 59000/91676 [01:00<00:31, 1022.70 examples/s]Grouping texts in chunks of 512 (num_proc=8):  68%|██████▊   | 62000/91676 [01:00<00:18, 1627.76 examples/s]Grouping texts in chunks of 512 (num_proc=8):  70%|██████▉   | 64000/91676 [01:00<00:13, 2103.43 examples/s]Grouping texts in chunks of 512 (num_proc=8):  71%|███████   | 65000/91676 [01:06<00:38, 689.44 examples/s] Grouping texts in chunks of 512 (num_proc=8):  72%|███████▏  | 66000/91676 [01:07<00:32, 785.06 examples/s]Grouping texts in chunks of 512 (num_proc=8):  73%|███████▎  | 67000/91676 [01:07<00:25, 977.19 examples/s]Grouping texts in chunks of 512 (num_proc=8):  76%|███████▋  | 70000/91676 [01:07<00:12, 1755.82 examples/s]Grouping texts in chunks of 512 (num_proc=8):  79%|███████▊  | 72000/91676 [01:08<00:08, 2347.64 examples/s]Grouping texts in chunks of 512 (num_proc=8):  80%|███████▉  | 73000/91676 [01:14<00:28, 663.29 examples/s] Grouping texts in chunks of 512 (num_proc=8):  81%|████████  | 74000/91676 [01:15<00:23, 752.76 examples/s]Grouping texts in chunks of 512 (num_proc=8):  85%|████████▌ | 78000/91676 [01:15<00:08, 1551.57 examples/s]Grouping texts in chunks of 512 (num_proc=8):  86%|████████▌ | 79000/91676 [01:15<00:07, 1781.74 examples/s]Grouping texts in chunks of 512 (num_proc=8):  87%|████████▋ | 80000/91676 [01:15<00:05, 2036.42 examples/s]Grouping texts in chunks of 512 (num_proc=8):  88%|████████▊ | 81000/91676 [01:21<00:18, 577.81 examples/s] Grouping texts in chunks of 512 (num_proc=8):  89%|████████▉ | 82000/91676 [01:22<00:14, 688.67 examples/s]Grouping texts in chunks of 512 (num_proc=8):  93%|█████████▎| 85000/91676 [01:22<00:05, 1323.98 examples/s]Grouping texts in chunks of 512 (num_proc=8):  94%|█████████▍| 86000/91676 [01:22<00:03, 1585.72 examples/s]Grouping texts in chunks of 512 (num_proc=8):  95%|█████████▍| 87000/91676 [01:22<00:02, 1838.14 examples/s]Grouping texts in chunks of 512 (num_proc=8):  96%|█████████▌| 88000/91676 [01:23<00:01, 2170.93 examples/s]Done writing 12942 examples in 46591200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpbiq3ydpw.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12942 examples in 46591200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpbiq3ydpw.
-Finished processing shard number 1 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 1 of 8.
-Grouping texts in chunks of 512 (num_proc=8):  97%|█████████▋| 88919/91676 [01:27<00:04, 648.56 examples/s] Done writing 12954 examples in 46634400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp6tk764de.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12954 examples in 46634400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp6tk764de.
-Done writing 12956 examples in 46641600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9qqgsemq.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12956 examples in 46641600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmp9qqgsemq.
-Finished processing shard number 7 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 7 of 8.
-Done writing 12997 examples in 46789200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpk8kjb1mh.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12997 examples in 46789200 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpk8kjb1mh.
-Finished processing shard number 3 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 3 of 8.
-Finished processing shard number 0 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 0 of 8.
-Grouping texts in chunks of 512 (num_proc=8):  98%|█████████▊| 90298/91676 [01:27<00:01, 943.34 examples/s]Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpxj0nzaxf.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpxj0nzaxf.
-Done writing 12951 examples in 46623600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpukigjpyq.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12951 examples in 46623600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpukigjpyq.
-Finished processing shard number 4 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 4 of 8.
-Finished processing shard number 6 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 6 of 8.
-Grouping texts in chunks of 512 (num_proc=8):  99%|█████████▉| 91216/91676 [01:28<00:00, 1198.54 examples/s]Done writing 12981 examples in 46731600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpv5an_ktf.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_writer - Done writing 12981 examples in 46731600 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpv5an_ktf.
-Finished processing shard number 5 of 8.
-12/26/2025 20:54:46 - DEBUG - datasets.arrow_dataset - Finished processing shard number 5 of 8.
-Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpkjjkhefk.
-12/26/2025 20:54:47 - DEBUG - datasets.arrow_writer - Done writing 12964 examples in 46670400 bytes /workspace/ddore/perplexity/cache/csv/default-dc0da6634afd4efd/0.0.0/a43390c7ecea6519ff2ce9d10005c8750601c9e456069be5efbd2747df45f420/tmpkjjkhefk.
-Finished processing shard number 2 of 8.
-12/26/2025 20:54:47 - DEBUG - datasets.arrow_dataset - Finished processing shard number 2 of 8.
-Grouping texts in chunks of 512 (num_proc=8): 100%|██████████| 91676/91676 [01:28<00:00, 1038.21 examples/s]
-Concatenating 8 shards
-12/26/2025 20:54:47 - INFO - datasets.arrow_dataset - Concatenating 8 shards
-Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:54:47 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for ['input_ids', 'token_type_ids', 'attention_mask', 'special_tokens_mask'] columns  (when key is int or slice) and don't output other (un-formatted) columns.
-Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-12/26/2025 20:54:47 - DEBUG - datasets.arrow_dataset - Set __getitem__(key) output type to python objects for no columns  (when key is int or slice) and don't output other (un-formatted) columns.
-[INFO|trainer.py:699] 2025-12-26 20:54:58,241 >> max_steps is given, it will override any value given in num_train_epochs
-[INFO|trainer.py:749] 2025-12-26 20:54:58,242 >> Using auto half precision backend
-12/26/2025 20:54:58 - INFO - __main__ - *** Evaluate ***
-[INFO|trainer.py:1012] 2025-12-26 20:54:58,245 >> The following columns in the Evaluation set don't have a corresponding argument in `DebertaForMaskedLM.forward` and have been ignored: special_tokens_mask. If special_tokens_mask are not expected by `DebertaForMaskedLM.forward`,  you can safely ignore this message.
-/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 8 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
-  warnings.warn(
-[INFO|trainer.py:4643] 2025-12-26 20:54:58,253 >> 
-***** Running Evaluation *****
-[INFO|trainer.py:4645] 2025-12-26 20:54:58,254 >>   Num examples = 103709
-[INFO|trainer.py:4648] 2025-12-26 20:54:58,255 >>   Batch size = 64
-Traceback (most recent call last):
-  File "/workspace/ddore/perplexity/run_mlm.py", line 669, in <module>
-    main()
-  File "/workspace/ddore/perplexity/run_mlm.py", line 635, in main
-    metrics = trainer.evaluate()
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/trainer.py", line 4489, in evaluate
-    output = eval_loop(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/trainer.py", line 4685, in evaluation_loop
-    losses, logits, labels = self.prediction_step(model, inputs, prediction_loss_only, ignore_keys=ignore_keys)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/trainer.py", line 4902, in prediction_step
-    loss, outputs = self.compute_loss(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/trainer.py", line 4110, in compute_loss
-    outputs = model(**inputs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/accelerate/utils/operations.py", line 819, in forward
-    return model_forward(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/accelerate/utils/operations.py", line 807, in __call__
-    return convert_to_fp32(self.model_forward(*args, **kwargs))
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/amp/autocast_mode.py", line 44, in decorate_autocast
-    return func(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 891, in forward
-    outputs = self.deberta(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 707, in forward
-    encoder_outputs = self.encoder(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 583, in forward
-    hidden_states, att_m = layer_module(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/modeling_layers.py", line 94, in __call__
-    return super().__call__(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 511, in forward
-    attention_output, att_matrix = self.attention(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 446, in forward
-    self_output, att_matrix = self.self(
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1775, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1786, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/home/ddore/.conda/envs/roosebert/lib/python3.10/site-packages/transformers/models/deberta/modeling_deberta.py", line 276, in forward
-    attention_scores = attention_scores.masked_fill(~(attention_mask), torch.finfo(query_layer.dtype).min)
-RuntimeError: value cannot be converted to type at::Half without overflow

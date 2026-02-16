@@ -4,9 +4,6 @@ Script used to prepare data for the masked language modelling task.
 import argparse
 import logging
 import os
-import random
-from collections import Counter
-from itertools import combinations
 from typing import Tuple
 
 import nltk
@@ -29,8 +26,6 @@ nltk.download('punkt_tab', quiet=True)
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 BASE_PATH = rootutils.find_root(search_from=__file__, indicator=".project-root")
 
-
-# ------------------- Helpers -------------------
 
 def split_sentences(df: pd.DataFrame) -> pd.DataFrame:
     """Split text into individual sentences."""
@@ -79,75 +74,11 @@ def shuffle_df(df: pd.DataFrame) -> pd.DataFrame:
     return df.sample(frac=1).dropna().drop_duplicates().reset_index(drop=True)
 
 
-# ------------------- Dataset Generators -------------------
-
-def count_diff_speaker_pairs(rows):
-    # Count how many rows each speaker has
-    speaker_counts = Counter(row['speaker'] for row in rows)
-
-    # Sum the product of counts for each pair of different speakers
-    total_pairs = sum(speaker_counts[s1] * speaker_counts[s2]
-                      for s1, s2 in combinations(speaker_counts.keys(), 2))
-
-    return total_pairs
-
-
-def create_speaker_change_prediction_dataset(df: pd.DataFrame, target: int) -> pd.DataFrame:
-    """Create examples combining sentences from different speakers on the same debate.
-        Speaker Change Prediction: Predict whether the next utterance comes from the same or different speaker. ù
-        Captures turn-taking dynamics
-    """
-    dataset = []
-    num_debates = len(df['ID'].unique())
-    for ID, debate_df in df.groupby("ID"):
-        for date, date_df in debate_df.groupby("date"):
-            rows = date_df.to_dict("records")
-            speakers = date_df["speaker"].unique()
-            if len(speakers) < 2:
-                num_debates = num_debates - 1
-                continue
-            count = 0
-            new_target = min(count_diff_speaker_pairs(rows), target // num_debates)
-            while count < new_target:
-                r1, r2 = random.sample(rows, 2)
-                if r1["speaker"] == r2["speaker"]:
-                    continue
-                dataset.append({
-                    "ID": ID,
-                    "date": date,
-                    "speaker": f"{r1['speaker']}_{r2['speaker']}",
-                    "text": f"{r1['text']} {r2['text']}",
-                })
-                count += 1
-    return pd.DataFrame(dataset).dropna().drop_duplicates().reset_index(drop=True)
-
-
-def create_argument_continuity_dataset(df: pd.DataFrame, target: int) -> pd.DataFrame:
-    """Create examples combining sentences from different debates.
-        Argument Continuity Modeling: Predict if consecutive sentences belong to the same argumentative thread
-    """
-    dataset = []
-    rows = df.to_dict("records")
-    while len(dataset) < target:
-        r1, r2 = random.sample(rows, 2)
-        if r1["ID"] == r2["ID"] or r1["ID"].split("_")[0] == r2["ID"].split("_")[0]:
-            continue
-        dataset.append({
-            "ID": f"{r1['ID']} {r2['ID']}",
-            "date": f"{r1['date']} {r2['date']}",
-            "speaker": f"{r1['speaker']}_{r2['speaker']}",
-            "text": f"{r1['text']} {r2['text']}",
-        })
-    return pd.DataFrame(dataset).dropna().drop_duplicates().reset_index(drop=True)
-
-
 def clean_df(df: pd.DataFrame, text_column_name: str) -> pd.DataFrame:
     df = df.dropna().drop_duplicates()
     df = df[df[text_column_name].apply(lambda x: isinstance(x, str) and x.strip() != "")]
     return df.reset_index(drop=True)
 
-
-# ------------------- Main Workflow -------------------
 
 def load_and_process_data(data_dir, max_sequence: int) -> Tuple:
     """Load CSVs, split sentences, create chunks, split into train/dev."""
@@ -169,6 +100,7 @@ def load_and_process_data(data_dir, max_sequence: int) -> Tuple:
 
         df = split_sentences(df)
         df = concatenate_in_chunks(df, max_sequence)
+        df = clean_df(df, 'text')[['text']]
 
         train, dev = train_test_split(df, test_size=0.1, random_state=42, shuffle=False)
         all_train.append(train)
@@ -177,19 +109,19 @@ def load_and_process_data(data_dir, max_sequence: int) -> Tuple:
     if not all_train or not all_dev:
         raise ValueError("No data processed.")
 
-    return pd.concat(all_train).reset_index(drop=True), pd.concat(all_dev).reset_index(drop=True)
+    train = pd.concat(all_train).reset_index(drop=True)
+    dev = pd.concat(all_dev).reset_index(drop=True)
+
+    return train, dev
 
 
 def main(data_dir: str):
-    for size in [128, 512]:
+    for size in [512]:
         train, dev = load_and_process_data(data_dir, max_sequence=size)
         os.makedirs(os.path.join(data_dir, f"max_{size}"), exist_ok=True)
 
         if size == 512:
             dev.to_csv(os.path.join(data_dir, "perplexity_test.csv"), index=False)
-
-        train = clean_df(train, 'text')
-        dev = clean_df(dev, 'text')
 
         train.to_csv(os.path.join(data_dir, f'max_{size}/train.csv'), index=False)
         dev.to_csv(os.path.join(data_dir, f'max_{size}/dev.csv'), index=False)
