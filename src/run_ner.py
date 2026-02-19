@@ -608,6 +608,32 @@ def main():
 
         metrics.append(results)
 
+        predictions = []
+        labels = []
+        for pred_seq, label_seq in zip(np.argmax(test_results.predictions, axis=-1), test_results.label_ids):
+            y_true = []
+            y_pred = []
+            for p, l in zip(pred_seq, label_seq):
+
+                # ignore padding tokens
+                if l == -100:
+                    continue
+
+                y_true.append(label_list[l])
+                y_pred.append(label_list[p])
+            predictions.append(y_pred)
+            labels.append(y_true)
+
+        pred_df = pd.DataFrame({'predictions': predictions,
+                                'labels': labels
+                                })
+
+        ckpt_name = ckpt.split("/")[-1]
+        pred_df.to_csv(
+            os.path.join(training_args.output_dir, f"predictions_{ckpt_name}.csv"),
+            index=False
+        )
+
     output_file = os.path.join(training_args.output_dir, f"ckpt_results.csv")
     pd.DataFrame(metrics).sort_values("test_step").to_csv(output_file, index=False)
 

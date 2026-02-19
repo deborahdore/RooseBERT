@@ -1,0 +1,6 @@
+model,seed,f1_score,accuracy
+/workspace/ddore/01-roosebert-project/roosebert-5runs/clusters/cluster2,42,0.6251622819997729,0.7195146210463497
+/workspace/ddore/01-roosebert-project/roosebert-5runs/clusters/cluster2,12,0.6203463537360028,0.719713546847026
+/workspace/ddore/01-roosebert-project/roosebert-5runs/clusters/cluster2,16,0.6257249708050724,0.7258802466679929
+/workspace/ddore/01-roosebert-project/roosebert-5runs/clusters/cluster2,48,0.6250768597782479,0.7216033419534513
+/workspace/ddore/01-roosebert-project/roosebert-5runs/clusters/cluster2,33,0.6281246001237862,0.723095285458524

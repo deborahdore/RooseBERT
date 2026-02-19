@@ -25,11 +25,12 @@ def ttest(my_model, comparison_model):
 if __name__ == '__main__':
     file_path = "./logs/encoders/5runs/random_seed_runs.xlsx"
     tasks = openpyxl.load_workbook(file_path).sheetnames
-    for t in tasks:
+    for t in ['multi_class_MotionPolicy']:
         statistically_significant = {}
         df = pd.read_excel(file_path, sheet_name=t)
         df['Scores'] = df['Scores'].apply(ast.literal_eval)
         best_model = df.iloc[df['Mean'].idxmax()]
+        # best_model = df[df['Models'] == 'NEWRooseBERT-scr-uncased'].iloc[0]
         print(f"Best model: {best_model['Models']} with task {t}")
         df.sort_values(by="Models", ascending=True, inplace=True)
         for _, row in df.iterrows():
@@ -42,7 +43,7 @@ if __name__ == '__main__':
                     "mean": row['Mean'],
                     "std": row['Std']
                 }
-            elif p_value < 0.05:
+            if p_value < 0.05:
                 statistically_significant[row['Models']] = {
                     "p_value": "p<0.05",
                     "value": "*" * 2,

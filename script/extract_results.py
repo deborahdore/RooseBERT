@@ -41,17 +41,19 @@ script_classification = """#!/bin/bash
 #SBATCH --partition=gpu
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
+#SBATCH --account=marianne
 
-set -e
+module purge
 module load miniconda
 conda activate roosebert
-
+set -e
 export TOKENIZERS_PARALLELISM=false
+export HF_HOME="/home/ddore/.cache/huggingface"
 export WANDB_PROJECT="{task}_{dataset}"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42 12 16 48 33)
+SEEDS=(42)
 wd=0.1
 
 model="{model}"
@@ -103,17 +105,19 @@ script_sequence_labelling = """#!/bin/bash
 #SBATCH --partition=gpu
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
+#SBATCH --account=marianne
 
-set -e
+module purge
 module load miniconda
 conda activate roosebert
-
+set -e
 export TOKENIZERS_PARALLELISM=false
+export HF_HOME="/home/ddore/.cache/huggingface"
 export WANDB_PROJECT="sequence_labelling_{dataset}"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42 12 16 48 33)
+SEEDS=(42)
 wd=0.1
 
 model="{model}"
@@ -163,17 +167,19 @@ script_ner = """#!/bin/bash
 #SBATCH --partition=gpu
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
+#SBATCH --account=marianne
 
-set -e
+module purge
 module load miniconda
 conda activate roosebert
-
+set -e
 export TOKENIZERS_PARALLELISM=false
+export HF_HOME="/home/ddore/.cache/huggingface"
 export WANDB_PROJECT="ner_nerex"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42 12 16 48 33)
+SEEDS=(42)
 wd=0.1
 
 model="{model}"
@@ -265,6 +271,7 @@ def extract_result() -> None:
                 continue
 
             model = model_path.name
+            if model == "roberta-base" or model == "deberta-base": continue
             best_score = float("-inf")
             best_row = None
 
@@ -338,10 +345,10 @@ MODELS2DIR = {
     'ConfliBERT-cont-uncased': 'snowood1',
     'deberta-base': 'microsoft',
     'roberta-base': 'FacebookAI',
-    'NEWRooseBERT-cont-uncased': 'user',
-    'NEWRooseBERT-cont-cased': 'user',
-    'NEWRooseBERT-scr-uncased': 'user',
-    'NEWRooseBERT-scr-cased': 'user',
+    'NEWRooseBERT-cont-uncased': 'ddore14',
+    'NEWRooseBERT-cont-cased': 'ddore14',
+    'NEWRooseBERT-scr-uncased': 'ddore14',
+    'NEWRooseBERT-scr-cased': 'ddore14',
     'bert-base-uncased': 'google-bert',
     'bert-base-cased': 'google-bert'
 }
@@ -379,5 +386,5 @@ def write_sbatch():
 
 
 if __name__ == "__main__":
-    extract_result()
+    # extract_result()
     write_sbatch()

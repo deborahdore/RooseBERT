@@ -493,27 +493,40 @@ def main():
             model=model,
             args=training_args,
             eval_dataset=test_dataset,
-            compute_metrics=lambda p: compute_metrics(
-                p,
-                None,
-                None,
-                None),
+            compute_metrics=lambda p: compute_metrics(p, None, None, None),
             compute_loss_func=compute_loss_func if class_weights is not None else None,
             processing_class=tokenizer,
             data_collator=data_collator_with_padding,
         )
         test_results = trainer.predict(test_dataset=test_dataset, metric_key_prefix="test")
+
         results = {
             'ckpt': str(ckpt.split("/")[-1]),
             **test_results.metrics
         }
         num_steps = int(ckpt.split("-")[-1])
         results['test_step'] = num_steps
-
         metrics.append(results)
 
-    output_file = os.path.join(training_args.output_dir, f"ckpt_results.csv")
-    pd.DataFrame(metrics).sort_values("test_step").to_csv(output_file, index=False)
+        # Save predictions for error analysis
+        predictions = np.argmax(test_results.predictions, axis=-1)
+        pred_df = pd.DataFrame({
+            'gold': test_results.label_ids,
+            'predicted': predictions,
+            'correct': predictions == test_results.label_ids
+        })
+        # Save logits too for confidence analysis
+        logits_df = pd.DataFrame(
+            test_results.predictions,
+            columns=[f'logit_{i}' for i in range(test_results.predictions.shape[-1])]
+        )
+        pred_df = pd.concat([pred_df, logits_df], axis=1)
+
+        ckpt_name = ckpt.split("/")[-1]
+        pred_df.to_csv(
+            os.path.join(training_args.output_dir, f"predictions_{ckpt_name}.csv"),
+            index=False
+        )
 
     for ckpt in ckpt_dirs:
         print(f"Deleting checkpoint: {ckpt}")

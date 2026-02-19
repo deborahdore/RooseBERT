@@ -15,14 +15,14 @@ rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=T
 
 def extract_and_round(x):
     x_round = str(x).replace(",", ".")
-    x_round = round(float(x_round), 3)
+    x_round = round(float(x_round), 2)
     return x_round
 
 
 if __name__ == '__main__':
     # Each time a run_classification/run_ner is executed, it writes down the results in a csv file called random_seed_runs
     # After n runs, we can access it and extract mean and standard deviation
-    base_path = os.path.join(rootutils.find_root(__file__), "logs/encoders/5runs")
+    base_path = os.path.join(rootutils.find_root(__file__), "logs/encoders/5runs-cluster")
     with pd.ExcelWriter(f"{base_path}/random_seed_runs.xlsx") as writer:
         for tsk in os.listdir(base_path):
             if tsk.endswith(".xlsx"): continue
@@ -34,9 +34,13 @@ if __name__ == '__main__':
             path = os.path.join(base_path, tsk)
             models_list = [model for model in os.listdir(path) if os.path.isdir(os.path.join(path, model))]
             for model in models_list:
+                if model=="roberta-base" or model=="deberta-base": continue
                 final_path = os.path.join(path, model)
                 results = pd.read_csv(os.path.join(final_path, "random_seed_testing.csv"))
+                if len(results) != 5:
+                    print(final_path)
                 assert (len(results) == 5)
+                assert len(results['seed'].unique()) == 5
 
                 models.append(model)
                 if tsk.startswith("binary_"):
