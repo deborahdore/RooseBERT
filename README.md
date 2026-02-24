@@ -1,7 +1,7 @@
 <div align="center">
 
 # RooseBERT: A New Deal For Political Language Modelling
-
+[![arXiv](https://img.shields.io/badge/arXiv-2508.03250-b31b1b.svg)](https://arxiv.org/abs/2508.03250)
 </div>
 
 ## Citation
