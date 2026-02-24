@@ -4,6 +4,23 @@
 
 </div>
 
+## Citation
+
+Our models are available on HuggingFace, in the [RooseBERT's collection](https://huggingface.co/collections/ddore14/roosebert). If you use them, cite
+us:
+
+```bibtex
+@misc{dore2025roosebertnewdealpolitical,
+    title = {RooseBERT: A New Deal For Political Language Modelling},
+    author = {Deborah Dore and Elena Cabrio and Serena Villata},
+    year = {2025},
+    eprint = {2508.03250},
+    archivePrefix = {arXiv},
+    primaryClass = {cs.CL},
+    url = {https://arxiv.org/abs/2508.03250},
+}
+```
+
 ## Table of Contents
 
 - [1️⃣ Description]
@@ -119,7 +136,7 @@ script adapted from the one by Hugging Face. The pretraining process consists of
 2. **Second phase**: Extending the sequence length to **512** and continuing training for a total of **150k steps**.
 
 Below is the recommended configuration, though you can modify parameters as needed. A ready-to-run script is
-provided [here](sbatch/encoders/run_mlm.sh).
+provided [here](sh/run_mlm.sh).
 
 #### **Phase 1: Training with Sequence Length 128**
 
@@ -294,3 +311,10 @@ script to extract mean and standard deviation.
 
 python compute_stats.py
 ```
+
+### Acknowledgement
+
+This work has been supported by the French government, through the 3IA Cote d’Azur Investments in the project managed by
+the National Research Agency (ANR) with the reference number ANR-23-IACL-0001. This project was provided with computing
+AI and storage resources by GENCI at IDRIS thanks to the grant 2026-AD011016047R1 on the supercomputer Jean Zay’s A100
+partition.

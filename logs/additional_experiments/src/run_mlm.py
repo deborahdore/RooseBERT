@@ -54,9 +54,9 @@ from transformers.utils.versions import require_version
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True, cwd=True)
 
-from src.experiments_with_loss.data.collator_multitask import DataCollatorForMultiTaskPretraining
-from src.experiments_with_loss.models.bert_multitask import BertForMultiTaskPretraining
-from src.experiments_with_loss.callbacks.MultiTaskLoggingCallback import MultiTaskLoggingCallback
+from logs.additional_experiments.experiments_with_loss.data.collator_multitask import DataCollatorForMultiTaskPretraining
+from logs.additional_experiments.experiments_with_loss.models.bert_multitask import BertForMultiTaskPretraining
+from logs.additional_experiments.experiments_with_loss.callbacks.MultiTaskLoggingCallback import MultiTaskLoggingCallback
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.49.0.dev0")
