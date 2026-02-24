@@ -4,8 +4,6 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2508.03250-b31b1b.svg)](https://arxiv.org/abs/2508.03250)
 </div>
 
-## Citation
-
 Our models are available on HuggingFace, in the [RooseBERT's collection](https://huggingface.co/collections/ddore14/roosebert). If you use them, cite
 us:
 
