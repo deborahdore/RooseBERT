@@ -19,18 +19,23 @@ us:
 }
 ```
 
-## Table of Contents
-
-- [1️⃣ Description]
-- [2️⃣ Datasets]
-- [3️⃣ Models]
-- [4️⃣ Installation]
-- [5️⃣ How to Run]
-    - [🚀Download the Corpora]
-    - [🚀 Prepare the Dataset]
-    - [🚀 Running Continuous Pretraining for Masked Language Modeling]
-    - [🚀 Choose a Downstream Task]
-- [6️⃣ Extract Results]
+<!-- TOC -->
+* [RooseBERT: A New Deal For Political Language Modelling](#roosebert-a-new-deal-for-political-language-modelling)
+  * [1️⃣ Description](#1-description)
+  * [2️⃣ Datasets](#2-datasets)
+  * [3️⃣ Models](#3-models)
+  * [4️⃣ Installation](#4-installation)
+      * [Conda Setup](#conda-setup)
+  * [5️⃣ How to Run](#5-how-to-run)
+    * [🚀 **Download the Corpora**](#-download-the-corpora)
+    * [🚀 Running Continuous Pretraining for Masked Language Modeling](#-running-continuous-pretraining-for-masked-language-modeling)
+      * [**Phase 1: Training with Sequence Length 128**](#phase-1-training-with-sequence-length-128)
+      * [**Phase 2: Training with Sequence Length 512**](#phase-2-training-with-sequence-length-512)
+      * [**Notes**](#notes)
+    * [🚀 Downstream Tasks](#-downstream-tasks)
+    * [🚀 Extract Results](#-extract-results)
+    * [Acknowledgement](#acknowledgement)
+<!-- TOC -->
 
 ## 1️⃣ Description
 
