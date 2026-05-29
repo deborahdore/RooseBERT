@@ -22,7 +22,7 @@ def extract_and_round(x):
 if __name__ == '__main__':
     # Each time a run_classification/run_ner is executed, it writes down the results in a csv file called random_seed_runs
     # After n runs, we can access it and extract mean and standard deviation
-    base_path = os.path.join(rootutils.find_root(__file__), "logs/encoders/5runs-cluster")
+    base_path = os.path.join(rootutils.find_root(__file__), "logs/encoders/5runs")
     with pd.ExcelWriter(f"{base_path}/random_seed_runs.xlsx") as writer:
         for tsk in os.listdir(base_path):
             if tsk.endswith(".xlsx"): continue
@@ -34,7 +34,6 @@ if __name__ == '__main__':
             path = os.path.join(base_path, tsk)
             models_list = [model for model in os.listdir(path) if os.path.isdir(os.path.join(path, model))]
             for model in models_list:
-                if model=="roberta-base" or model=="deberta-base": continue
                 final_path = os.path.join(path, model)
                 results = pd.read_csv(os.path.join(final_path, "random_seed_testing.csv"))
                 if len(results) != 5:

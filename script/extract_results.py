@@ -53,7 +53,7 @@ export WANDB_PROJECT="{task}_{dataset}"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42)
+SEEDS=(42 12 48 16 33)
 wd=0.1
 
 model="{model}"
@@ -117,7 +117,7 @@ export WANDB_PROJECT="sequence_labelling_{dataset}"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42)
+SEEDS=(42 12 48 16 33)
 wd=0.1
 
 model="{model}"
@@ -179,7 +179,7 @@ export WANDB_PROJECT="ner_nerex"
 wandb disabled
 
 MODEL_DIR="{model_dir}"
-SEEDS=(42)
+SEEDS=(42 12 48 16 33)
 wd=0.1
 
 model="{model}"
@@ -350,7 +350,8 @@ MODELS2DIR = {
     'NEWRooseBERT-scr-uncased': 'ddore14',
     'NEWRooseBERT-scr-cased': 'ddore14',
     'bert-base-uncased': 'google-bert',
-    'bert-base-cased': 'google-bert'
+    'bert-base-cased': 'google-bert',
+    "ModernBERT-base":'answerdotai'
 }
 
 
@@ -386,5 +387,5 @@ def write_sbatch():
 
 
 if __name__ == "__main__":
-    # extract_result()
+    extract_result()
     write_sbatch()
