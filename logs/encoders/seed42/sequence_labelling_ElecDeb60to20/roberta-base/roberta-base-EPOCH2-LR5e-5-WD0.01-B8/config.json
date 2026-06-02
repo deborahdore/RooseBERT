@@ -1,0 +1,42 @@
+{
+  "add_cross_attention": false,
+  "architectures": [
+    "RobertaForTokenClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "classifier_dropout": null,
+  "dtype": "float32",
+  "eos_token_id": 2,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 768,
+  "id2label": {
+    "0": "B-Claim",
+    "1": "B-Premise",
+    "2": "I-Claim",
+    "3": "I-Premise",
+    "4": "O"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 3072,
+  "is_decoder": false,
+  "label2id": {
+    "B-Claim": 0,
+    "B-Premise": 1,
+    "I-Claim": 2,
+    "I-Premise": 3,
+    "O": 4
+  },
+  "layer_norm_eps": 1e-05,
+  "max_position_embeddings": 514,
+  "model_type": "roberta",
+  "num_attention_heads": 12,
+  "num_hidden_layers": 12,
+  "pad_token_id": 1,
+  "tie_word_embeddings": true,
+  "transformers_version": "5.8.0.dev0",
+  "type_vocab_size": 1,
+  "use_cache": false,
+  "vocab_size": 50265
+}

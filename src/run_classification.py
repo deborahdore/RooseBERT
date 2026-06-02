@@ -244,7 +244,7 @@ class ModelArguments:
     )
 
 
-def preprocess_function(examples, tokenizer, max_seq_length):
+def preprocess_function(examples, tokenizer, max_seq_length, label_to_id=None):
     """Preprocess input examples by tokenizing them."""
     result = tokenizer(
         examples["sentence"],
@@ -253,7 +253,10 @@ def preprocess_function(examples, tokenizer, max_seq_length):
         truncation=True
     )
 
-    result["label"] = examples["label"]
+    if label_to_id is not None:
+        result["label"] = [label_to_id[str(l)] for l in examples["label"]]
+    else:
+        result["label"] = examples["label"]
     return result
 
 
@@ -391,14 +394,15 @@ def main():
         trust_remote_code=model_args.trust_remote_code,
         ignore_mismatched_sizes=model_args.ignore_mismatched_sizes,
     )
+    model.resize_token_embeddings(len(tokenizer))
     model.train()
 
     # Preprocess datasets
     with training_args.main_process_first(desc="dataset map pre-processing"):
-        max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings)
+        max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings - 2)
         logger.info(f"MAX SEQUENCE LENGTH: {max_seq_length}")
         raw_datasets = raw_datasets.map(
-            lambda examples: preprocess_function(examples, tokenizer, max_seq_length),
+            lambda examples: preprocess_function(examples, tokenizer, max_seq_length, label_to_id),
             batched=True,
             num_proc=data_args.preprocessing_num_workers,
             desc="Running tokenizer on dataset",
@@ -435,7 +439,7 @@ def main():
         class_weights = weights * len(counts) / weights.sum()
 
     def compute_loss_func(outputs, labels, num_items_in_batch=None):
-        loss = F.cross_entropy(input=outputs['logits'].view(-1, num_labels),
+        loss = F.cross_entropy(input=outputs['logits'].view(-1, num_labels).float(),
                                target=labels.view(-1),
                                weight=class_weights)
         return loss

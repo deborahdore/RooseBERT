@@ -1,0 +1,78 @@
+{
+  "best_global_step": null,
+  "best_metric": null,
+  "best_model_checkpoint": null,
+  "epoch": 2.0,
+  "eval_steps": 2000,
+  "global_step": 1724,
+  "is_hyper_param_search": false,
+  "is_local_process_zero": true,
+  "is_world_process_zero": true,
+  "log_history": [
+    {
+      "epoch": 0,
+      "eval_accuracy": 0.5216192687173534,
+      "eval_epoch": 0,
+      "eval_f1": 0.685610756174311,
+      "eval_loss": 0.6937079429626465,
+      "eval_precision": 0.5216192687173534,
+      "eval_recall": 1.0,
+      "eval_runtime": 39.2853,
+      "eval_samples_per_second": 175.435,
+      "eval_step": 0,
+      "eval_steps_per_second": 5.498,
+      "step": 0
+    },
+    {
+      "epoch": 1.160092807424594,
+      "grad_norm": 1.2516920566558838,
+      "learning_rate": 8.410672853828307e-06,
+      "loss": 0.6866897583007813,
+      "step": 1000
+    },
+    {
+      "epoch": 2.0,
+      "eval_accuracy": 0.619413813116657,
+      "eval_epoch": 2.0,
+      "eval_f1": 0.6407341460073962,
+      "eval_loss": 0.6423949003219604,
+      "eval_precision": 0.631138694009714,
+      "eval_recall": 0.6506258692628651,
+      "eval_runtime": 39.1497,
+      "eval_samples_per_second": 176.042,
+      "eval_step": 1724,
+      "eval_steps_per_second": 5.517,
+      "step": 1724
+    },
+    {
+      "epoch": 2.0,
+      "step": 1724,
+      "total_flos": 1.6902112450461696e+16,
+      "train_loss": 0.6734771020451167,
+      "train_runtime": 882.3219,
+      "train_samples_per_second": 62.481,
+      "train_steps_per_second": 1.954
+    }
+  ],
+  "logging_steps": 1000,
+  "max_steps": 1724,
+  "num_input_tokens_seen": 0,
+  "num_train_epochs": 2,
+  "save_steps": 500,
+  "stateful_callbacks": {
+    "TrainerControl": {
+      "args": {
+        "should_epoch_stop": false,
+        "should_evaluate": false,
+        "should_log": false,
+        "should_save": true,
+        "should_training_stop": true
+      },
+      "attributes": {}
+    }
+  },
+  "total_flos": 1.6902112450461696e+16,
+  "train_batch_size": 32,
+  "trial_name": null,
+  "trial_params": null
+}

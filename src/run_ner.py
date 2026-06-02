@@ -411,6 +411,7 @@ def main():
     )
     model.config.label2id = label_to_id
     model.config.id2label = id_to_label
+    model.resize_token_embeddings(len(tokenizer))
     model.train()
 
     b_to_i_label = []
@@ -420,7 +421,7 @@ def main():
         else:
             b_to_i_label.append(idx)
 
-    max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings)
+    max_seq_length = min(tokenizer.model_max_length, config.max_position_embeddings - 2)
     logger.info(f"MAX SEQUENCE LENGTH: {max_seq_length}")
 
     def tokenize_and_align_labels(examples):

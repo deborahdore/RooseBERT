@@ -271,7 +271,6 @@ def extract_result() -> None:
                 continue
 
             model = model_path.name
-            if model == "roberta-base" or model == "deberta-base": continue
             best_score = float("-inf")
             best_row = None
 
@@ -343,8 +342,8 @@ MODELS2DIR = {
     'ConfliBERT-scr-cased': 'snowood1',
     'ConfliBERT-cont-cased': 'snowood1',
     'ConfliBERT-cont-uncased': 'snowood1',
-    'deberta-base': 'microsoft',
     'roberta-base': 'FacebookAI',
+    'deberta-base': 'microsoft',
     'NEWRooseBERT-cont-uncased': 'ddore14',
     'NEWRooseBERT-cont-cased': 'ddore14',
     'NEWRooseBERT-scr-uncased': 'ddore14',

@@ -1,0 +1,2 @@
+ckpt,test_loss,test_model_preparation_time,test_step,test_epoch,test_accuracy,test_precision,test_recall,test_f1,test_runtime,test_samples_per_second,test_steps_per_second
+checkpoint-672,2.2824854850769043,0.0027,672,,0.47023809523809523,0.3452556471306471,0.33631944444444445,0.315884589154366,0.3262,515.026,64.378

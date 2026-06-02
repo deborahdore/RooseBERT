@@ -25,7 +25,7 @@ def ttest(my_model, comparison_model):
 if __name__ == '__main__':
     file_path = "./logs/encoders/5runs/random_seed_runs.xlsx"
     tasks = openpyxl.load_workbook(file_path).sheetnames
-    for t in ['multi_class_MotionPolicy']:
+    for t in tasks:
         statistically_significant = {}
         df = pd.read_excel(file_path, sheet_name=t)
         df['Scores'] = df['Scores'].apply(ast.literal_eval)
