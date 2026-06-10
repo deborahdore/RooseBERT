@@ -362,9 +362,8 @@ def main():
     config.problem_type = "single_label_classification"
 
     # Sync pad_token_id from tokenizer into config before model loading.
-    # Custom tokenizers (e.g. RooseBERT) may use a different pad_token_id
-    # than the base model (roberta-base uses 1; this tokenizer uses 3).
-    # A mismatch causes wrong position IDs and can trigger CUDA index errors.
+    # Custom tokenizers (e.g. RooseBERT-scr) may assign a different pad_token_id
+    # than bert-base. A mismatch causes wrong position IDs and can trigger CUDA index errors.
     if hasattr(config, "pad_token_id"):
         config.pad_token_id = None  # will be set after tokenizer is loaded
 

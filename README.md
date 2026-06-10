@@ -4,7 +4,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2508.03250-b31b1b.svg)](https://arxiv.org/abs/2508.03250)
 </div>
 
-Our models are available on HuggingFace, in the [RooseBERT's collection](https://huggingface.co/collections/ddore14/roosebert). If you use them, cite
+Our models are available on HuggingFace, in the [RooseBERT's collection](https://huggingface.co/collections/MARIANNE-INRIA/roosebert). If you use them, cite
 us:
 
 ```bibtex
@@ -28,10 +28,11 @@ us:
       * [Conda Setup](#conda-setup)
   * [5️⃣ How to Run](#5-how-to-run)
     * [🚀 **Download the Corpora**](#-download-the-corpora)
-    * [🚀 Running Continuous Pretraining for Masked Language Modeling](#-running-continuous-pretraining-for-masked-language-modeling)
+    * [🚀 Pre-Training: Continued Pre-Training (CONT)](#-pre-training-continued-pre-training-cont)
       * [**Phase 1: Training with Sequence Length 128**](#phase-1-training-with-sequence-length-128)
       * [**Phase 2: Training with Sequence Length 512**](#phase-2-training-with-sequence-length-512)
       * [**Notes**](#notes)
+    * [🚀 Pre-Training: Training from Scratch (SCR)](#-pre-training-training-from-scratch-scr)
     * [🚀 Downstream Tasks](#-downstream-tasks)
     * [🚀 Extract Results](#-extract-results)
     * [Acknowledgement](#acknowledgement)
@@ -39,23 +40,33 @@ us:
 
 ## 1️⃣ Description
 
-The goal of this project is to continue the pretraining of BERT on a curated dataset of political debates.
-By training BERT on a domain-specific content, we aim to generate embeddings that capture the nuanced language,
+The goal of this project is to pre-train a domain-specific language model on a curated corpus of English political
+debates. By training on domain-specific content, we aim to generate embeddings that capture the nuanced language,
 rhetoric, and argumentation style unique to political discourse.
-The project will investigate whether these enhanced embeddings can improve performance in downstream tasks related to
+The project investigates whether these enhanced embeddings improve performance on downstream tasks related to
 political debates such as sentiment analysis, stance detection, argument classification and relation classification.
+
+RooseBERT was trained using two strategies:
+
+1. **Continued Pre-Training (CONT)**: We initialise from BERT's original weights and vocabulary and continue
+   training on the political debate corpus.
+2. **Training from Scratch (SCR)**: We train BERT from random initialisation using a custom WordPiece tokenizer
+   built from the domain corpus. This produces a domain-specific vocabulary that encodes political terminology
+   as single tokens.
+
+Each strategy was applied in both **cased** and **uncased** variants, yielding four RooseBERT models in total.
 
 **Objectives**:
 
-1. _Continuous Pre-Training_: <br>
-   We pretrain BERT on political debate transcripts to generate embeddings that reflect the intricate structure
-   and linguistic patterns in political dialogue.
+1. _Pre-Training_: <br>
+   We pre-train BERT (CONT and SCR) on political debate transcripts to generate embeddings that reflect the
+   intricate structure and linguistic patterns in political dialogue.
 2. _Evaluation on Downstream Tasks_: <br>
-   The effectiveness of these embeddings will be assessed across a variety of downstream tasks, with a focus on tasks
+   The effectiveness of these embeddings is assessed across a variety of downstream tasks, with a focus on tasks
    relevant to the political domain.
 3. _Analysis_: <br>
-   By comparing the performance of RooseBERT (our pretrained BERT model) against general BERT and similar competitor
-   models, we aim to prove the effectiveness of our model in this domain.
+   By comparing the performance of RooseBERT against BERT, ModernBERT, ConfliBERT, and PoliBERTweet, we
+   demonstrate the effectiveness of domain-specific pre-training for political NLP.
 
 ## 2️⃣ Datasets
 
@@ -74,7 +85,7 @@ The following datasets were used for pre-training:
     * Contains the full-text speeches from eight legislative chambers for Ireland, covering 2009-2019.
 * [📌 Parliamentary Speeches in Ireland](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/6MZN76)
     * Contains parliamentary speeches in Ireland from 1919 to 2023.
-* [📌 Parlaimentary Speeches in New Zealand](https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0)
+* [📌 Parliamentary Speeches in New Zealand](https://dataverse.harvard.edu/file.xhtml?persistentId=doi:10.7910/DVN/L4OAKN/LLMYON&version=1.0)
 * [📌 Scottish Parliament](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/EQ9WBE)
     - Contains 1.8 million spoken contributions for the Scottish Parliament (up to 2021/02/03).
 * [📌House of Commons Parliamentary Debates](https://reshare.ukdataservice.ac.uk/854292/)
@@ -90,10 +101,18 @@ The following datasets were used for pre-training:
 
 ## 3️⃣ Models
 
-This project fine-tunes **BERT** models:
+This project produces **RooseBERT**, a domain-specific language model for English political debates, in four variants:
 
-- `bert-base-cased`
-- `bert-base-uncased`
+| Model | Strategy | Vocab |
+|---|---|---|
+| [`RooseBERT-cont-cased`](https://huggingface.co/MARIANNE-INRIA/RooseBERT-cont-cased) | Continued pre-training from `bert-base-cased` | Original BERT cased vocab |
+| [`RooseBERT-cont-uncased`](https://huggingface.co/MARIANNE-INRIA/RooseBERT-cont-uncased) | Continued pre-training from `bert-base-uncased` | Original BERT uncased vocab |
+| [`RooseBERT-scr-cased`](https://huggingface.co/MARIANNE-INRIA/RooseBERT-scr-cased) | Trained from scratch | Custom cased WordPiece vocab |
+| [`RooseBERT-scr-uncased`](https://huggingface.co/MARIANNE-INRIA/RooseBERT-scr-uncased) | Trained from scratch | Custom uncased WordPiece vocab |
+
+Comparison baselines used in the paper: `bert-base-cased`, `bert-base-uncased`, `ModernBERT-base`,
+`ConfliBERT-cont-cased`, `ConfliBERT-cont-uncased`, `ConfliBERT-scr-cased`, `ConfliBERT-scr-uncased`,
+and `PoliBERTweet`.
 
 ## 4️⃣ Installation
 
@@ -102,7 +121,7 @@ This project fine-tunes **BERT** models:
 ```bash
 
 # clone project
-git clone https://github.com/user/RooseBERT
+git clone https://github.com/MARIANNE-INRIA/RooseBERT
 cd RooseBERT
 
 # create conda environment and install dependencies
@@ -130,13 +149,14 @@ python  script/prepare_training_dataset.py
 
 ```
 
-### 🚀 Running Continuous Pretraining for Masked Language Modeling
+### 🚀 Pre-Training: Continued Pre-Training (CONT)
 
-To continue pretraining a model using Masked Language Modeling (MLM), you can use the [run_mlm.py](src/run_mlm.py)
-script adapted from the one by Hugging Face. The pretraining process consists of two phases:
+To continue pre-training BERT using Masked Language Modeling (MLM), use the [run_mlm.py](src/run_mlm.py)
+script and the [run_mlm.sh](sh/run_mlm.sh) shell script. The pre-training process consists of two phases:
 
-1. **First phase**: Training for **120k steps** with a maximum sequence length of **128**.
-2. **Second phase**: Extending the sequence length to **512** and continuing training for a total of **150k steps**.
+1. **Phase 1**: Train for **120k steps** with a maximum sequence length of **128**.
+2. **Phase 2**: Resume from the Phase 1 checkpoint and continue to a **cumulative total of 150k steps**
+   (i.e., 30k additional steps) with a maximum sequence length of **512**.
 
 Below is the recommended configuration, though you can modify parameters as needed. A ready-to-run script is
 provided [here](sh/run_mlm.sh).
@@ -234,33 +254,48 @@ python -m torch.distributed.launch --nproc_per_node=8 \
 
 - The **DeepSpeed** configuration file ([deepspeed_config.json](configs/deepspeed_config.json)) is used for optimization
   along with FP16 and gradient accumulation to speed up the training.
+- The above example uses `bert-base-cased`; replace with `bert-base-uncased` for the uncased CONT variant.
+
+### 🚀 Pre-Training: Training from Scratch (SCR)
+
+To train RooseBERT from scratch with a custom domain vocabulary, use the [run_mlm_scratch.sh](sh/run_mlm_scratch.sh)
+script. A custom WordPiece tokenizer must be trained first on the political debate corpus and saved to
+`./tokenizer_cased/` or `./tokenizer_uncased/`.
+
+The SCR pre-training also uses two phases:
+
+1. **Phase 1**: Train for **200k steps** with a maximum sequence length of **128**.
+2. **Phase 2**: Resume from the Phase 1 checkpoint and continue to a **cumulative total of 250k steps**
+   (i.e., 50k additional steps) with a maximum sequence length of **512**.
+
+```bash
+# Edit run_mlm_scratch.sh to set TYPE="cased" or TYPE="uncased", then:
+sbatch sh/run_mlm_scratch.sh
+```
 
 ### 🚀 Downstream Tasks
 
-We evaluated BERT on various downstream tasks relevant to natural language processing and political discourse
-analysis. Below is a summary of the tasks and their datasets:
+We evaluated RooseBERT and all comparison models (BERT, ModernBERT, ConfliBERT, PoliBERTweet) on the following
+downstream tasks. Below is a summary of the tasks and their datasets:
 
-* **Stance classification: a comparative study and use case on Australian parliamentary debates** (binary
-  classification)
-    * Stance detection and cross-domain transferability on Australian Parliamentary Debates
-* **Get out the vote: Determining support or opposition from Congressional floor-debate transcripts** (binary
-  classification)
-    * Stance detection of US Congress Debates
-* **'Aye' or 'No'? Speech-level Sentiment Analysis of Hansard UK Parliamentary Debate Transcripts** (binary
-  classification)
-    * Sentiment Analysis of UK Parliamentary Debates
-* **ParlVote: A Corpus for Sentiment Analysis of Political Debates** (sentence-pair, binary classification)
-    * Sentiment Analysis of UK Parliamentary Debates usign both motion and speech
-* **Policy-focused Stance Detection in Parliamentary Debate Speeches** (multi class classification)
-    * Policy preference classification of UK Parliamentary Debates
-* **Argument-based detection and classification of fallacies in political debates**
-    * Two tasks: Argument Component Detection and Classification (sequence labelling) and Argument Component Relations
-      Prediction and Classification (sentence-pair, multi-class classification) in US Presidential Debates
-* **Policy Preference Detection in Parliamentary Debate Motions** (multi-class classification)
-    * Policy preference classification in UK Parliamentary speeches
-* **From Debates to Diplomacy: Argument Mining Across Political Registers**
-    * Two tasks: Argument Component Detection and Classification (sequence labelling) and Argument Component Relations
-      Prediction and Classification (sentence-pair, multi-class classification) in the UNSC.
+* **ParlVote** (sentence-pair, binary classification)
+    * Sentiment analysis of UK Parliamentary Debates using both motion and speech text
+* **HanDeSeT** (binary classification)
+    * Sentiment analysis of UK Parliamentary Debates
+* **ConVote** (binary classification)
+    * Stance detection of US Congressional floor debates
+* **AusHansard** (binary classification, cross-domain)
+    * Stance detection on Australian Parliamentary Debates; used for cross-domain evaluation
+* **ElecDeb60to20** — two tasks:
+    * Argument Component Detection and Classification (sequence labelling) in US Presidential Debates
+    * Argument Relation Prediction and Classification (sentence-pair, multi-class) in US Presidential Debates
+* **ArgUNSC** — two tasks:
+    * Argument Component Detection and Classification (sequence labelling) in UN Security Council debates
+    * Argument Relation Prediction and Classification (sentence-pair, multi-class) in UN Security Council debates
+* **ParlVote+** (multi-class classification)
+    * Policy preference classification of UK Parliamentary speeches (34 policy categories)
+* **NEREx** (NER / token classification)
+    * Named entity recognition in US Presidential Debate transcripts (37 entity types)
 
 To sum up:
 
@@ -285,13 +320,12 @@ To sum up:
 | argument component relation prediction and classification | 2         |  
 |                            NER                            | 1         |
 
-To download all the necessary dataset use the [download_downstream_data.sh](download_downstream_data.sh) script. Then,
-use the [prepare_downstream_data.py](script/prepare_downstream_data.py) script to process all the dataset. The script
-will do everything for you, just launch it.
+To download all the necessary datasets use the [download_downstream_data.sh](download_downstream_data.sh) script.
+Then use the [prepare_downstream_data.py](script/prepare_downstream_data.py) script to process all datasets.
 
 ```bash
 
-./download.sh
+./download_downstream_data.sh
 
 python script/prepare_downstream_data.py
 ```
