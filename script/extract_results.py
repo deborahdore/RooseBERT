@@ -344,8 +344,6 @@ MODELS2DIR = {
     'ConfliBERT-scr-cased': 'snowood1',
     'ConfliBERT-cont-cased': 'snowood1',
     'ConfliBERT-cont-uncased': 'snowood1',
-    'roberta-base': 'FacebookAI',
-    'deberta-base': 'microsoft',
     'RooseBERT-cont-uncased': 'MARIANNE-INRIA',
     'RooseBERT-cont-cased': 'MARIANNE-INRIA',
     'RooseBERT-scr-uncased': 'MARIANNE-INRIA',
@@ -389,4 +387,4 @@ def write_sbatch():
 
 if __name__ == "__main__":
     extract_result()
-    write_sbatch()
+    # write_sbatch()

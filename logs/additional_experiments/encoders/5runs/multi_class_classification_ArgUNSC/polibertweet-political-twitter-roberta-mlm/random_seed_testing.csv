@@ -1,6 +1,0 @@
-model,seed,f1_score,accuracy
-kornosk/polibertweet-political-twitter-roberta-mlm,42,0.6674284713766125,0.778751369112815
-kornosk/polibertweet-political-twitter-roberta-mlm,12,0.6672771004439331,0.7743702081051479
-kornosk/polibertweet-political-twitter-roberta-mlm,16,0.6562412976886661,0.7535596933187295
-kornosk/polibertweet-political-twitter-roberta-mlm,48,0.6342506649297074,0.7064622124863089
-kornosk/polibertweet-political-twitter-roberta-mlm,33,0.7136353017793401,0.8105147864184009

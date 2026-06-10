@@ -1,6 +1,0 @@
-model,seed,f1_score,accuracy
-/home/ddore/workspace/Ablation/models/base,42,0.6305441008909085,0.7275711159737418
-/home/ddore/workspace/Ablation/models/base,12,0.6318435379223103,0.7213049532524368
-/home/ddore/workspace/Ablation/models/base,16,0.6238544171833224,0.718519992042968
-/home/ddore/workspace/Ablation/models/base,48,0.6261328944263963,0.7180226775412771
-/home/ddore/workspace/Ablation/models/base,33,0.6295014382428289,0.7131489954247066
