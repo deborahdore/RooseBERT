@@ -106,6 +106,7 @@ script_sequence_labelling = """#!/bin/bash
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
 #SBATCH --account=marianne
+#SBATCH --begin=now+2hour
 
 module purge
 module load miniconda
@@ -168,6 +169,7 @@ script_ner = """#!/bin/bash
 #SBATCH --gpus=h100:1
 #SBATCH --time=36:00:00
 #SBATCH --account=marianne
+#SBATCH --begin=now+2hour
 
 module purge
 module load miniconda
@@ -344,10 +346,10 @@ MODELS2DIR = {
     'ConfliBERT-cont-uncased': 'snowood1',
     'roberta-base': 'FacebookAI',
     'deberta-base': 'microsoft',
-    'NEWRooseBERT-cont-uncased': 'ddore14',
-    'NEWRooseBERT-cont-cased': 'ddore14',
-    'NEWRooseBERT-scr-uncased': 'ddore14',
-    'NEWRooseBERT-scr-cased': 'ddore14',
+    'RooseBERT-cont-uncased': 'MARIANNE-INRIA',
+    'RooseBERT-cont-cased': 'MARIANNE-INRIA',
+    'RooseBERT-scr-uncased': 'MARIANNE-INRIA',
+    'RooseBERT-scr-cased': 'MARIANNE-INRIA',
     'bert-base-uncased': 'google-bert',
     'bert-base-cased': 'google-bert',
     "ModernBERT-base":'answerdotai'

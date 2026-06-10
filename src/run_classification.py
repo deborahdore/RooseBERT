@@ -254,9 +254,9 @@ def preprocess_function(examples, tokenizer, max_seq_length, label_to_id=None):
     )
 
     if label_to_id is not None:
-        result["label"] = [label_to_id[str(l)] for l in examples["label"]]
+        result["labels"] = [label_to_id[str(l)] for l in examples["label"]]
     else:
-        result["label"] = examples["label"]
+        result["labels"] = examples["label"]
     return result
 
 
@@ -361,6 +361,13 @@ def main():
     )
     config.problem_type = "single_label_classification"
 
+    # Sync pad_token_id from tokenizer into config before model loading.
+    # Custom tokenizers (e.g. RooseBERT) may use a different pad_token_id
+    # than the base model (roberta-base uses 1; this tokenizer uses 3).
+    # A mismatch causes wrong position IDs and can trigger CUDA index errors.
+    if hasattr(config, "pad_token_id"):
+        config.pad_token_id = None  # will be set after tokenizer is loaded
+
     tokenizer_name_or_path = model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path
     if config.model_type in {"bloom", "gpt2", "roberta", "deberta"}:
         tokenizer = AutoTokenizer.from_pretrained(
@@ -385,6 +392,9 @@ def main():
             add_prefix_space=add_prefix_space
         )
 
+    # Sync pad_token_id so position embeddings use the right padding index.
+    config.pad_token_id = tokenizer.pad_token_id
+
     model = AutoModelForSequenceClassification.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -395,6 +405,10 @@ def main():
         ignore_mismatched_sizes=model_args.ignore_mismatched_sizes,
     )
     model.resize_token_embeddings(len(tokenizer))
+    logger.info(
+        f"Vocab sizes — model: {model.config.vocab_size}, tokenizer: {len(tokenizer)}, "
+        f"pad_token_id: {model.config.pad_token_id}"
+    )
     model.train()
 
     # Preprocess datasets
@@ -492,6 +506,7 @@ def main():
     for ckpt in ckpt_dirs:
         logger.info(f"Evaluating checkpoint: {ckpt}")
         model = AutoModelForSequenceClassification.from_pretrained(ckpt)
+        model.resize_token_embeddings(len(tokenizer))
         model.eval()
         trainer = Trainer(
             model=model,
