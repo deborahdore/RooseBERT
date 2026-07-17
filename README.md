@@ -351,7 +351,4 @@ python compute_stats.py
 
 ### Acknowledgement
 
-This work has been supported by the French government, through the 3IA Cote d’Azur Investments in the project managed by
-the National Research Agency (ANR) with the reference number ANR-23-IACL-0001. This project was provided with computing
-AI and storage resources by GENCI at IDRIS thanks to the grant 2026-AD011016047R1 on the supercomputer Jean Zay’s A100
-partition.
+This work was supported by the French government through 3IA Côte d’Azur (ANR-23-IACL-0001) and the France 2030 investment plan under the Initiative of Excellence Université Côte d’Azur (ANR-15-IDEX-01). Computing and storage resources were provided by GENCI at IDRIS through grant 2026-AD011016047R1 on the Jean Zay A100 partition. The authors thank Franck Diard for access to AI computing resources via the DR-1 GPU cluster and Greta Damo for assistance with manuscript editing.
