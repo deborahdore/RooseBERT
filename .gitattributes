@@ -1,0 +1,10 @@
+# don't count notebooks toward the stats
+*.ipynb linguist-detectable=false
+
+# treat these as docs or generated, so they're excluded
+docs/** linguist-documentation
+results/** linguist-generated
+static/js/** linguist-vendored
+
+# force the language for an ambiguous extension
+*.m linguist-language=MATLAB
