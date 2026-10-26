@@ -2,6 +2,8 @@
 
 # RooseBERT: A New Deal For Political Language Modelling
 [![arXiv](https://img.shields.io/badge/arXiv-2508.03250-b31b1b.svg)](https://arxiv.org/abs/2508.03250)
+[![WI-IAT](https://img.shields.io/badge/WI--IAT-2025-1f6feb.svg)](https://YOUR-LINK-HERE)
+[![Hugging Face](https://img.shields.io/badge/Hugging_Face-RooseBERT-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/collections/MARIANNE-INRIA/roosebert)
 </div>
 
 Our models are available on HuggingFace, in the [RooseBERT's collection](https://huggingface.co/collections/MARIANNE-INRIA/roosebert). If you use them, cite
